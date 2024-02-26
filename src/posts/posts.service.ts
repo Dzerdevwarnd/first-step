@@ -1,21 +1,46 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import {
+  Post,
+  PostDocument,
+  postDBType,
+  postViewType,
+  postsByBlogIdPaginationType,
+} from './posts.scheme.types';
 
 @Injectable()
 export class PostsService {
   constructor(
     protected blogsRepository: BlogsRepository,
     protected postsRepository: PostsRepository,
+    @InjectModel(Post.name) private postModel: Model<PostDocument>,
   ) {}
   async returnAllPosts(
     query: any,
     userId: string,
   ): Promise<postsByBlogIdPaginationType> {
-    const postsDB = await this.postsRepository.findPostsWithQuery(query);
+    const pageSize = Number(query?.pageSize) || 10;
+    const page = Number(query?.pageNumber) || 1;
+    const sortBy: string = query?.sortBy ?? 'createdAt';
+    let sortDirection = query?.sortDirection ?? 'desc';
+    if (sortDirection === 'desc') {
+      sortDirection = -1;
+    } else {
+      sortDirection = 1;
+    }
+    const postsDB = await this.postModel
+      .find({}, '-_id -__v')
+      .skip((page - 1) * pageSize)
+      .sort({ [sortBy]: sortDirection, createdAt: sortDirection })
+      .limit(pageSize)
+      .lean();
+    const totalCount = await this.postModel.countDocuments();
     const postsView: postViewType[] = [];
     for (const post of postsDB) {
-      let like = await postLikesService.findPostLikeFromUser(userId, post.id);
-      let last3DBLikes = await postLikesService.findLast3Likes(post.id);
-      let postView = {
+      const like = await postLikesService.findPostLikeFromUser(userId, post.id);
+      const last3DBLikes = await postLikesService.findLast3Likes(post.id);
+      const postView = {
         title: post.title,
         id: post.id,
         content: post.content,
@@ -33,7 +58,6 @@ export class PostsService {
 
       postsView.push(postView);
     }
-    const totalCount = await postModel.countDocuments();
     const pagesCount = Math.ceil(totalCount / query.pageSize);
     const postsPagination = {
       pagesCount: pagesCount || 0,
@@ -49,12 +73,12 @@ export class PostsService {
     params: { id: string },
     userId: string,
   ): Promise<postViewType | null> {
-    const foundPost = await this.postsRepository.findPost(params);
+    const foundPost = await this.postModel.findOne({ id: params.id });
     if (!foundPost) {
       return null;
     }
-    let like = await postLikesService.findPostLikeFromUser(userId, params.id);
-    let last3DBLikes = await postLikesService.findLast3Likes(foundPost.id);
+    const like = await postLikesService.findPostLikeFromUser(userId, params.id);
+    const last3DBLikes = await postLikesService.findLast3Likes(foundPost.id);
     const postView = {
       title: foundPost.title,
       id: foundPost.id,
@@ -92,7 +116,7 @@ export class PostsService {
         dislikesCount: 0,
       },
     };
-    const postDB = await this.postsRepository.createPost(newPost);
+    const result = await this.postModel.insertMany(newPost);
     const postView: postViewType = {
       id: newPost.id,
       title: newPost.title,
@@ -132,7 +156,7 @@ export class PostsService {
         dislikesCount: 0,
       },
     };
-    const postDB = await this.postsRepository.createPost(newPost);
+    await this.postModel.insertMany(newPost);
     const postView: postViewType = {
       id: newPost.id,
       title: newPost.title,
@@ -159,8 +183,18 @@ export class PostsService {
       blogId: string;
     },
   ): Promise<boolean> {
-    const resultBoolean = this.postsRepository.updatePost(id, body);
-    return resultBoolean;
+    const resultBoolean = await this.postModel.updateOne(
+      { id: id },
+      {
+        $set: {
+          title: body.title,
+          shortDescription: body.shortDescription,
+          content: body.content,
+          blogId: body.blogId,
+        },
+      },
+    );
+    return resultBoolean.matchedCount === 1;
   }
 
   async updatePostLikeStatus(
@@ -180,10 +214,14 @@ export class PostsService {
       if (post?.extendedLikesInfo.myStatus === 'Dislike') {
         dislikesCount = +dislikesCount - 1;
       }
-      this.postsRepository.updatePostLikesAndDislikesCount(
-        id,
-        likesCount,
-        dislikesCount,
+      await this.postModel.updateOne(
+        { id: id },
+        {
+          $set: {
+            'likesInfo.likesCount': likesCount,
+            'likesInfo.dislikesCount': dislikesCount,
+          },
+        },
       );
     } else if (
       body.likeStatus === 'Dislike' &&
@@ -193,33 +231,45 @@ export class PostsService {
       if (post?.extendedLikesInfo.myStatus === 'Like') {
         likesCount = +likesCount - 1;
       }
-      this.postsRepository.updatePostLikesAndDislikesCount(
-        id,
-        likesCount,
-        dislikesCount,
+      await this.postModel.updateOne(
+        { id: id },
+        {
+          $set: {
+            'likesInfo.likesCount': likesCount,
+            'likesInfo.dislikesCount': dislikesCount,
+          },
+        },
       );
     } else if (
       body.likeStatus === 'None' &&
       post?.extendedLikesInfo.myStatus === 'Like'
     ) {
       likesCount = likesCount - 1;
-      this.postsRepository.updatePostLikesAndDislikesCount(
-        id,
-        likesCount,
-        dislikesCount,
+      await this.postModel.updateOne(
+        { id: id },
+        {
+          $set: {
+            'likesInfo.likesCount': likesCount,
+            'likesInfo.dislikesCount': dislikesCount,
+          },
+        },
       );
     } else if (
       body.likeStatus === 'None' &&
       post?.extendedLikesInfo.myStatus === 'Dislike'
     ) {
       dislikesCount = dislikesCount - 1;
-      this.postsRepository.updatePostLikesAndDislikesCount(
-        id,
-        likesCount,
-        dislikesCount,
+      await this.postModel.updateOne(
+        { id: id },
+        {
+          $set: {
+            'likesInfo.likesCount': likesCount,
+            'likesInfo.dislikesCount': dislikesCount,
+          },
+        },
       );
     }
-    let like = await postLikesService.findPostLikeFromUser(userId, id);
+    const like = await postLikesService.findPostLikeFromUser(userId, id);
     const user = await userService.findUser(userId);
     if (!like) {
       await postLikesService.addLikeToBdFromUser(
@@ -239,7 +289,7 @@ export class PostsService {
   }
 
   async deletePost(params: { id: string }): Promise<boolean> {
-    const resultBoolean = this.postsRepository.deletePost(params);
-    return resultBoolean;
+    const result = await this.postModel.deleteOne({ id: params.id });
+    return result.deletedCount === 1;
   }
 }
