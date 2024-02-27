@@ -3,6 +3,11 @@ import { HydratedDocument } from 'mongoose';
 
 export type PostDocument = HydratedDocument<Post>;
 
+export interface NestedObject {
+  likesCount: { type: number; default: 0 };
+  dislikesCount: { type: number; default: 0 };
+}
+
 @Schema()
 export class Post {
   @Prop({ required: true })

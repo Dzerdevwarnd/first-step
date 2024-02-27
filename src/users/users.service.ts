@@ -1,74 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import bcrypt from 'bcrypt';
 import add from 'date-fns/add';
-import { Model } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
-import {
-  User,
-  UserDbType,
-  UserDocument,
-  userViewType,
-  usersPaginationType,
-} from './users.scheme.types';
 
 @Injectable()
 export class UsersService {
   constructor(
     protected usersRepository: UserRepository,
     protected postsReposittory: PostsRepository,
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
-  async findUser(id: string): Promise<User | null> {
-    const user = await this.userModel.findOne({ id: id });
+  async findUser(id: string): Promise<UserDbType | null> {
+    let user = await usersRepository.findUser(id);
     return user;
   }
   async returnAllUsers(query: any): Promise<usersPaginationType> {
-    const pageSize = Number(query.pageSize) || 10;
-    const page = Number(query.pageNumber) || 1;
-    const sortBy: string = query.sortBy || 'createdAt';
-    const searchLoginTerm: string = query.searchLoginTerm || '';
-    const searchEmailTerm: string = query.searchEmailTerm || '';
-    let sortDirection = query.sortDirection || 'desc';
-    if (sortDirection === 'desc') {
-      sortDirection = -1;
-    } else {
-      sortDirection = 1;
-    }
-    const users: User[] = await this.userModel
-      .find({
-        $or: [
-          { 'accountData.login': { $regex: searchLoginTerm, $options: 'i' } },
-          { 'accountData.email': { $regex: searchEmailTerm, $options: 'i' } },
-        ],
-      })
-      .skip((page - 1) * pageSize)
-      .sort({ [sortBy]: sortDirection })
-      .limit(pageSize)
-      .lean();
-    const totalCount = await this.userModel.countDocuments({
-      $or: [
-        { 'accountData.login': { $regex: searchLoginTerm, $options: 'i' } },
-        { 'accountData.email': { $regex: searchEmailTerm, $options: 'i' } },
-      ],
-    });
-    const pagesCount = Math.ceil(totalCount / pageSize);
-    const usersView: userViewType[] = await users.map(
-      ({ id, accountData }) => ({
-        id,
-        login: accountData.login,
-        email: accountData.email,
-        createdAt: accountData.createdAt,
-      }),
-    );
-    const usersPagination = {
-      pagesCount: pagesCount,
-      page: Number(page),
-      pageSize: pageSize,
-      totalCount: totalCount,
-      items: usersView,
-    };
-    return usersPagination;
+    return await usersRepository.returnAllUsers(query);
   }
   async createUser(body: {
     login: string;

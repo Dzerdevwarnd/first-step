@@ -4,12 +4,16 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BlogsController } from './blogs/blogs.controller';
 import { Blog, BlogSchema } from './blogs/blogs.scheme.types';
+import { BlogsService } from './blogs/blogs.service';
 import { CommentsController } from './comments/comments.controller';
+import { CommentsService } from './comments/comments.service';
 import { PostsController } from './posts/posts.controller';
 import { Post, PostSchema } from './posts/posts.scheme.types';
+import { PostsService } from './posts/posts.service';
 import { settings } from './settings';
 import { UsersController } from './users/users.controller';
 import { User, UserSchema } from './users/users.scheme.types';
+import { UsersService } from './users/users.service';
 
 @Module({
   imports: [
@@ -30,6 +34,12 @@ import { User, UserSchema } from './users/users.scheme.types';
     UsersController,
     CommentsController,
   ],
-  providers: [AppService],
+  providers: [
+    AppService,
+    BlogsService,
+    PostsService,
+    UsersService,
+    CommentsService,
+  ],
 })
 export class AppModule {}
