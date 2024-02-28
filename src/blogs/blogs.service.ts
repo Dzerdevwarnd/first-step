@@ -1,17 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import Inje
+import { PostsRepository } from 'src/posts/posts.repository';
+import { postsByBlogIdPaginationType } from 'src/posts/posts.scheme.types';
+import { BlogsRepository } from './blogs.repository';
+import {
+  blogDBType,
+  blogViewType,
+  blogsPaginationType,
+} from './blogs.scheme.types';
 
 @Injectable()
 export class BlogsService {
   constructor(
     protected blogsRepository: BlogsRepository,
-    protected postsReposittory: PostsRepository,
+    protected postsRepository: PostsRepository,
   ) {}
   async returnAllBlogs(query: any): Promise<blogsPaginationType> {
     return this.blogsRepository.returnAllBlogs(query);
   }
   async findBlog(params: { id: string }): Promise<blogViewType | undefined> {
-    return this.blogsRepository.findBlog(params);
+    return await this.blogsRepository.findBlog(params);
   }
   async findPostsByBlogId(
     params: {
@@ -47,7 +54,7 @@ export class BlogsService {
     return resultBoolean;
   }
   async deleteBlog(params: { id: string }): Promise<boolean> {
-    const resultBoolean = this.blogsRepository.deleteBlog(params);
+    const resultBoolean = await this.blogsRepository.deleteBlog(params);
     return resultBoolean;
   }
 }

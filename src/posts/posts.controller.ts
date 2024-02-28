@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 import {
   Body,
   Controller,
@@ -11,13 +12,17 @@ import {
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { BlogsService } from 'src/blogs/blogs.service';
+import { CommentsService } from 'src/comments/comments.service';
+import { postsByBlogIdPaginationType } from './posts.scheme.types';
+import { PostsService } from './posts.service';
 
 @Controller('posts')
 export class PostsController {
   constructor(
     protected postsService: PostsService,
     protected commentService: CommentsService,
-    protected blogService: BlogService,
+    protected blogService: BlogsService,
   ) {}
   @Get()
   async getPostsWithPagination(
@@ -26,11 +31,11 @@ export class PostsController {
     @Res() res: Response,
   ) {
     let userId = undefined;
-    if (headers.authorization) {
+    /*if (headers.authorization) {
       userId = await jwtService.verifyAndGetUserIdByToken(
         headers.authorization.split(' ')[1],
       );
-    }
+    }*/
     const allPosts: postsByBlogIdPaginationType =
       await this.postsService.returnAllPosts(query, userId);
     res.status(200).send(allPosts);
@@ -44,11 +49,11 @@ export class PostsController {
     @Res() res: Response,
   ) {
     let userId = undefined;
-    if (headers.authorization) {
+    /* if (headers.authorization) {
       userId = await jwtService.verifyAndGetUserIdByToken(
         headers.authorization.split(' ')[1],
       );
-    }
+    }*/
     const foundPost = await this.postsService.findPost(params, userId);
     if (!foundPost) {
       res.sendStatus(404);
@@ -58,9 +63,9 @@ export class PostsController {
       return;
     }
   }
-  @Get(':id/comments')
+  /* @Get(':id/comments')
   async getCommentsByPostId(
-    @Query() query: {},
+    @Query() query: { object },
     @Param() params: { id: string },
     @Res() res: Response,
     @Headers() headers: { authorization: string },
@@ -83,18 +88,24 @@ export class PostsController {
       res.status(200).send(commentsPagination);
       return;
     }
-  }
-  @Post(':id/posts')
+  }*/
+  @Post()
   async postPost(
     @Param() params: { id: string },
-    @Body() body: { title: string; shortDescription: string; content: string },
+    @Body()
+    body: {
+      title: string;
+      shortDescription: string;
+      content: string;
+      blogId: string;
+    },
     @Res() res: Response,
   ) {
     const newPost = await this.postsService.createPost(body);
     res.status(201).send(newPost);
     return;
   }
-  @Post(':id/comments')
+  /* @Post(':id/comments')
   async postCommentByPostId(
     @Headers() headers: { authorization: string },
     @Param() params: { id: string },
@@ -109,7 +120,7 @@ export class PostsController {
       }
       const token = headers.authorization!.split(' ')[1];
 
-      const comment = await this.commentService.createCommentsByPostId(
+      const comment = await this.comment.createCommentsByPostId(
         params.id,
         body,
         token,
@@ -122,11 +133,17 @@ export class PostsController {
         return;
       }
     }
-  }
+  }*/
   @Put(':id')
   async updatePost(
     @Param() params: { id: string },
-    @Body() body: { name: string; description: string; websiteUrl: string },
+    @Body()
+    body: {
+      title: string;
+      shortDescription: string;
+      content: string;
+      blogId: string;
+    },
     @Res() res: Response,
   ) {
     const ResultOfUpdatePost = await this.postsService.updatePost(
@@ -141,7 +158,7 @@ export class PostsController {
       return;
     }
   }
-  @Put(':id/like-status')
+  /* @Put(':id/like-status')
   async updatePostLikeStatus(
     @Headers() headers: { authorization: string },
     @Param() params: { id: string },
@@ -165,7 +182,7 @@ export class PostsController {
     res.sendStatus(204);
     return;
   }
-
+*/
   @Delete(':id')
   async deleteBlogByID(@Param() params: { id }, @Res() res: Response) {
     const resultOfDelete = await this.postsService.deletePost(params);

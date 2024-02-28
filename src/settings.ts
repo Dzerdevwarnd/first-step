@@ -1,14 +1,4 @@
-import cookieParser from 'cookie-parser';
-import express from 'express';
-import { authRouter } from './routers/authRouter';
-import { blogsRouter } from './routers/blogsRouter';
-import { commentsRouter } from './routers/commentsRouter';
-import { postsRouter } from './routers/postsRouter';
-import { securityRouter } from './routers/securityRouter';
-import { testingRouter } from './routers/testingRouter';
-import { usersRouter } from './routers/usersRouter';
-
-export const app = express();
+//import cookieParser from 'cookie-parser';
 
 export const dbName = 'homeWorks';
 export const settings = {
@@ -21,7 +11,7 @@ export const settings = {
   recoveryCodeLifeTime: '1000000',
 };
 
-export const routersPaths = {
+/*export const routersPaths = {
   auth: '/auth',
   blogs: '/blogs',
   posts: '/posts',
@@ -42,3 +32,4 @@ app.use(routersPaths.users, usersRouter);
 app.use(routersPaths.testing, testingRouter);
 app.use(routersPaths.comments, commentsRouter);
 app.use(routersPaths.security, securityRouter);
+*/

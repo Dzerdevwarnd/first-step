@@ -1,10 +1,31 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
-export type PostDocument = HydratedDocument<Post>;
+export type CommentDocument = HydratedDocument<Comment>;
 
 @Schema()
-export class Post {
+export class CommentatorInfo {
+  @Prop({ required: true })
+  userId: string;
+
+  @Prop({ required: true })
+  userLogin: string;
+}
+export const CommentatorInfoSchema =
+  SchemaFactory.createForClass(CommentatorInfo);
+
+@Schema()
+export class LikesInfo {
+  @Prop({ default: '0' })
+  likesCount: number;
+
+  @Prop({ default: '0' })
+  dislikesCount: number;
+}
+export const LikesInfoSchema = SchemaFactory.createForClass(LikesInfo);
+
+@Schema()
+export class Comment {
   @Prop({ required: true })
   id: string;
 
@@ -15,25 +36,14 @@ export class Post {
   content: string;
   @Prop({ required: true })
   createdAt: Date;
-  @Prop({ required: true })
-  commentatorInfo: {
-    type: {
-      userId: { type: string; required: true };
-      userLogin: { type: string; required: true };
-    };
-    required: true;
-  };
-  @Prop({ required: true })
-  likesInfo: {
-    type: {
-      likesCount: { type: number; required: true; default: '0' };
-      dislikesCount: { type: number; required: true; default: '0' };
-    };
-    required: true;
-  };
+  @Prop({ required: true, type: CommentatorInfoSchema })
+  commentatorInfo: CommentatorInfo;
+
+  @Prop({ required: true, type: LikesInfoSchema })
+  likesInfo: LikesInfo;
 }
 
-export const PostSchema = SchemaFactory.createForClass(Post);
+export const CommentSchema = SchemaFactory.createForClass(Comment);
 
 export class CommentViewType {
   constructor(
@@ -58,7 +68,7 @@ export class CommentDBType {
     dislikesCount: number;
   };
   constructor(
-    public _id: ObjectId,
+    //public _id: ObjectId,
     public id: string,
     public postId: string,
     public content: string,

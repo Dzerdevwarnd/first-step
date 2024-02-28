@@ -3,10 +3,16 @@ import { HydratedDocument } from 'mongoose';
 
 export type PostDocument = HydratedDocument<Post>;
 
-export interface NestedObject {
-  likesCount: { type: number; default: 0 };
-  dislikesCount: { type: number; default: 0 };
+@Schema()
+export class LikesInfo {
+  @Prop({ default: 0 })
+  likesCount: number;
+
+  @Prop({ default: 0 })
+  dislikesCount: number;
 }
+
+export const LikesInfoSchema = SchemaFactory.createForClass(LikesInfo);
 
 @Schema()
 export class Post {
@@ -26,11 +32,8 @@ export class Post {
   blogName: string;
   @Prop({ required: true })
   createdAt: Date;
-  @Prop({ required: true })
-  likesInfo: {
-    likesCount: { type: number; default: 0 };
-    dislikesCount: { type: number; default: 0 };
-  };
+  @Prop({ required: true, type: LikesInfoSchema })
+  likesInfo: LikesInfo;
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);
@@ -61,7 +64,7 @@ export class postViewType {
     likesCount: number;
     dislikesCount: number;
     myStatus: string;
-    newestLikes: postLikeViewType[];
+    newestLikes: any; //postLikeViewType[];
   };
   constructor(
     public id: string,

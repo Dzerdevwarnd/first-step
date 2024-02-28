@@ -1,33 +1,30 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Headers,
-  Param,
-  Put,
-  Query,
-  Res,
-} from '@nestjs/common';
+/* eslint-disable prefer-const */
+import { Controller, Get, Headers, Param, Query, Res } from '@nestjs/common';
 import { Response } from 'express';
+import { PostsService } from 'src/posts/posts.service';
+import { CommentsService } from './comments.service';
 
 @Controller('comments')
 export class CommentsController {
-  constructor(protected commentsService: CommentsService) {}
+  constructor(
+    protected commentsService: CommentsService,
+    protected postsService: PostsService,
+  ) {}
   @Get()
   async getComment(
     @Query() query: { object },
+    @Param() params: { id: string },
     @Headers() headers: { authorization: string },
     @Res() res: Response,
   ) {
     let userId = undefined;
-    if (req.headers.authorization) {
+    /*if (req.headers.authorization) {
       userId = await jwtService.verifyAndGetUserIdByToken(
         req.headers.authorization.split(' ')[1],
       );
-    }
+    }*/
     const foundComment = await this.commentsService.findComment(
-      req.params.id,
+      params.id,
       userId,
     );
     if (!foundComment) {
@@ -46,11 +43,11 @@ export class CommentsController {
     @Res() res: Response,
   ) {
     let userId = undefined;
-    if (headers.authorization) {
+    /*if (headers.authorization) {
       userId = await jwtService.verifyAndGetUserIdByToken(
         headers.authorization.split(' ')[1],
       );
-    }
+    }*/
     const foundPost = await this.postsService.findPost(params, userId);
     if (!foundPost) {
       res.sendStatus(404);
@@ -60,11 +57,11 @@ export class CommentsController {
       return;
     }
   }
-  @Put(':id')
+  /*  @Put(':id')
   async updateCommentContent(
     @Headers() headers: { authorization: string },
     @Param() params: { id: string },
-    @Body() body: { name: string; description: string; websiteUrl: string },
+    @Body() body: { content: string },
     @Res() res: Response,
   ) {
     const comment = await this.commentsService.findComment(
@@ -90,7 +87,7 @@ export class CommentsController {
   async updateCommentLikeStatus(
     @Headers() headers: { authorization: string },
     @Param() params: { id: string },
-    @Body() body: { name: string; description: string; websiteUrl: string },
+    @Body() body: { likeStatus: string },
     @Res() res: Response,
   ) {
     const comment = await this.commentsService.findComment(
@@ -132,5 +129,5 @@ export class CommentsController {
     const ResultOfDelete = await this.commentsService.deleteComment(params.id);
     res.sendStatus(204);
     return;
-  }
+  }*/
 }

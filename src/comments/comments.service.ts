@@ -1,4 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { BlogsRepository } from 'src/blogs/blogs.repository';
+import { PostsRepository } from 'src/posts/posts.repository';
+import { CommentsRepository } from './comments.repository';
+import { CommentViewType } from './comments.scheme.types';
 
 @Injectable()
 export class CommentsService {
@@ -11,10 +15,10 @@ export class CommentsService {
     commentId: string,
     userId: string,
   ): Promise<CommentViewType | null> {
-    const like = await commentsLikesService.findCommentLikeFromUser(
+    const like = null; /*await commentsLikesService.findCommentLikeFromUser(
       userId,
       commentId,
-    );
+    );*/
     const userLikeStatus = like?.likeStatus || 'None';
     const comment = await this.commentsRepository.findComment(
       commentId,
@@ -22,7 +26,7 @@ export class CommentsService {
     );
     return comment;
   }
-  async findCommentsByPostId(
+  /* async findCommentsByPostId(
     postId: string,
     query: any,
     userId: string,
@@ -176,5 +180,5 @@ export class CommentsService {
       userId,
     );
     return commentView;
-  }
+  }*/
 }

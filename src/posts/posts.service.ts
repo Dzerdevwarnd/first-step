@@ -1,8 +1,20 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { BlogsRepository } from 'src/blogs/blogs.repository';
+import { PostsRepository } from './posts.repository';
+import {
+  Post,
+  PostDocument,
+  postDBType,
+  postViewType,
+  postsByBlogIdPaginationType,
+} from './posts.scheme.types';
 
 @Injectable()
 export class PostsService {
   constructor(
+    @InjectModel(Post.name) private postModel: Model<PostDocument>,
     protected blogsRepository: BlogsRepository,
     protected postsRepository: PostsRepository,
   ) {}
@@ -13,9 +25,9 @@ export class PostsService {
     const postsDB = await this.postsRepository.findPostsWithQuery(query);
     const postsView: postViewType[] = [];
     for (const post of postsDB) {
-      let like = await postLikesService.findPostLikeFromUser(userId, post.id);
-      let last3DBLikes = await postLikesService.findLast3Likes(post.id);
-      let postView = {
+      const like = null; //await postLikesService.findPostLikeFromUser(userId, post.id);
+      const last3DBLikes = null; //await postLikesService.findLast3Likes(post.id);
+      const postView = {
         title: post.title,
         id: post.id,
         content: post.content,
@@ -33,10 +45,10 @@ export class PostsService {
 
       postsView.push(postView);
     }
-    const totalCount = await postModel.countDocuments();
+    const totalCount = await this.postModel.countDocuments();
     const pagesCount = Math.ceil(totalCount / query.pageSize);
     const postsPagination = {
-      pagesCount: pagesCount || 0,
+      pagesCount: pagesCount || 1,
       page: Number(query.page) || 1,
       pageSize: query.pageSize || 10,
       totalCount: totalCount || 0,
@@ -53,8 +65,8 @@ export class PostsService {
     if (!foundPost) {
       return null;
     }
-    let like = await postLikesService.findPostLikeFromUser(userId, params.id);
-    let last3DBLikes = await postLikesService.findLast3Likes(foundPost.id);
+    const like = null; //await postLikesService.findPostLikeFromUser(userId, params.id);
+    const last3DBLikes = null; //await postLikesService.findLast3Likes(foundPost.id);
     const postView = {
       title: foundPost.title,
       id: foundPost.id,
@@ -163,7 +175,7 @@ export class PostsService {
     return resultBoolean;
   }
 
-  async updatePostLikeStatus(
+  /* async updatePostLikeStatus(
     id: string,
     body: { likeStatus: string },
     accessToken: string,
@@ -219,7 +231,7 @@ export class PostsService {
         dislikesCount,
       );
     }
-    let like = await postLikesService.findPostLikeFromUser(userId, id);
+    const like = await postLikesService.findPostLikeFromUser(userId, id);
     const user = await userService.findUser(userId);
     if (!like) {
       await postLikesService.addLikeToBdFromUser(
@@ -236,7 +248,7 @@ export class PostsService {
       postLikesService.updateUserLikeStatus(userId, id, body.likeStatus);
       return true;
     }
-  }
+  }*/
 
   async deletePost(params: { id: string }): Promise<boolean> {
     const resultBoolean = this.postsRepository.deletePost(params);

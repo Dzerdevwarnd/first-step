@@ -11,11 +11,14 @@ import {
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { PostsService } from 'src/posts/posts.service';
+import { blogsPaginationType } from './blogs.scheme.types';
+import { BlogsService } from './blogs.service';
 
 @Controller('blogs')
 export class BlogsController {
   constructor(
-    protected blogsService: BlogService,
+    protected blogsService: BlogsService,
     protected postsService: PostsService,
   ) {}
   @Get()
@@ -41,17 +44,17 @@ export class BlogsController {
   }
   @Get(':id/posts')
   async getPostsByBlogId(
-    @Query() query: {},
+    @Query() query: { object },
     @Param() params: { id: string },
     @Res() res: Response,
     @Headers() headers: { authorization: string },
   ) {
-    let userId = undefined;
-    if (headers.authorization) {
+    const userId = undefined;
+    /* if (headers.authorization) {
       userId = await jwtService.verifyAndGetUserIdByToken(
         headers.authorization.split(' ')[1],
       );
-    }
+    }*/
     const foundPosts = await this.blogsService.findPostsByBlogId(
       params,
       query,

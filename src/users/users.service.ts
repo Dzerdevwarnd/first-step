@@ -1,20 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import bcrypt from 'bcrypt';
 import add from 'date-fns/add';
+import { PostsRepository } from 'src/posts/posts.repository';
 import { v4 as uuidv4 } from 'uuid';
+import { UsersRepository } from './users.repository';
+import {
+  UserDbType,
+  userViewType,
+  usersPaginationType,
+} from './users.scheme.types';
 
 @Injectable()
 export class UsersService {
   constructor(
-    protected usersRepository: UserRepository,
-    protected postsReposittory: PostsRepository,
+    protected usersRepository: UsersRepository,
+    protected postsRepository: PostsRepository,
   ) {}
   async findUser(id: string): Promise<UserDbType | null> {
-    let user = await usersRepository.findUser(id);
+    const user = await this.usersRepository.findUser(id);
     return user;
   }
   async returnAllUsers(query: any): Promise<usersPaginationType> {
-    return await usersRepository.returnAllUsers(query);
+    return await this.usersRepository.returnAllUsers(query);
   }
   async createUser(body: {
     login: string;
@@ -39,11 +46,11 @@ export class UsersService {
         isConfirmed: true,
       },
     };
-    const userView = await usersRepository.createUser(newUser);
+    const userView = await this.usersRepository.createUser(newUser);
     return userView;
   }
   async deleteUser(params: { id: string }): Promise<boolean> {
-    let resultBoolean = await usersRepository.deleteUser(params);
+    const resultBoolean = await this.usersRepository.deleteUser(params);
     return resultBoolean;
   }
   async generateHash(password: string, passwordSalt: string) {
@@ -58,7 +65,7 @@ export class UsersService {
     loginOrEmail: string,
     password: string,
   ): Promise<UserDbType | undefined> {
-    const user = await usersRepository.findDBUser(loginOrEmail);
+    const user = await this.usersRepository.findDBUser(loginOrEmail);
     if (!user) {
       return undefined;
     }
@@ -71,29 +78,29 @@ export class UsersService {
       return user;
     }
   }
-  async userEmailConfirmationAccept(confirmationCode: any): Promise<Boolean> {
+  async userEmailConfirmationAccept(confirmationCode: any): Promise<boolean> {
     const isConfirmationAccept =
-      await usersRepository.userEmailConfirmationAccept(confirmationCode);
+      await this.usersRepository.userEmailConfirmationAccept(confirmationCode);
     return isConfirmationAccept;
   }
   async findDBUserByConfirmationCode(confirmationCode: any) {
     const user =
-      await usersRepository.findDBUserByConfirmationCode(confirmationCode);
+      await this.usersRepository.findDBUserByConfirmationCode(confirmationCode);
     return user;
   }
-  async getUserIdFromRefreshToken(
+  /* async getUserIdFromRefreshToken(
     refreshToken: string,
   ): Promise<string | undefined> {
     const deviceId = await jwtService.verifyAndGetDeviceIdByToken(refreshToken);
-    const userId = refreshTokensMetaRepository.findUserIdByDeviceId(deviceId);
+    const userId = this.refreshTokensMetaRepository.findUserIdByDeviceId(deviceId);
     return userId;
-  }
+  }*/
 
   async updateRecoveryCode(
     email: string,
     recoveryCode: string,
   ): Promise<boolean> {
-    const result = await usersRepository.updateRecoveryCode(
+    const result = await this.usersRepository.updateRecoveryCode(
       email,
       recoveryCode,
     );
@@ -105,7 +112,7 @@ export class UsersService {
   ): Promise<boolean> {
     const passwordSalt = await this.generateSalt();
     const passwordHash = await this.generateHash(newPassword, passwordSalt);
-    const result = await usersRepository.updateUserSaltAndHash(
+    const result = await this.usersRepository.updateUserSaltAndHash(
       recoveryCode,
       passwordSalt,
       passwordHash,

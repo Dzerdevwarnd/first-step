@@ -4,26 +4,52 @@ import { HydratedDocument } from 'mongoose';
 export type UserDocument = HydratedDocument<User>;
 
 @Schema()
+export class AccountData {
+  @Prop({ required: true })
+  login: string;
+
+  @Prop({ required: true })
+  email: string;
+
+  @Prop({ required: true })
+  createdAt: Date;
+
+  @Prop({ required: true })
+  passwordSalt: string;
+
+  @Prop({ required: true })
+  passwordHash: string;
+
+  @Prop({ required: '' })
+  recoveryCode: string;
+}
+
+export const AccountDataSchema = SchemaFactory.createForClass(AccountData);
+
+@Schema()
+export class EmailConfirmationData {
+  @Prop({ required: true })
+  confirmationCode: string;
+  @Prop({ required: true })
+  expirationDate: Date;
+  @Prop({ required: true })
+  isConfirmed: boolean;
+}
+
+export const EmailConfirmationDataSchema = SchemaFactory.createForClass(
+  EmailConfirmationData,
+);
+
+@Schema()
 export class User {
   @Prop({ required: true })
   id: string;
 
-  @Prop()
-  accountData: {
-    login: { type: string; required: true };
-    email: { type: string; required: true };
-    createdAt: { type: Date; required: true };
-    passwordSalt: { type: string; required: true };
-    passwordHash: { type: string; required: true };
-    recoveryCode: { type: string; default: '' };
-  };
+  @Prop({ required: true, type: AccountDataSchema })
+  accountData: AccountData;
 
-  @Prop({ required: true })
-  emailConfirmationData: {
-    confirmationCode: { type: string; required: true };
-    expirationDate: { type: Date; required: true };
-    isConfirmed: { type: boolean; required: true };
-  };
+  @Prop({ required: true, type: EmailConfirmationDataSchema })
+  emailConfirmationData: EmailConfirmationData;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

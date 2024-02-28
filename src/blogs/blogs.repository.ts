@@ -24,10 +24,7 @@ export class BlogsRepository {
       sortDirection = 1;
     }
     const blogs = await this.blogModel
-      .find(
-        { name: { $regex: searchNameTerm, $options: 'i' } },
-        { projection: { _id: 0 } },
-      )
+      .find({ name: { $regex: searchNameTerm, $options: 'i' } }, '-_id -__v')
       .skip((page - 1) * pageSize)
       .sort({ [sortBy]: sortDirection })
       .limit(pageSize)
@@ -45,12 +42,12 @@ export class BlogsRepository {
     };
     return blogsPagination;
   }
-  async findBlog(params: { id: string }): Promise<blogViewType | undefined> {
+  async findBlog(params: { id: string }): Promise<blogViewType | null> {
     const blog: blogDBType | null = await this.blogModel.findOne({
       id: params.id,
     });
     if (!blog) {
-      return;
+      return null;
     }
     const blogView = {
       createdAt: blog.createdAt,
@@ -64,8 +61,8 @@ export class BlogsRepository {
   }
 
   async createBlog(newBlog: blogDBType): Promise<blogDBType> {
-    const result = await blogModel.insertMany(newBlog);
-    //@ts-ignore
+    const result = await this.blogModel.insertMany(newBlog);
+    //@ts-expect-error  _id dont exist in blogDBType
     const { _id, ...blogWithout_Id } = newBlog;
     return blogWithout_Id;
   }
@@ -73,7 +70,7 @@ export class BlogsRepository {
     id: string,
     body: { name: string; description: string; websiteUrl: string },
   ): Promise<boolean> {
-    const result = await blogModel.updateOne(
+    const result = await this.blogModel.updateOne(
       { id: id },
       {
         $set: {
@@ -86,7 +83,7 @@ export class BlogsRepository {
     return result.matchedCount === 1;
   }
   async deleteBlog(params: { id: string }): Promise<boolean> {
-    let result = await blogModel.deleteOne({ id: params.id });
+    const result = await this.blogModel.deleteOne({ id: params.id });
     return result.deletedCount === 1;
   }
 }
