@@ -37,7 +37,7 @@ export class PostsController {
       );
     }*/
     const allPosts: postsByBlogIdPaginationType =
-      await this.postsService.returnAllPosts(query, userId);
+      await this.postsService.getPostsWithPagination(query, userId);
     res.status(200).send(allPosts);
     return;
   }

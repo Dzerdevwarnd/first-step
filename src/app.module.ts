@@ -2,6 +2,10 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import {
+  BlacklistToken,
+  BlacklistTokenSchema,
+} from './blacklistTokens/blacklistTokens.scheme.types';
 import { BlogsController } from './blogs/blogs.controller';
 import { BlogsRepository } from './blogs/blogs.repository';
 import { Blog, BlogSchema } from './blogs/blogs.scheme.types';
@@ -32,6 +36,7 @@ import { UsersService } from './users/users.service';
       { name: Post.name, schema: PostSchema },
       { name: User.name, schema: UserSchema },
       { name: Comment.name, schema: CommentSchema },
+      { name: BlacklistToken.name, schema: BlacklistTokenSchema },
     ]),
   ],
   controllers: [

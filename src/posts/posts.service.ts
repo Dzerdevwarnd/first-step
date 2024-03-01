@@ -18,7 +18,7 @@ export class PostsService {
     protected blogsRepository: BlogsRepository,
     protected postsRepository: PostsRepository,
   ) {}
-  async returnAllPosts(
+  async getPostsWithPagination(
     query: any,
     userId: string,
   ): Promise<postsByBlogIdPaginationType> {
@@ -46,11 +46,12 @@ export class PostsService {
       postsView.push(postView);
     }
     const totalCount = await this.postModel.countDocuments();
-    const pagesCount = Math.ceil(totalCount / query.pageSize);
+    const pageSize = query.pageSize || 10;
+    const pagesCount = Math.ceil(totalCount / pageSize);
     const postsPagination = {
       pagesCount: pagesCount || 1,
-      page: Number(query.page) || 1,
-      pageSize: query.pageSize || 10,
+      page: Number(query.pageNumber) || 1,
+      pageSize: Number(pageSize),
       totalCount: totalCount || 0,
       items: postsView,
     };

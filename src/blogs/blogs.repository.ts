@@ -50,6 +50,7 @@ export class BlogsRepository {
       return null;
     }
     const blogView = {
+      //
       createdAt: blog.createdAt,
       description: blog.description,
       id: blog.id,

@@ -27,7 +27,7 @@ export class BlogsService {
     query: any,
     userId: string,
   ): Promise<postsByBlogIdPaginationType | undefined> {
-    return this.postsRepository.findPostsByBlogId(params, query, userId);
+    return await this.postsRepository.findPostsByBlogId(params, query, userId);
   }
   async createBlog(body: {
     name: string;

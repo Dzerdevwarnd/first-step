@@ -35,7 +35,7 @@ export class BlogsController {
   ) {
     const foundBlog = await this.blogsService.findBlog(params);
     if (!foundBlog) {
-      res.status(404);
+      res.sendStatus(404);
       return;
     } else {
       res.status(200).send(foundBlog);
@@ -60,8 +60,8 @@ export class BlogsController {
       query,
       userId,
     );
-    if (foundPosts?.items.length === 0) {
-      res.status(404);
+    if (!foundPosts) {
+      res.sendStatus(404);
       return;
     } else {
       res.status(200).send(foundPosts);
@@ -88,7 +88,8 @@ export class BlogsController {
     @Body() body: { title: string; shortDescription: string; content: string },
     @Res() res: Response,
   ) {
-    if ((await this.blogsService.findBlog(params)) === undefined) {
+    const createdPost = await this.blogsService.findBlog(params);
+    if (!createdPost) {
       res.sendStatus(404);
       return;
     }

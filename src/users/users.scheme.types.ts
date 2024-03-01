@@ -20,7 +20,7 @@ export class AccountData {
   @Prop({ required: true })
   passwordHash: string;
 
-  @Prop({ required: '' })
+  @Prop({ default: '' })
   recoveryCode: string;
 }
 

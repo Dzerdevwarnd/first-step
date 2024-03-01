@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import bcrypt from 'bcrypt';
-import add from 'date-fns/add';
+import { add } from 'date-fns';
 import { PostsRepository } from 'src/posts/posts.repository';
 import { v4 as uuidv4 } from 'uuid';
 import { UsersRepository } from './users.repository';
@@ -9,7 +8,8 @@ import {
   userViewType,
   usersPaginationType,
 } from './users.scheme.types';
-
+import bcrypt = require('bcrypt');
+///
 @Injectable()
 export class UsersService {
   constructor(
@@ -41,7 +41,7 @@ export class UsersService {
         passwordHash: passwordHash,
       },
       emailConfirmationData: {
-        confirmationCode: uuidv4,
+        confirmationCode: uuidv4(),
         expirationDate: add(new Date(), { hours: 1, minutes: 3 }),
         isConfirmed: true,
       },

@@ -21,7 +21,7 @@ export class UsersRepository {
   async returnAllUsers(query: any): Promise<usersPaginationType> {
     const pageSize = Number(query.pageSize) || 10;
     const page = Number(query.pageNumber) || 1;
-    const sortBy: string = query.sortBy || 'createdAt';
+    const sortBy: string = query.sortBy || 'accountData.createdAt';
     const searchLoginTerm: string = query.searchLoginTerm || '';
     const searchEmailTerm: string = query.searchEmailTerm || '';
     let sortDirection = query.sortDirection || 'desc';
@@ -38,7 +38,7 @@ export class UsersRepository {
         ],
       })
       .skip((page - 1) * pageSize)
-      .sort({ [sortBy]: sortDirection })
+      .sort({ [sortBy]: sortDirection, createdAt: -1 })
       .limit(pageSize)
       .lean();
     const totalCount = await this.userModel.countDocuments({
@@ -79,7 +79,7 @@ export class UsersRepository {
     const userView = {
       id: newUser.id,
       login: newUser.accountData.login,
-      email: newUser.accountData.login,
+      email: newUser.accountData.email,
       createdAt: newUser.accountData.createdAt,
     };
     return userView;
