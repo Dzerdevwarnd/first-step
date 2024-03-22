@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { BlogsRepository } from 'src/blogs/blogs.repository';
+import { JwtService } from 'src/jwt/jwtService';
+import { PostLikesService } from 'src/postLikes/postLikes.service';
+import { UsersService } from 'src/users/users.service';
 import { PostsRepository } from './posts.repository';
 import {
   Post,
@@ -17,6 +20,9 @@ export class PostsService {
     @InjectModel(Post.name) private postModel: Model<PostDocument>,
     protected blogsRepository: BlogsRepository,
     protected postsRepository: PostsRepository,
+    protected postLikesService: PostLikesService,
+    protected jwtService: JwtService,
+    protected usersService: UsersService,
   ) {}
   async getPostsWithPagination(
     query: any,
@@ -66,8 +72,13 @@ export class PostsService {
     if (!foundPost) {
       return null;
     }
-    const like = null; //await postLikesService.findPostLikeFromUser(userId, params.id);
-    const last3DBLikes = null; //await postLikesService.findLast3Likes(foundPost.id);
+    const like = await this.postLikesService.findPostLikeFromUser(
+      userId,
+      params.id,
+    );
+    const last3DBLikes = await this.postLikesService.findLast3Likes(
+      foundPost.id,
+    );
     const postView = {
       title: foundPost.title,
       id: foundPost.id,
@@ -176,12 +187,12 @@ export class PostsService {
     return resultBoolean;
   }
 
-  /* async updatePostLikeStatus(
+  async updatePostLikeStatus(
     id: string,
     body: { likeStatus: string },
     accessToken: string,
   ): Promise<boolean> {
-    const userId = await jwtService.verifyAndGetUserIdByToken(accessToken);
+    const userId = await this.jwtService.verifyAndGetUserIdByToken(accessToken);
     const post = await this.findPost({ id }, userId);
     let likesCount = post!.extendedLikesInfo.likesCount;
     let dislikesCount = post!.extendedLikesInfo.dislikesCount;
@@ -232,10 +243,10 @@ export class PostsService {
         dislikesCount,
       );
     }
-    const like = await postLikesService.findPostLikeFromUser(userId, id);
-    const user = await userService.findUser(userId);
+    const like = await this.postLikesService.findPostLikeFromUser(userId, id);
+    const user = await this.usersService.findUser(userId);
     if (!like) {
-      await postLikesService.addLikeToBdFromUser(
+      await this.postLikesService.addLikeToBdFromUser(
         userId,
         id,
         body.likeStatus,
@@ -246,10 +257,10 @@ export class PostsService {
       if (like.likeStatus === body.likeStatus) {
         return false;
       }
-      postLikesService.updateUserLikeStatus(userId, id, body.likeStatus);
+      this.postLikesService.updateUserLikeStatus(userId, id, body.likeStatus);
       return true;
     }
-  }*/
+  }
 
   async deletePost(params: { id: string }): Promise<boolean> {
     const resultBoolean = this.postsRepository.deletePost(params);

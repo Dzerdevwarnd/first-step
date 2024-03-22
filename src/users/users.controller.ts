@@ -21,7 +21,7 @@ export class UsersController {
     @Res() res: Response,
   ) {
     const usersPagination: usersPaginationType =
-      await this.userService.returnAllUsers(query);
+      await this.userService.returnUsersWithPagination(query);
     res.status(200).send(usersPagination);
     return;
   }

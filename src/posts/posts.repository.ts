@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { PostLikesService } from 'src/postLikes/postLikes.service';
 import {
   Post,
   PostDocument,
@@ -11,7 +12,10 @@ import {
 
 @Injectable()
 export class PostsRepository {
-  constructor(@InjectModel(Post.name) private postModel: Model<PostDocument>) {}
+  constructor(
+    @InjectModel(Post.name) private postModel: Model<PostDocument>,
+    protected postLikesService: PostLikesService,
+  ) {}
   async findPostsWithQuery(query: any): Promise<postDBType[]> {
     const pageSize = Number(query?.pageSize) || 10;
     const page = Number(query?.pageNumber) || 1;
@@ -65,8 +69,11 @@ export class PostsRepository {
       .lean();
     const postsView: postViewType[] = [];
     for (const post of postsDB) {
-      const like = null; //await postLikesService.findPostLikeFromUser(userId, post.id);
-      const last3DBLikes = null; // await postLikesService.findLast3Likes(post.id);
+      const like = await this.postLikesService.findPostLikeFromUser(
+        userId,
+        post.id,
+      );
+      const last3DBLikes = await this.postLikesService.findLast3Likes(post.id);
       const postView = {
         title: post.title,
         id: post.id,

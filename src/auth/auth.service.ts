@@ -16,6 +16,18 @@ export class AuthService {
     protected usersRepository: UsersRepository,
     protected blacklistRepository: BlacklistRepository,
   ) {}
+  async validateUser(loginOrEmail: string, password: string) {
+    const user = await this.usersService.checkCredentialsAndReturnUser(
+      loginOrEmail,
+      password,
+    );
+    if (!user) {
+      return null;
+    } else {
+      return user;
+    }
+  }
+
   async loginAndReturnJwtKeys(
     loginOrEmail: string,
     password: string,
@@ -90,3 +102,4 @@ export class AuthService {
     return isAdded;
   }
 }
+////

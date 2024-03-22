@@ -11,8 +11,13 @@ import {
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { JwtService } from 'src/jwt/jwtService';
 import { PostsService } from 'src/posts/posts.service';
-import { blogsPaginationType } from './blogs.scheme.types';
+import {
+  CreateBlogInputModelType,
+  UpdateBlogInputModelType,
+  blogsPaginationType,
+} from './blogs.scheme.types';
 import { BlogsService } from './blogs.service';
 
 @Controller('blogs')
@@ -20,6 +25,7 @@ export class BlogsController {
   constructor(
     protected blogsService: BlogsService,
     protected postsService: PostsService,
+    protected jwtService: JwtService,
   ) {}
   @Get()
   async getBlogsWithPagination(@Query() query: { object }) {
@@ -49,12 +55,12 @@ export class BlogsController {
     @Res() res: Response,
     @Headers() headers: { authorization: string },
   ) {
-    const userId = undefined;
-    /* if (headers.authorization) {
-      userId = await jwtService.verifyAndGetUserIdByToken(
+    let userId = undefined;
+    if (headers.authorization) {
+      userId = await this.jwtService.verifyAndGetUserIdByToken(
         headers.authorization.split(' ')[1],
       );
-    }*/
+    }
     const foundPosts = await this.blogsService.findPostsByBlogId(
       params,
       query,
@@ -71,11 +77,7 @@ export class BlogsController {
   @Post()
   async postBlog(
     @Body()
-    body: {
-      name: string;
-      description: string;
-      websiteUrl: string;
-    },
+    body: CreateBlogInputModelType,
     @Res() res: Response,
   ) {
     const newBlog = await this.blogsService.createBlog(body);
@@ -100,7 +102,7 @@ export class BlogsController {
   @Put(':id')
   async updateBlog(
     @Param() params: { id: string },
-    @Body() body: { name: string; description: string; websiteUrl: string },
+    @Body() body: UpdateBlogInputModelType,
     @Res() res: Response,
   ) {
     const resultOfUpdateBlog = await this.blogsService.updateBlog(

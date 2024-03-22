@@ -1,8 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { BlogsRepository } from 'src/blogs/blogs.repository';
+import { CommentLikesService } from 'src/commentLikes/commentLikesService';
+import { JwtService } from 'src/jwt/jwtService';
 import { PostsRepository } from 'src/posts/posts.repository';
+import { UsersRepository } from 'src/users/users.repository';
 import { CommentsRepository } from './comments.repository';
-import { CommentViewType } from './comments.scheme.types';
+import {
+  CommentDBType,
+  CommentViewType,
+  CommentsPaginationType,
+} from './comments.scheme.types';
 
 @Injectable()
 export class CommentsService {
@@ -10,6 +17,9 @@ export class CommentsService {
     protected commentsRepository: CommentsRepository,
     protected blogsRepository: BlogsRepository,
     protected postsReposittory: PostsRepository,
+    protected commentLikesService: CommentLikesService,
+    protected usersRepository: UsersRepository,
+    protected jwtService: JwtService,
   ) {}
   async findComment(
     commentId: string,
@@ -26,7 +36,7 @@ export class CommentsService {
     );
     return comment;
   }
-  /* async findCommentsByPostId(
+  async findCommentsByPostId(
     postId: string,
     query: any,
     userId: string,
@@ -41,11 +51,11 @@ export class CommentsService {
     }
     const commentsView: CommentViewType[] = [];
     for (const comment of commentsDB) {
-      const like = await commentsLikesService.findCommentLikeFromUser(
+      const like = await this.commentLikesService.findCommentLikeFromUser(
         userId,
         comment.id,
       );
-      let commentView = {
+      const commentView = {
         id: comment.id,
         content: comment.content,
         commentatorInfo: {
@@ -61,7 +71,7 @@ export class CommentsService {
       };
       commentsView.push(commentView);
     }
-    const totalCount = await commentModel.countDocuments({ postId: postId });
+    const totalCount = commentsDB.length;
     const pagesCount = Math.ceil(totalCount / Number(query?.pageSize) || 1);
     const commentsPagination: CommentsPaginationType =
       new CommentsPaginationType(
@@ -86,7 +96,7 @@ export class CommentsService {
     body: { likeStatus: string },
     accessToken: string,
   ): Promise<boolean> {
-    const userId = await jwtService.verifyAndGetUserIdByToken(accessToken);
+    const userId = await this.jwtService.verifyAndGetUserIdByToken(accessToken);
     const comment = await this.findComment(commentId, userId);
     let likesCount = comment!.likesInfo.likesCount;
     let dislikesCount = comment!.likesInfo.dislikesCount;
@@ -134,12 +144,12 @@ export class CommentsService {
         dislikesCount,
       );
     }
-    const like = await commentsLikesService.findCommentLikeFromUser(
+    const like = await this.commentLikesService.findCommentLikeFromUser(
       userId,
       commentId,
     );
     if (!like) {
-      await commentsLikesService.addLikeToBdFromUser(
+      await this.commentLikesService.addLikeToBdFromUser(
         userId,
         commentId,
         body.likeStatus,
@@ -149,7 +159,7 @@ export class CommentsService {
       if (like.likeStatus === body.likeStatus) {
         return false;
       }
-      commentsLikesService.updateUserLikeStatus(
+      this.commentLikesService.updateUserLikeStatus(
         userId,
         commentId,
         body.likeStatus,
@@ -162,13 +172,12 @@ export class CommentsService {
     body: { content: string },
     token: string,
   ): Promise<CommentViewType | null> {
-    const userId = await jwtService.verifyAndGetUserIdByToken(token);
-    const user = await usersRepository.findUser(userId!);
+    const userId = await this.jwtService.verifyAndGetUserIdByToken(token);
+    const user = await this.usersRepository.findUser(userId!);
     if (!user) {
-      return user;
+      return;
     }
     const comment: CommentDBType = new CommentDBType(
-      new ObjectId(),
       String(Date.now()),
       id,
       body.content,
@@ -180,5 +189,5 @@ export class CommentsService {
       userId,
     );
     return commentView;
-  }*/
+  }
 }

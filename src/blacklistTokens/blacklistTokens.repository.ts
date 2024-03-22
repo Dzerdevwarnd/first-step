@@ -5,6 +5,7 @@ import { settings } from 'src/settings';
 import {
   BlacklistToken,
   BlacklistTokenDocument,
+  TokenDBType,
 } from './blacklistTokens.scheme.types';
 
 @Injectable()
@@ -64,5 +65,12 @@ export class BlacklistRepository {
       parseInt(settings.refreshTokenLifeTime),
     );
     return result.length == 1;
+  }
+  async findTokenInBlacklist(refreshToken: string): Promise<TokenDBType> {
+    const TokenInBlackList = await this.blacklistTokenModel.findOne({
+      token: refreshToken,
+    });
+
+    return TokenInBlackList;
   }
 }

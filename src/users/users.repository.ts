@@ -18,13 +18,14 @@ export class UsersRepository {
     return user;
   }
 
-  async returnAllUsers(query: any): Promise<usersPaginationType> {
+  async returnUsersWithPagination(query: any): Promise<usersPaginationType> {
     const pageSize = Number(query.pageSize) || 10;
     const page = Number(query.pageNumber) || 1;
-    const sortBy: string = query.sortBy || 'accountData.createdAt';
+    const sortBy: string = query.sortBy || 'createdAt';
     const searchLoginTerm: string = query.searchLoginTerm || '';
     const searchEmailTerm: string = query.searchEmailTerm || '';
     let sortDirection = query.sortDirection || 'desc';
+    console.log(sortBy);
     if (sortDirection === 'desc') {
       sortDirection = -1;
     } else {
@@ -37,8 +38,8 @@ export class UsersRepository {
           { 'accountData.email': { $regex: searchEmailTerm, $options: 'i' } },
         ],
       })
+      .sort({ ['accountData.' + sortBy]: sortDirection, createdAt: -1 })
       .skip((page - 1) * pageSize)
-      .sort({ [sortBy]: sortDirection, createdAt: -1 })
       .limit(pageSize)
       .lean();
     const totalCount = await this.userModel.countDocuments({

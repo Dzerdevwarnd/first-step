@@ -9,7 +9,7 @@ export class BlacklistToken {
   token: string;
 
   @Prop({ required: true })
-  expireDate: string;
+  expireDate: Date;
 }
 
 export const BlacklistTokenSchema =

@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { add } from 'date-fns';
+import { JwtService } from 'src/jwt/jwtService';
 import { PostsRepository } from 'src/posts/posts.repository';
+import { RefreshTokensMetaRepository } from 'src/refreshTokenMeta/refreshTokenMeta.repository';
 import { v4 as uuidv4 } from 'uuid';
 import { UsersRepository } from './users.repository';
 import {
@@ -15,13 +17,15 @@ export class UsersService {
   constructor(
     protected usersRepository: UsersRepository,
     protected postsRepository: PostsRepository,
+    protected jwtService: JwtService,
+    protected refreshTokensMetaRepository: RefreshTokensMetaRepository,
   ) {}
   async findUser(id: string): Promise<UserDbType | null> {
     const user = await this.usersRepository.findUser(id);
     return user;
   }
-  async returnAllUsers(query: any): Promise<usersPaginationType> {
-    return await this.usersRepository.returnAllUsers(query);
+  async returnUsersWithPagination(query: any): Promise<usersPaginationType> {
+    return await this.usersRepository.returnUsersWithPagination(query);
   }
   async createUser(body: {
     login: string;
@@ -88,13 +92,15 @@ export class UsersService {
       await this.usersRepository.findDBUserByConfirmationCode(confirmationCode);
     return user;
   }
-  /* async getUserIdFromRefreshToken(
+  async getUserIdFromRefreshToken(
     refreshToken: string,
   ): Promise<string | undefined> {
-    const deviceId = await jwtService.verifyAndGetDeviceIdByToken(refreshToken);
-    const userId = this.refreshTokensMetaRepository.findUserIdByDeviceId(deviceId);
+    const deviceId =
+      await this.jwtService.verifyAndGetDeviceIdByToken(refreshToken);
+    const userId =
+      this.refreshTokensMetaRepository.findUserIdByDeviceId(deviceId);
     return userId;
-  }*/
+  }
 
   async updateRecoveryCode(
     email: string,

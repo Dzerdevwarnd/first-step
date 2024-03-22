@@ -14,6 +14,7 @@ import {
 import { Response } from 'express';
 import { BlogsService } from 'src/blogs/blogs.service';
 import { CommentsService } from 'src/comments/comments.service';
+import { JwtService } from 'src/jwt/jwtService';
 import { postsByBlogIdPaginationType } from './posts.scheme.types';
 import { PostsService } from './posts.service';
 
@@ -23,6 +24,7 @@ export class PostsController {
     protected postsService: PostsService,
     protected commentService: CommentsService,
     protected blogService: BlogsService,
+    protected jwtService: JwtService,
   ) {}
   @Get()
   async getPostsWithPagination(
@@ -31,11 +33,11 @@ export class PostsController {
     @Res() res: Response,
   ) {
     let userId = undefined;
-    /*if (headers.authorization) {
-      userId = await jwtService.verifyAndGetUserIdByToken(
+    if (headers.authorization) {
+      userId = await this.jwtService.verifyAndGetUserIdByToken(
         headers.authorization.split(' ')[1],
       );
-    }*/
+    }
     const allPosts: postsByBlogIdPaginationType =
       await this.postsService.getPostsWithPagination(query, userId);
     res.status(200).send(allPosts);
@@ -49,11 +51,11 @@ export class PostsController {
     @Res() res: Response,
   ) {
     let userId = undefined;
-    /* if (headers.authorization) {
-      userId = await jwtService.verifyAndGetUserIdByToken(
+    if (headers.authorization) {
+      userId = await this.jwtService.verifyAndGetUserIdByToken(
         headers.authorization.split(' ')[1],
       );
-    }*/
+    }
     const foundPost = await this.postsService.findPost(params, userId);
     if (!foundPost) {
       res.sendStatus(404);
@@ -63,7 +65,7 @@ export class PostsController {
       return;
     }
   }
-  /* @Get(':id/comments')
+  @Get(':id/comments')
   async getCommentsByPostId(
     @Query() query: { object },
     @Param() params: { id: string },
@@ -72,7 +74,7 @@ export class PostsController {
   ) {
     let userId = undefined;
     if (headers.authorization) {
-      userId = await jwtService.verifyAndGetUserIdByToken(
+      userId = await this.jwtService.verifyAndGetUserIdByToken(
         headers.authorization.split(' ')[1],
       );
     }
@@ -88,7 +90,7 @@ export class PostsController {
       res.status(200).send(commentsPagination);
       return;
     }
-  }*/
+  }
   @Post()
   async postPost(
     @Param() params: { id: string },
@@ -105,7 +107,7 @@ export class PostsController {
     res.status(201).send(newPost);
     return;
   }
-  /* @Post(':id/comments')
+  @Post(':id/comments')
   async postCommentByPostId(
     @Headers() headers: { authorization: string },
     @Param() params: { id: string },
@@ -120,7 +122,7 @@ export class PostsController {
       }
       const token = headers.authorization!.split(' ')[1];
 
-      const comment = await this.comment.createCommentsByPostId(
+      const comment = await this.commentService.createCommentsByPostId(
         params.id,
         body,
         token,
@@ -133,7 +135,7 @@ export class PostsController {
         return;
       }
     }
-  }*/
+  }
   @Put(':id')
   async updatePost(
     @Param() params: { id: string },
@@ -158,11 +160,11 @@ export class PostsController {
       return;
     }
   }
-  /* @Put(':id/like-status')
+  @Put(':id/like-status')
   async updatePostLikeStatus(
     @Headers() headers: { authorization: string },
     @Param() params: { id: string },
-    @Body() body: { name: string; description: string; websiteUrl: string },
+    @Body() body: { likeStatus: string },
     @Res() res: Response,
   ) {
     const post = await this.postsService.findPost(
@@ -182,7 +184,7 @@ export class PostsController {
     res.sendStatus(204);
     return;
   }
-*/
+
   @Delete(':id')
   async deleteBlogByID(@Param() params: { id }, @Res() res: Response) {
     const resultOfDelete = await this.postsService.deletePost(params);

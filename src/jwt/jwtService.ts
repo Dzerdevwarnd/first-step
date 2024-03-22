@@ -1,25 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import jwt from 'jsonwebtoken';
+import { JwtService as JwtNestService } from '@nestjs/jwt';
 import { settings } from 'src/settings';
 import { UserDbType } from 'src/users/users.scheme.types';
 
 @Injectable()
 export class JwtService {
+  constructor(private jwtNestService: JwtNestService) {}
   async createAccessToken(user: UserDbType, expirationTime: string) {
-    const AccessToken = jwt.sign({ userId: user.id }, settings.JWT_SECRET, {
-      expiresIn: expirationTime,
-    });
+    const AccessToken = this.jwtNestService.sign(
+      { userId: user.id },
+      { expiresIn: expirationTime },
+    );
     return AccessToken;
   }
   async createRefreshToken(deviceId: string, expirationTime: string) {
-    const RefreshToken = jwt.sign({ deviceId: deviceId }, settings.JWT_SECRET, {
-      expiresIn: expirationTime,
-    });
+    const RefreshToken = this.jwtNestService.sign(
+      { deviceId: deviceId },
+      { expiresIn: expirationTime },
+    );
     return RefreshToken;
   }
   async verifyAndGetUserIdByToken(token: string) {
     try {
-      const result: any = await jwt.verify(token, settings.JWT_SECRET);
+      const result: any = await this.jwtNestService.verify(token);
       return result.userId;
     } catch (error) {
       return;
@@ -27,22 +30,23 @@ export class JwtService {
   }
   async verifyAndGetDeviceIdByToken(token: string) {
     try {
-      const result: any = await jwt.verify(token, settings.JWT_SECRET);
+      const result: any = await this.jwtNestService.verify(token);
       return result.deviceId;
     } catch (error) {
       return;
     }
   }
   async createRecoveryCode(email: string) {
-    const RecoveryCode = await jwt.sign({ email: email }, settings.JWT_SECRET, {
-      expiresIn: settings.recoveryCodeLifeTime,
-    });
+    const RecoveryCode = await this.jwtNestService.sign(
+      { email: email },
+      { expiresIn: settings.recoveryCodeLifeTime },
+    );
 
     return RecoveryCode;
   }
   async verifyJwtToken(token: string) {
     try {
-      const result: any = await jwt.verify(token, settings.JWT_SECRET);
+      const result: any = await this.jwtNestService.verify(token);
       return true;
     } catch (error) {
       return;

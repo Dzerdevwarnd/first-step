@@ -1,12 +1,25 @@
 /* eslint-disable prefer-const */
-import { Controller, Get, Headers, Param, Query, Res } from '@nestjs/common';
-import { Response } from 'express';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Headers,
+  Param,
+  Put,
+  Query,
+  Req,
+  Res,
+} from '@nestjs/common';
+import { Request, Response } from 'express';
+import { JwtService } from 'src/jwt/jwtService';
 import { PostsService } from 'src/posts/posts.service';
 import { CommentsService } from './comments.service';
 
 @Controller('comments')
 export class CommentsController {
   constructor(
+    protected jwtService: JwtService,
     protected commentsService: CommentsService,
     protected postsService: PostsService,
   ) {}
@@ -18,11 +31,11 @@ export class CommentsController {
     @Res() res: Response,
   ) {
     let userId = undefined;
-    /*if (req.headers.authorization) {
-      userId = await jwtService.verifyAndGetUserIdByToken(
-        req.headers.authorization.split(' ')[1],
+    if (headers.authorization) {
+      userId = await this.jwtService.verifyAndGetUserIdByToken(
+        headers.authorization.split(' ')[1],
       );
-    }*/
+    }
     const foundComment = await this.commentsService.findComment(
       params.id,
       userId,
@@ -43,11 +56,11 @@ export class CommentsController {
     @Res() res: Response,
   ) {
     let userId = undefined;
-    /*if (headers.authorization) {
-      userId = await jwtService.verifyAndGetUserIdByToken(
+    if (headers.authorization) {
+      userId = await this.jwtService.verifyAndGetUserIdByToken(
         headers.authorization.split(' ')[1],
       );
-    }*/
+    }
     const foundPost = await this.postsService.findPost(params, userId);
     if (!foundPost) {
       res.sendStatus(404);
@@ -57,8 +70,9 @@ export class CommentsController {
       return;
     }
   }
-  /*  @Put(':id')
+  @Put(':id')
   async updateCommentContent(
+    @Req() req: Request,
     @Headers() headers: { authorization: string },
     @Param() params: { id: string },
     @Body() body: { content: string },
@@ -110,6 +124,7 @@ export class CommentsController {
 
   @Delete(':id')
   async deleteComment(
+    @Req() req: Request,
     @Headers() headers: { authorization: string },
     @Param() params: { id },
     @Res() res: Response,
@@ -129,5 +144,5 @@ export class CommentsController {
     const ResultOfDelete = await this.commentsService.deleteComment(params.id);
     res.sendStatus(204);
     return;
-  }*/
+  }
 }
