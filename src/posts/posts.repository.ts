@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { PostLikesService } from 'src/postLikes/postLikes.service';
+import { PostLikesService } from 'src/posts/postLikes/postLikes.service';
+import { Post, PostDocument } from './posts.mongo.scheme';
 import {
-  Post,
-  PostDocument,
   postDBType,
   postViewType,
   postsByBlogIdPaginationType,
-} from './posts.scheme.types';
+} from './posts.types';
 
 @Injectable()
 export class PostsRepository {

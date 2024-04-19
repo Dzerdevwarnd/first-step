@@ -9,6 +9,8 @@ export const settings = {
   accessTokenLifeTime: '10000000',
   refreshTokenLifeTime: '20000000',
   recoveryCodeLifeTime: '1000000',
+  basicAuthLogin: 'admin',
+  basicAuthPassword: 'qwerty',
 };
 
 /*export const routersPaths = {

@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Comment, CommentDocument } from './comments.mongo.scheme';
 import {
-  Comment,
   CommentDBType,
-  CommentDocument,
   CommentViewType,
   CommentsPaginationType,
-} from './comments.scheme.types';
+} from './comments.types';
 
 @Injectable()
 export class CommentsRepository {

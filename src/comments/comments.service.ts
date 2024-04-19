@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { BlogsRepository } from 'src/blogs/blogs.repository';
-import { CommentLikesService } from 'src/commentLikes/commentLikesService';
-import { JwtService } from 'src/jwt/jwtService';
+import { JwtService } from 'src/application/jwt/jwtService';
+import { CommentLikesService } from 'src/comments/commentLikes/commentLikesService';
+import { BlogsRepository } from 'src/endPointsEntities/blogs/blogs.repository';
+import { UsersRepository } from 'src/endPointsEntities/users/users.repository';
 import { PostsRepository } from 'src/posts/posts.repository';
-import { UsersRepository } from 'src/users/users.repository';
 import { CommentsRepository } from './comments.repository';
 import {
   CommentDBType,
   CommentViewType,
   CommentsPaginationType,
-} from './comments.scheme.types';
+} from './comments.types';
 
 @Injectable()
 export class CommentsService {
@@ -25,10 +25,10 @@ export class CommentsService {
     commentId: string,
     userId: string,
   ): Promise<CommentViewType | null> {
-    const like = null; /*await commentsLikesService.findCommentLikeFromUser(
+    const like = await this.commentLikesService.findCommentLikeFromUser(
       userId,
       commentId,
-    );*/
+    );
     const userLikeStatus = like?.likeStatus || 'None';
     const comment = await this.commentsRepository.findComment(
       commentId,

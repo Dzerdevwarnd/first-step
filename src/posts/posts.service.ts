@@ -1,18 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { BlogsRepository } from 'src/blogs/blogs.repository';
-import { JwtService } from 'src/jwt/jwtService';
-import { PostLikesService } from 'src/postLikes/postLikes.service';
-import { UsersService } from 'src/users/users.service';
+import { JwtService } from 'src/application/jwt/jwtService';
+import { BlogsRepository } from 'src/endPointsEntities/blogs/blogs.repository';
+import { UsersService } from 'src/endPointsEntities/users/users.service';
+import { PostLikesService } from 'src/posts/postLikes/postLikes.service';
+import { Post, PostDocument } from './posts.mongo.scheme';
 import { PostsRepository } from './posts.repository';
-import {
-  Post,
-  PostDocument,
-  postDBType,
-  postViewType,
-  postsByBlogIdPaginationType,
-} from './posts.scheme.types';
+import { postViewType } from './posts.types';
 
 @Injectable()
 export class PostsService {
@@ -24,7 +19,7 @@ export class PostsService {
     protected jwtService: JwtService,
     protected usersService: UsersService,
   ) {}
-  async getPostsWithPagination(
+  /*async getPostsWithPagination(
     query: any,
     userId: string,
   ): Promise<postsByBlogIdPaginationType> {
@@ -63,7 +58,7 @@ export class PostsService {
     };
     return postsPagination;
   }
-
+*/
   async findPost(
     params: { id: string },
     userId: string,
@@ -96,6 +91,7 @@ export class PostsService {
     };
     return postView;
   }
+  /*
   async createPost(body: {
     title: string;
     shortDescription: string;
@@ -266,4 +262,5 @@ export class PostsService {
     const resultBoolean = this.postsRepository.deletePost(params);
     return resultBoolean;
   }
+  */
 }

@@ -1,53 +1,94 @@
+//this module should be first line of app.module.ts
+import { getConfigModule } from './configuration/getConfigModule';
+const configModule = getConfigModule;
+
 import { Module } from '@nestjs/common';
+import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
-import { AuthController } from './auth/auth.controller';
-import { AuthService } from './auth/auth.service';
-import { LocalStrategy } from './auth/strategies/local.strategy';
-import { BlacklistRepository } from './blacklistTokens/blacklistTokens.repository';
+import { BlacklistRepository } from './DBEntities/blacklistTokens/blacklistTokens.repository';
 import {
   BlacklistToken,
   BlacklistTokenSchema,
-} from './blacklistTokens/blacklistTokens.scheme.types';
-import { BlogsController } from './blogs/blogs.controller';
-import { BlogsRepository } from './blogs/blogs.repository';
-import { Blog, BlogSchema } from './blogs/blogs.scheme.types';
-import { BlogsService } from './blogs/blogs.service';
-import {
-  CommentLike,
-  CommentLikeSchema,
-} from './commentLikes/commentLikes.scheme.types';
-import { CommentLikesRepository } from './commentLikes/commentLikesRepository';
-import { CommentLikesService } from './commentLikes/commentLikesService';
-import { CommentsController } from './comments/comments.controller';
-import { CommentsRepository } from './comments/comments.repository';
-import { Comment, CommentSchema } from './comments/comments.scheme.types';
-import { CommentsService } from './comments/comments.service';
-import { EmailAdapter } from './emailAdapter/emailAdapter';
-import { JwtService } from './jwt/jwtService';
-import { PostLikesRepository } from './postLikes/postLikes.repository';
-import { PostLike, PostLikeSchema } from './postLikes/postLikes.scheme.types';
-import { PostLikesService } from './postLikes/postLikes.service';
-import { PostsController } from './posts/posts.controller';
-import { PostsRepository } from './posts/posts.repository';
-import { Post, PostSchema } from './posts/posts.scheme.types';
-import { PostsService } from './posts/posts.service';
-import { RefreshTokensMetaRepository } from './refreshTokenMeta/refreshTokenMeta.repository';
+} from './DBEntities/blacklistTokens/blacklistTokens.scheme.types';
+import { RefreshTokensMetaRepository } from './DBEntities/refreshTokenMeta/refreshTokenMeta.repository';
 import {
   RefreshTokenMeta,
   RefreshTokenMetaSchema,
-} from './refreshTokenMeta/refreshTokenMeta.scheme.types';
-import { SecurityController } from './security/securityController';
+} from './DBEntities/refreshTokenMeta/refreshTokenMeta.scheme.types';
+import { EmailAdapter } from './application/emailAdapter/emailAdapter';
+import { JwtService } from './application/jwt/jwtService';
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
+import { AccessTokenAuthStrategy } from './auth/strategies/accessToken.strategy';
+import { BasicStrategy } from './auth/strategies/basic.strategy';
+import { LocalStrategy } from './auth/strategies/local.strategy';
+import { RefreshTokenAuthStrategy } from './auth/strategies/refreshToken.strategy';
+import {
+  CommentLike,
+  CommentLikeSchema,
+} from './comments/commentLikes/commentLikes.mongo.scheme';
+import { CommentLikesRepository } from './comments/commentLikes/commentLikesRepository';
+import { CommentLikesService } from './comments/commentLikes/commentLikesService';
+import { CommentsController } from './comments/comments.controller';
+import { Comment, CommentSchema } from './comments/comments.mongo.scheme';
+import { CommentsRepository } from './comments/comments.repository';
+import { CommentsService } from './comments/comments.service';
+import { BlogsController } from './endPointsEntities/blogs/blogs.controller';
+import { Blog, BlogSchema } from './endPointsEntities/blogs/blogs.mongo.scheme';
+import { BlogsRepository } from './endPointsEntities/blogs/blogs.repository';
+import { DeleteBlogUseCase } from './endPointsEntities/blogs/use-cases/deleteBlog';
+import { FindBlogByIdUseCase } from './endPointsEntities/blogs/use-cases/findBlogById';
+import { PostBlogUseCase } from './endPointsEntities/blogs/use-cases/postBlog';
+import { ReturnBlogsWithPaginationUseCase } from './endPointsEntities/blogs/use-cases/returnBlogsWithPagination';
+import { UpdateBlogUseCase } from './endPointsEntities/blogs/use-cases/updateBlog';
+import { SecurityController } from './endPointsEntities/security/securityController';
+import { TestController } from './endPointsEntities/testing/testing.controller';
+import { UsersController } from './endPointsEntities/users/users.controller';
+import { User, UserSchema } from './endPointsEntities/users/users.mongo.scheme';
+import { UsersRepository } from './endPointsEntities/users/users.repository';
+import { UsersService } from './endPointsEntities/users/users.service';
+import { PostLikesRepository } from './posts/postLikes/postLikes.repository';
+import { PostLike, PostLikeSchema } from './posts/postLikes/postLikes.scheme';
+import { PostLikesService } from './posts/postLikes/postLikes.service';
+import { PostsController } from './posts/posts.controller';
+import { Post, PostSchema } from './posts/posts.mongo.scheme';
+import { PostsRepository } from './posts/posts.repository';
+import { PostsService } from './posts/posts.service';
+import { CreatePostUseCase } from './posts/use-cases/createPost';
+import { createPostByBlogIdUseCase } from './posts/use-cases/createPostByBlogId';
+import { deletePostUseCase } from './posts/use-cases/deletePost';
+import { GetPostsWithPaginationUseCase } from './posts/use-cases/getPostsWithPagination';
+import { updatePostUseCase } from './posts/use-cases/updatePost';
+import { updatePostLikeStatusUseCase } from './posts/use-cases/updatePostLikeStatus';
 import { settings } from './settings';
-import { TestController } from './testing/testing.controller';
-import { UsersController } from './users/users.controller';
-import { UsersRepository } from './users/users.repository';
-import { User, UserSchema } from './users/users.scheme.types';
-import { UsersService } from './users/users.service';
+import { BlogExistValidationConstraint } from './validation/customValidators/BlogExist.validator';
+import { IsEmailIsAlreadyConfirmedConstraint } from './validation/customValidators/EmailIsAlreadyConfirmed.validator';
+import { ConfirmationCodeValidationConstraint } from './validation/customValidators/confCode.validator';
+import { IsEmailExistInDBConstraint } from './validation/customValidators/emailExistInDB.validator';
+import { isEmailAlreadyInUseConstraint } from './validation/customValidators/isEmailAlreadyInUse.validator';
+import { jwtKeyValidationConstraint } from './validation/customValidators/jwtKey.validator';
+import { LoginAlreadyInUseConstraint } from './validation/customValidators/loginInUse.validator';
+
+const useCases = [
+  ReturnBlogsWithPaginationUseCase,
+  DeleteBlogUseCase,
+  FindBlogByIdUseCase,
+  PostBlogUseCase,
+  UpdateBlogUseCase,
+  CreatePostUseCase,
+  createPostByBlogIdUseCase,
+  deletePostUseCase,
+  GetPostsWithPaginationUseCase,
+  updatePostUseCase,
+  updatePostLikeStatusUseCase,
+];
 
 @Module({
   imports: [
+    CqrsModule,
+    configModule,
     PassportModule,
     JwtModule.register({
       global: true,
@@ -79,7 +120,6 @@ import { UsersService } from './users/users.service';
     AuthController,
   ],
   providers: [
-    BlogsService,
     PostsService,
     UsersService,
     CommentsService,
@@ -97,6 +137,18 @@ import { UsersService } from './users/users.service';
     BlacklistRepository,
     AuthService,
     LocalStrategy,
+    BasicStrategy,
+    AccessTokenAuthStrategy,
+    RefreshTokenAuthStrategy,
+    ConfirmationCodeValidationConstraint,
+    BlogExistValidationConstraint,
+    IsEmailExistInDBConstraint,
+    isEmailAlreadyInUseConstraint,
+    IsEmailIsAlreadyConfirmedConstraint,
+    jwtKeyValidationConstraint,
+    LoginAlreadyInUseConstraint,
+    ...useCases,
   ],
 })
 export class AppModule {}
+//

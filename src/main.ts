@@ -1,5 +1,6 @@
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { useContainer } from 'class-validator';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './exception.filter';
@@ -11,7 +12,7 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
-      stopAtFirstError: false,
+      stopAtFirstError: true,
       exceptionFactory: (errors) => {
         const errorsForResposnse = [];
         errors.forEach((e) => {
@@ -30,6 +31,9 @@ async function bootstrap() {
   app.useGlobalFilters(
     /*new ErrorExceptionFilter()*/ new HttpExceptionFilter(),
   );
+  useContainer(app.select(AppModule), {
+    fallbackOnErrors: true,
+  });
   await app.listen(3004);
 }
 bootstrap();

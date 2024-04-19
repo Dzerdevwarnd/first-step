@@ -10,11 +10,17 @@ import {
   Query,
   Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { JwtService } from 'src/jwt/jwtService';
+import { JwtService } from 'src/application/jwt/jwtService';
+import { AccessTokenAuthGuard } from 'src/auth/guards/accessToken.auth.guard';
 import { PostsService } from 'src/posts/posts.service';
 import { CommentsService } from './comments.service';
+import {
+  CommentUpdateInputModelType,
+  UpdateCommentLikeStatusInputModelType,
+} from './comments.types';
 
 @Controller('comments')
 export class CommentsController {
@@ -23,7 +29,8 @@ export class CommentsController {
     protected commentsService: CommentsService,
     protected postsService: PostsService,
   ) {}
-  @Get()
+
+  @Get(':id')
   async getComment(
     @Query() query: { object },
     @Param() params: { id: string },
@@ -42,6 +49,7 @@ export class CommentsController {
     );
     if (!foundComment) {
       res.sendStatus(404);
+      console.log('!');
       return;
     } else {
       res.status(200).send(foundComment);
@@ -70,12 +78,14 @@ export class CommentsController {
       return;
     }
   }
+
+  @UseGuards(AccessTokenAuthGuard)
   @Put(':id')
   async updateCommentContent(
     @Req() req: Request,
     @Headers() headers: { authorization: string },
     @Param() params: { id: string },
-    @Body() body: { content: string },
+    @Body() body: CommentUpdateInputModelType,
     @Res() res: Response,
   ) {
     const comment = await this.commentsService.findComment(
@@ -86,7 +96,7 @@ export class CommentsController {
       res.sendStatus(404);
       return;
     }
-    if (comment.commentatorInfo.userId !== req.user!.id) {
+    if (comment.commentatorInfo.userId !== req.user!.userId) {
       res.sendStatus(403);
       return;
     }
@@ -97,11 +107,13 @@ export class CommentsController {
     res.sendStatus(204);
     return;
   }
+
+  @UseGuards(AccessTokenAuthGuard)
   @Put(':id/like-status')
   async updateCommentLikeStatus(
     @Headers() headers: { authorization: string },
     @Param() params: { id: string },
-    @Body() body: { likeStatus: string },
+    @Body() body: UpdateCommentLikeStatusInputModelType,
     @Res() res: Response,
   ) {
     const comment = await this.commentsService.findComment(
@@ -122,6 +134,7 @@ export class CommentsController {
     return;
   }
 
+  @UseGuards(AccessTokenAuthGuard)
   @Delete(':id')
   async deleteComment(
     @Req() req: Request,
@@ -137,7 +150,7 @@ export class CommentsController {
       res.sendStatus(404);
       return;
     }
-    if (comment.commentatorInfo.userId !== req.user!.id) {
+    if (comment.commentatorInfo.userId !== req.user!.userId) {
       res.sendStatus(403);
       return;
     }

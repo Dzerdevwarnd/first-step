@@ -10,20 +10,34 @@ import {
   Put,
   Query,
   Res,
+  UseGuards,
 } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
 import { Response } from 'express';
-import { BlogsService } from 'src/blogs/blogs.service';
+import { JwtService } from 'src/application/jwt/jwtService';
+import { AccessTokenAuthGuard } from 'src/auth/guards/accessToken.auth.guard';
+import { BasicAuthGuard } from 'src/auth/guards/basic.auth.guard';
 import { CommentsService } from 'src/comments/comments.service';
-import { JwtService } from 'src/jwt/jwtService';
-import { postsByBlogIdPaginationType } from './posts.scheme.types';
+import { CommentCreateInputModelType } from 'src/comments/comments.types';
 import { PostsService } from './posts.service';
+import {
+  CreatePostInputModelType,
+  UpdatePostInputModelType,
+  UpdatePostLikeStatusInputModelType,
+  postsByBlogIdPaginationType,
+} from './posts.types';
+import { CreatePostCommand } from './use-cases/createPost';
+import { deletePostCommand } from './use-cases/deletePost';
+import { GetPostsWithPaginationCommand } from './use-cases/getPostsWithPagination';
+import { updatePostCommand } from './use-cases/updatePost';
+import { updatePostLikeStatusCommand } from './use-cases/updatePostLikeStatus';
 
 @Controller('posts')
 export class PostsController {
   constructor(
+    private commandBus: CommandBus,
     protected postsService: PostsService,
     protected commentService: CommentsService,
-    protected blogService: BlogsService,
     protected jwtService: JwtService,
   ) {}
   @Get()
@@ -38,8 +52,9 @@ export class PostsController {
         headers.authorization.split(' ')[1],
       );
     }
-    const allPosts: postsByBlogIdPaginationType =
-      await this.postsService.getPostsWithPagination(query, userId);
+    const allPosts: postsByBlogIdPaginationType = await this.commandBus.execute(
+      new GetPostsWithPaginationCommand(query, userId),
+    );
     res.status(200).send(allPosts);
     return;
   }
@@ -91,36 +106,36 @@ export class PostsController {
       return;
     }
   }
+
+  @UseGuards(BasicAuthGuard)
   @Post()
   async postPost(
     @Param() params: { id: string },
     @Body()
-    body: {
-      title: string;
-      shortDescription: string;
-      content: string;
-      blogId: string;
-    },
+    body: CreatePostInputModelType,
     @Res() res: Response,
   ) {
-    const newPost = await this.postsService.createPost(body);
+    const newPost = await this.commandBus.execute(new CreatePostCommand(body));
     res.status(201).send(newPost);
     return;
   }
+
+  @UseGuards(AccessTokenAuthGuard)
   @Post(':id/comments')
   async postCommentByPostId(
     @Headers() headers: { authorization: string },
     @Param() params: { id: string },
-    @Body() body: { title: string; shortDescription: string; content: string },
+    @Body() body: CommentCreateInputModelType,
     @Res() res: Response,
   ) {
     {
-      const post = await this.postsService.findPost(params, 'userId');
+      const token = headers.authorization!.split(' ')[1];
+      const userId = await this.jwtService.verifyAndGetUserIdByToken(token);
+      const post = await this.postsService.findPost(params, userId);
       if (!post) {
         res.sendStatus(404);
         return;
       }
-      const token = headers.authorization!.split(' ')[1];
 
       const comment = await this.commentService.createCommentsByPostId(
         params.id,
@@ -136,21 +151,17 @@ export class PostsController {
       }
     }
   }
+
+  @UseGuards(BasicAuthGuard)
   @Put(':id')
   async updatePost(
     @Param() params: { id: string },
     @Body()
-    body: {
-      title: string;
-      shortDescription: string;
-      content: string;
-      blogId: string;
-    },
+    body: UpdatePostInputModelType,
     @Res() res: Response,
   ) {
-    const ResultOfUpdatePost = await this.postsService.updatePost(
-      params.id,
-      body,
+    const ResultOfUpdatePost = await this.commandBus.execute(
+      new updatePostCommand(params.id, body),
     );
     if (!ResultOfUpdatePost) {
       res.sendStatus(404);
@@ -160,11 +171,13 @@ export class PostsController {
       return;
     }
   }
+
+  @UseGuards(AccessTokenAuthGuard)
   @Put(':id/like-status')
   async updatePostLikeStatus(
     @Headers() headers: { authorization: string },
     @Param() params: { id: string },
-    @Body() body: { likeStatus: string },
+    @Body() body: UpdatePostLikeStatusInputModelType,
     @Res() res: Response,
   ) {
     const post = await this.postsService.findPost(
@@ -176,18 +189,23 @@ export class PostsController {
       return;
     }
 
-    const resultOfUpdate = await this.postsService.updatePostLikeStatus(
-      params.id,
-      body,
-      headers.authorization!.split(' ')[1],
+    const resultOfUpdate = await this.commandBus.execute(
+      new updatePostLikeStatusCommand(
+        params.id,
+        body,
+        headers.authorization!.split(' ')[1],
+      ),
     );
     res.sendStatus(204);
     return;
   }
 
+  @UseGuards(BasicAuthGuard)
   @Delete(':id')
   async deleteBlogByID(@Param() params: { id }, @Res() res: Response) {
-    const resultOfDelete = await this.postsService.deletePost(params);
+    const resultOfDelete = await await this.commandBus.execute(
+      new deletePostCommand(params),
+    );
     if (!resultOfDelete) {
       res.sendStatus(404);
       return;
