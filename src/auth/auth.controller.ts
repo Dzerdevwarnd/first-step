@@ -15,6 +15,7 @@ import { Request, Response } from 'express';
 import { BlacklistRepository } from 'src/DBEntities/blacklistTokens/blacklistTokens.repository';
 import { RefreshTokensMetaRepository } from 'src/DBEntities/refreshTokenMeta/refreshTokenMeta.repository';
 
+import { ThrottlerGuard } from '@nestjs/throttler';
 import { EmailAdapter } from 'src/application/emailAdapter/emailAdapter';
 import { JwtService } from 'src/application/jwt/jwtService';
 import { UsersRepository } from 'src/endPointsEntities/users/users.repository';
@@ -47,6 +48,7 @@ export class AuthController {
     protected refreshTokenMetaRepository: RefreshTokensMetaRepository,
   ) {}
 
+  @UseGuards(ThrottlerGuard)
   @UseGuards(AccessTokenAuthGuard)
   @Get('/me')
   async getInformationAboutMe(
@@ -73,8 +75,8 @@ export class AuthController {
     res.status(200).send(userInfo);
     return;
   }
-
   @UseGuards(LocalAuthGuard)
+  @UseGuards(ThrottlerGuard)
   @Post('/login')
   async userLogin(
     @Req() req: Request,
@@ -113,6 +115,7 @@ export class AuthController {
     return;
   }
 
+  @UseGuards(ThrottlerGuard)
   @UseGuards(RefreshTokenAuthGuard)
   @Post('/refresh-token')
   async refreshAccessAndRefreshTokens(
@@ -175,6 +178,7 @@ export class AuthController {
     return;
   }
 
+  @UseGuards(ThrottlerGuard)
   @UseGuards(RefreshTokenAuthGuard)
   @Post('/logout')
   async logout(@Req() req: Request, @Res() res: Response) {
@@ -214,6 +218,7 @@ export class AuthController {
     }
   }
 
+  @UseGuards(ThrottlerGuard)
   @Post('/registration')
   async registration(
     @Req() req: Request,
@@ -234,6 +239,7 @@ export class AuthController {
     return;
   }
 
+  @UseGuards(ThrottlerGuard)
   @Post('/registration-confirmation')
   async registrationConfirmation(
     @Req() req: Request,
@@ -251,6 +257,7 @@ export class AuthController {
     }
   }
 
+  @UseGuards(ThrottlerGuard)
   @Post('/registration-email-resending')
   async registrationEmailResending(
     @Req() req: Request,
@@ -263,6 +270,7 @@ export class AuthController {
     return;
   }
 
+  @UseGuards(ThrottlerGuard)
   @Post('/password-recovery')
   async passwordRecovery(
     @Req() req: Request,
@@ -285,6 +293,7 @@ export class AuthController {
     return;
   }
 
+  @UseGuards(ThrottlerGuard)
   @Post('/new-password')
   async newPassword(
     @Req() req: Request,

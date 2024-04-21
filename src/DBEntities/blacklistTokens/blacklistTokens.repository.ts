@@ -57,7 +57,6 @@ export class BlacklistRepository {
         Date.now() + parseInt(settings.refreshTokenLifeTime.match(/\d+/)),
       ),
     };
-
     const result = await this.blacklistTokenModel.insertMany(refreshTokenDB);
 
     setTimeout(

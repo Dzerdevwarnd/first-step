@@ -7,6 +7,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { BlacklistRepository } from './DBEntities/blacklistTokens/blacklistTokens.repository';
 import {
   BlacklistToken,
@@ -87,6 +88,12 @@ const useCases = [
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 10000,
+        limit: 5,
+      },
+    ]),
     CqrsModule,
     configModule,
     PassportModule,
@@ -96,8 +103,8 @@ const useCases = [
       signOptions: { expiresIn: settings.accessTokenLifeTime + 'ms' },
     }),
     MongooseModule.forRoot(
-      settings.MONGO_URL || `mongodb://0.0.0.0:27017/${1}`,
-      { dbName: 'hm13' },
+      settings.MONGO_URL, //|| `mongodb://0.0.0.0:27017/${1}`,
+      //  { dbName: 'hm13' },
     ),
     MongooseModule.forFeature([
       { name: Blog.name, schema: BlogSchema },

@@ -3,6 +3,14 @@ import { Controller, Delete, Res } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Response } from 'express';
 import { Model } from 'mongoose';
+import {
+  BlacklistToken,
+  BlacklistTokenDocument,
+} from 'src/DBEntities/blacklistTokens/blacklistTokens.scheme.types';
+import {
+  RefreshTokenMeta,
+  RefreshTokenMetaDocument,
+} from 'src/DBEntities/refreshTokenMeta/refreshTokenMeta.scheme.types';
 import { Comment } from 'src/comments/comments.mongo.scheme';
 import {
   Blog,
@@ -18,6 +26,10 @@ export class TestController {
     @InjectModel(Post.name) private postModel: Model<PostDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Comment.name) private commentModel: Model<BlogDocument>,
+    @InjectModel(BlacklistToken.name)
+    private blacklistTokenModel: Model<BlacklistTokenDocument>,
+    @InjectModel(RefreshTokenMeta.name)
+    private refreshTokensMetaModel: Model<RefreshTokenMetaDocument>,
   ) {}
 
   @Delete('all-data')
@@ -29,10 +41,11 @@ export class TestController {
     let resultOfDeleteUsers = await this.userModel.deleteMany({});
 
     let resultOfDeleteComments = await this.commentModel.deleteMany({});
-    /*let resultOfDeleteBlacklistTokens = await BlacklistTokensModel.deleteMany({})
-	let resultOfDeleteIpRequests = await ipRequestModel.deleteMany({})
-	let resultOfDeleteRefreshTokenMeta = await refreshTokensMetaModel.deleteMany(		{}
-	)*/
+    let resultOfDeleteBlacklistTokens =
+      await this.blacklistTokenModel.deleteMany({});
+    // let resultOfDeleteIpRequests = await ipRequestModel.deleteMany({});
+    let resultOfDeleteRefreshTokenMeta =
+      await this.refreshTokensMetaModel.deleteMany({});
     res.sendStatus(204);
     return;
   }
