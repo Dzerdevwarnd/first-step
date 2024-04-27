@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from 'src/application/jwt/jwtService';
 import { CommentLikesService } from 'src/comments/commentLikes/commentLikesService';
 import { BlogsRepository } from 'src/endPointsEntities/blogs/blogs.repository';
-import { UsersRepository } from 'src/endPointsEntities/users/users.repository';
+import { UsersMongoRepository } from 'src/endPointsEntities/users/users.repository';
 import { PostsRepository } from 'src/posts/posts.repository';
 import { CommentsRepository } from './comments.repository';
 import {
@@ -18,7 +18,7 @@ export class CommentsService {
     protected blogsRepository: BlogsRepository,
     protected postsReposittory: PostsRepository,
     protected commentLikesService: CommentLikesService,
-    protected usersRepository: UsersRepository,
+    protected usersMongoRepository: UsersMongoRepository,
     protected jwtService: JwtService,
   ) {}
   async findComment(
@@ -173,7 +173,7 @@ export class CommentsService {
     token: string,
   ): Promise<CommentViewType | null> {
     const userId = await this.jwtService.verifyAndGetUserIdByToken(token);
-    const user = await this.usersRepository.findUser(userId!);
+    const user = await this.usersMongoRepository.findUser(userId!);
     if (!user) {
       return;
     }

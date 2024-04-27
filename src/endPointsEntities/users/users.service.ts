@@ -4,24 +4,37 @@ import { RefreshTokensMetaRepository } from 'src/DBEntities/refreshTokenMeta/ref
 import { JwtService } from 'src/application/jwt/jwtService';
 import { PostsRepository } from 'src/posts/posts.repository';
 import { v4 as uuidv4 } from 'uuid';
-import { UsersRepository } from './users.repository';
+import { UsersPgSqlRepository } from './users.postgreSQLRepository';
+import { UsersMongoRepository } from './users.repository';
 import { UserDbType, userViewType, usersPaginationType } from './users.types';
 import bcrypt = require('bcrypt');
 ///
 @Injectable()
 export class UsersService {
+  private usersRepository;
   constructor(
-    protected usersRepository: UsersRepository,
+    protected usersPgSqlRepository: UsersPgSqlRepository,
+    protected usersMongoRepository: UsersMongoRepository,
     protected postsRepository: PostsRepository,
     protected jwtService: JwtService,
     protected refreshTokensMetaRepository: RefreshTokensMetaRepository,
-  ) {}
+  ) {
+    this.usersRepository = this.getUsersRepository();
+  }
+
+  private getUsersRepository() {
+    return process.env.USERS_REPOSITORY === 'Mongo'
+      ? this.usersMongoRepository
+      : this.usersPgSqlRepository;
+  }
+
   async findUser(id: string): Promise<UserDbType | null> {
+    const repo = process.env.UserRepository;
     const user = await this.usersRepository.findUser(id);
     return user;
   }
   async returnUsersWithPagination(query: any): Promise<usersPaginationType> {
-    return await this.usersRepository.returnUsersWithPagination(query);
+    return await this.usersMongoRepository.returnUsersWithPagination(query);
   }
   async createUser(body: {
     login: string;
@@ -46,11 +59,11 @@ export class UsersService {
         isConfirmed: true,
       },
     };
-    const userView = await this.usersRepository.createUser(newUser);
+    const userView = await this.usersMongoRepository.createUser(newUser);
     return userView;
   }
   async deleteUser(params: { id: string }): Promise<boolean> {
-    const resultBoolean = await this.usersRepository.deleteUser(params);
+    const resultBoolean = await this.usersMongoRepository.deleteUser(params);
     return resultBoolean;
   }
   async generateHash(password: string, passwordSalt: string) {
@@ -65,7 +78,7 @@ export class UsersService {
     loginOrEmail: string,
     password: string,
   ): Promise<UserDbType | undefined> {
-    const user = await this.usersRepository.findDBUser(loginOrEmail);
+    const user = await this.usersMongoRepository.findDBUser(loginOrEmail);
     if (!user) {
       return undefined;
     }
@@ -80,12 +93,16 @@ export class UsersService {
   }
   async userEmailConfirmationAccept(confirmationCode: any): Promise<boolean> {
     const isConfirmationAccept =
-      await this.usersRepository.userEmailConfirmationAccept(confirmationCode);
+      await this.usersMongoRepository.userEmailConfirmationAccept(
+        confirmationCode,
+      );
     return isConfirmationAccept;
   }
   async findDBUserByConfirmationCode(confirmationCode: any) {
     const user =
-      await this.usersRepository.findDBUserByConfirmationCode(confirmationCode);
+      await this.usersMongoRepository.findDBUserByConfirmationCode(
+        confirmationCode,
+      );
     return user;
   }
   async getUserIdFromRefreshToken(
@@ -102,7 +119,7 @@ export class UsersService {
     email: string,
     recoveryCode: string,
   ): Promise<boolean> {
-    const result = await this.usersRepository.updateRecoveryCode(
+    const result = await this.usersMongoRepository.updateRecoveryCode(
       email,
       recoveryCode,
     );
@@ -114,7 +131,7 @@ export class UsersService {
   ): Promise<boolean> {
     const passwordSalt = await this.generateSalt();
     const passwordHash = await this.generateHash(newPassword, passwordSalt);
-    const result = await this.usersRepository.updateUserSaltAndHash(
+    const result = await this.usersMongoRepository.updateUserSaltAndHash(
       recoveryCode,
       passwordSalt,
       passwordHash,

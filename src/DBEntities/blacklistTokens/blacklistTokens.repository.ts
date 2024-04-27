@@ -48,9 +48,7 @@ export class BlacklistRepository {
     return result.length == 2;
   }
 
-  async addRefreshTokenInBlacklist(cookies: {
-    refreshToken: string;
-  }): Promise<boolean> {
+  async addRefreshTokenInBlacklist(cookies): Promise<boolean> {
     const refreshTokenDB = {
       token: cookies.refreshToken,
       expireDate: new Date( //@ts-expect-error type error

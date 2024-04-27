@@ -8,6 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { BlacklistRepository } from './DBEntities/blacklistTokens/blacklistTokens.repository';
 import {
   BlacklistToken,
@@ -48,7 +49,8 @@ import { SecurityController } from './endPointsEntities/security/securityControl
 import { TestController } from './endPointsEntities/testing/testing.controller';
 import { UsersController } from './endPointsEntities/users/users.controller';
 import { User, UserSchema } from './endPointsEntities/users/users.mongo.scheme';
-import { UsersRepository } from './endPointsEntities/users/users.repository';
+import { UsersPgSqlRepository } from './endPointsEntities/users/users.postgreSQLRepository';
+import { UsersMongoRepository } from './endPointsEntities/users/users.repository';
 import { UsersService } from './endPointsEntities/users/users.service';
 import { PostLikesRepository } from './posts/postLikes/postLikes.repository';
 import { PostLike, PostLikeSchema } from './posts/postLikes/postLikes.scheme';
@@ -71,6 +73,14 @@ import { IsEmailExistInDBConstraint } from './validation/customValidators/emailE
 import { isEmailAlreadyInUseConstraint } from './validation/customValidators/isEmailAlreadyInUse.validator';
 import { jwtKeyValidationConstraint } from './validation/customValidators/jwtKey.validator';
 import { LoginAlreadyInUseConstraint } from './validation/customValidators/loginInUse.validator';
+
+const usersRepositoryProvider = {
+  provide: 'usersRepository',
+  useClass:
+    process.env.Users_Repository === 'Mongo'
+      ? UsersMongoRepository
+      : UsersPgSqlRepository,
+};
 
 const useCases = [
   ReturnBlogsWithPaginationUseCase,
@@ -116,6 +126,16 @@ const useCases = [
       { name: CommentLike.name, schema: CommentLikeSchema },
       { name: PostLike.name, schema: PostLikeSchema },
     ]),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'nodejs',
+      password: 'nodejs',
+      database: 'Homework',
+      autoLoadEntities: false,
+      synchronize: false,
+    }),
   ],
   controllers: [
     TestController,
@@ -132,7 +152,8 @@ const useCases = [
     CommentsService,
     BlogsRepository,
     PostsRepository,
-    UsersRepository,
+    UsersPgSqlRepository,
+    UsersMongoRepository,
     CommentsRepository,
     RefreshTokensMetaRepository,
     PostLikesRepository,
@@ -154,8 +175,9 @@ const useCases = [
     IsEmailIsAlreadyConfirmedConstraint,
     jwtKeyValidationConstraint,
     LoginAlreadyInUseConstraint,
+    usersRepositoryProvider,
     ...useCases,
   ],
 })
 export class AppModule {}
-//
+///.

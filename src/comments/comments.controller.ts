@@ -49,7 +49,6 @@ export class CommentsController {
     );
     if (!foundComment) {
       res.sendStatus(404);
-      console.log('!');
       return;
     } else {
       res.status(200).send(foundComment);

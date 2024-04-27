@@ -18,7 +18,7 @@ import { RefreshTokensMetaRepository } from 'src/DBEntities/refreshTokenMeta/ref
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { EmailAdapter } from 'src/application/emailAdapter/emailAdapter';
 import { JwtService } from 'src/application/jwt/jwtService';
-import { UsersRepository } from 'src/endPointsEntities/users/users.repository';
+import { UsersMongoRepository } from 'src/endPointsEntities/users/users.repository';
 import { UsersService } from 'src/endPointsEntities/users/users.service';
 import {
   CreateUserInputModelType,
@@ -43,7 +43,7 @@ export class AuthController {
     protected authService: AuthService,
     protected jwtService: JwtService,
     protected usersService: UsersService,
-    protected usersRepository: UsersRepository,
+    protected usersMongoRepository: UsersMongoRepository,
     protected blacklistRepository: BlacklistRepository,
     protected refreshTokenMetaRepository: RefreshTokensMetaRepository,
   ) {}
@@ -122,6 +122,14 @@ export class AuthController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
+    const tokenInBlackList =
+      await this.blacklistRepository.findTokenInBlacklist(
+        req.cookies.refreshToken,
+      );
+    if (tokenInBlackList) {
+      res.sendStatus(401);
+      return;
+    }
     const userId: string | undefined =
       await this.usersService.getUserIdFromRefreshToken(
         req.cookies.refreshToken,
@@ -130,7 +138,8 @@ export class AuthController {
       res.sendStatus(401);
       return;
     }
-    const user: UserDbType | null = await this.usersRepository.findUser(userId);
+    const user: UserDbType | null =
+      await this.usersMongoRepository.findUser(userId);
     if (!user) {
       res.sendStatus(401);
       return;
@@ -264,7 +273,7 @@ export class AuthController {
     @Body() body: EmailResendingModelType,
     @Res() res: Response,
   ) {
-    await this.usersRepository.userConfirmationCodeUpdate(body.email);
+    await this.usersMongoRepository.userConfirmationCodeUpdate(body.email);
     await this.emailAdapter.sendConfirmEmail(body.email);
     res.sendStatus(204);
     return;
@@ -278,7 +287,6 @@ export class AuthController {
     @Res() res: Response,
   ) {
     const recoveryCode = await this.jwtService.createRecoveryCode(body.email);
-    console.log(recoveryCode);
     await this.emailAdapter.sendRecoveryCode(body.email, recoveryCode);
     const result = await this.usersService.updateRecoveryCode(
       body.email,

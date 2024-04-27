@@ -34,7 +34,7 @@ export class RefreshTokenAuthStrategy extends PassportStrategy(
 
   async validate(payload: any) {
     const tokenInBlackList =
-      await this.blacklistRepository.findTokenInBlacklist(payload.token);
+      await this.blacklistRepository.findTokenInBlacklist('');
     if (tokenInBlackList) {
       throw new UnauthorizedException();
     }

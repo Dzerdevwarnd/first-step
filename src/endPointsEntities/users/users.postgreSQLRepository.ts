@@ -1,19 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { v4 as uuidv4 } from 'uuid';
-import { User, UserDocument } from './users.mongo.scheme';
-import { UserDbType, userViewType, usersPaginationType } from './users.types';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { UserDbType } from './users.types';
 
 @Injectable()
-export class UsersMongoRepository {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+export class UsersPgSqlRepository {
+  constructor(@InjectDataSource() protected dataSource: DataSource) {}
   async findUser(id: string): Promise<UserDbType | null> {
-    const user = await this.userModel.findOne({ id: id });
+    const user = this.dataSource.query(
+      `SELECT id, email, login, "createdAt"
+		FROM public."Users" u
+	WHERE u.id = $1`,
+      [id],
+    );
     return user;
   }
-
-  async returnUsersWithPagination(query: any): Promise<usersPaginationType> {
+}
+/*async returnUsersWithPagination(query: any): Promise<usersPaginationType> {
     const pageSize = Number(query.pageSize) || 10;
     const page = Number(query.pageNumber) || 1;
     const sortBy: string = query.sortBy || 'createdAt';
@@ -25,7 +28,7 @@ export class UsersMongoRepository {
     } else {
       sortDirection = 1;
     }
-    const users = await this.userModel
+    const users = await this.
       .find({
         $or: [
           { 'accountData.login': { $regex: searchLoginTerm, $options: 'i' } },
@@ -139,7 +142,6 @@ export class UsersMongoRepository {
     const user = await this.userModel.findOne({
       'emailConfirmationData.confirmationCode': confirmationCode,
     });
-    return user;
-  }
+    return user; }
 }
-//
+*/

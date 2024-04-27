@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { add } from 'date-fns';
 import { BlacklistRepository } from 'src/DBEntities/blacklistTokens/blacklistTokens.repository';
 import { JwtService } from 'src/application/jwt/jwtService';
-import { UsersRepository } from 'src/endPointsEntities/users/users.repository';
+import { UsersMongoRepository } from 'src/endPointsEntities/users/users.repository';
 import { UsersService } from 'src/endPointsEntities/users/users.service';
 import {
   UserDbType,
@@ -16,7 +16,7 @@ export class AuthService {
   constructor(
     protected jwtService: JwtService,
     protected usersService: UsersService,
-    protected usersRepository: UsersRepository,
+    protected usersMongoRepository: UsersMongoRepository,
     protected blacklistRepository: BlacklistRepository,
   ) {}
   async validateUser(loginOrEmail: string, password: string) {
@@ -91,7 +91,7 @@ export class AuthService {
         isConfirmed: false,
       },
     };
-    const userView = await this.usersRepository.createUser(newUser);
+    const userView = await this.usersMongoRepository.createUser(newUser);
     return userView;
   }
   async addTokensInBlacklist(

@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
-import { UsersRepository } from 'src/endPointsEntities/users/users.repository';
+import { UsersMongoRepository } from 'src/endPointsEntities/users/users.repository';
 
 @Injectable()
 export class EmailAdapter {
-  constructor(protected usersRepository: UsersRepository) {}
+  constructor(protected usersMongoRepository: UsersMongoRepository) {}
   async sendConfirmEmail(email: string) {
-    const user = await this.usersRepository.findDBUser(email);
+    const user = await this.usersMongoRepository.findDBUser(email);
     const transport = await nodemailer.createTransport({
       service: 'gmail',
       auth: { user: 'dzerdevwarnd3@gmail.com', pass: 'tjqt bbvt kmzl onzs' },
@@ -20,7 +20,6 @@ export class EmailAdapter {
      <a href='https://somesite.com/confirm-email?code=${user?.emailConfirmationData.confirmationCode}'>complete registration</a>
  </p>`,
     });
-    console.log(info);
     return;
   }
   async sendRecoveryCode(email: string, recoveryCode: string) {
@@ -37,7 +36,6 @@ export class EmailAdapter {
 				 <a href='https://somesite.com/password-recovery?recoveryCode=${recoveryCode}'>recovery password</a>
 		 </p>`,
     });
-    console.log(info);
     return;
   }
 }

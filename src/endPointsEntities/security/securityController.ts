@@ -1,8 +1,8 @@
 import { Controller, Delete, Get, Req, Res } from '@nestjs/common';
-import { Request, Response, Router } from 'express';
+import { Request, Response } from 'express';
 import { RefreshTokensMetaRepository } from 'src/DBEntities/refreshTokenMeta/refreshTokenMeta.repository';
 
-export const securityRouter = Router({});
+//export const securityRouter = Router({});
 
 @Controller('security')
 export class SecurityController {
