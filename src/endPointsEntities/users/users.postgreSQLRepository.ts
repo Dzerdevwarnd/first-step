@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { UserDbType } from './users.types';
+import { UserDbType, userViewType, usersPaginationType } from './users.types';
 
 @Injectable()
 export class UsersPgSqlRepository {
   constructor(@InjectDataSource() protected dataSource: DataSource) {}
   async findUser(id: string): Promise<UserDbType | null> {
-    const user = this.dataSource.query(
+    const user = await this.dataSource.query(
       `SELECT id, email, login, "createdAt"
 		FROM public."Users" u
 	WHERE u.id = $1`,
@@ -15,8 +15,8 @@ export class UsersPgSqlRepository {
     );
     return user;
   }
-}
-/*async returnUsersWithPagination(query: any): Promise<usersPaginationType> {
+
+  async returnUsersWithPagination(query: any): Promise<usersPaginationType> {
     const pageSize = Number(query.pageSize) || 10;
     const page = Number(query.pageNumber) || 1;
     const sortBy: string = query.sortBy || 'createdAt';
@@ -24,27 +24,33 @@ export class UsersPgSqlRepository {
     const searchEmailTerm: string = query.searchEmailTerm || '';
     let sortDirection = query.sortDirection || 'desc';
     if (sortDirection === 'desc') {
-      sortDirection = -1;
+      sortDirection = 'DESC';
     } else {
-      sortDirection = 1;
+      sortDirection = 'ASC';
     }
-    const users = await this.
-      .find({
-        $or: [
-          { 'accountData.login': { $regex: searchLoginTerm, $options: 'i' } },
-          { 'accountData.email': { $regex: searchEmailTerm, $options: 'i' } },
-        ],
-      })
-      .sort({ ['accountData.' + sortBy]: sortDirection, createdAt: -1 })
-      .skip((page - 1) * pageSize)
-      .limit(pageSize)
-      .lean();
-    const totalCount = await this.userModel.countDocuments({
-      $or: [
-        { 'accountData.login': { $regex: searchLoginTerm, $options: 'i' } },
-        { 'accountData.email': { $regex: searchEmailTerm, $options: 'i' } },
+    const users = await this.dataSource.query(
+      `
+      SELECT * FROM users
+      WHERE login ILIKE $1 OR email ILIKE $2
+      ORDER BY $3  $4
+      OFFSET $5 LIMIT $6
+  `,
+      [
+        searchLoginTerm,
+        searchEmailTerm,
+        sortBy,
+        sortDirection,
+        (page - 1) * pageSize,
+        pageSize,
       ],
-    });
+    );
+    const totalCount = await this.dataSource.query(
+      `
+    SELECT COUNT(*) FROM users
+    WHERE accountData.login ILIKE $1 OR accountData.email ILIKE $2
+`,
+      [searchLoginTerm, searchEmailTerm],
+    );
     const pagesCount = Math.ceil(totalCount / pageSize);
     const usersView = users.map(({ id, accountData }) => ({
       id,
@@ -63,17 +69,36 @@ export class UsersPgSqlRepository {
   }
 
   async findDBUser(loginOrEmail: string): Promise<UserDbType | undefined> {
-    const user = await this.userModel.findOne({
-      $or: [
-        { 'accountData.email': loginOrEmail },
-        { 'accountData.login': loginOrEmail },
-      ],
-    });
+    const user = await this.dataSource.query(
+      `
+    SELECT * FROM users
+    WHERE accountData.email = $1 OR accountData.login = $1
+    LIMIT 1
+`,
+      [loginOrEmail],
+    );
     return user;
   }
 
   async createUser(newUser: UserDbType): Promise<userViewType> {
-    const result = await this.userModel.insertMany(newUser);
+    const result = await this.dataSource.query(
+      `
+    INSERT INTO users (id, login, email, createdAt, passwordSalt, passwordHash, confirmationCode, expirationDate, isConfirmed)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+`,
+      [
+        newUser.id,
+        newUser.accountData.login,
+        newUser.accountData.email,
+        newUser.accountData.createdAt,
+        newUser.accountData.passwordSalt,
+        newUser.accountData.passwordHash,
+        newUser.emailConfirmationData.confirmationCode,
+        newUser.emailConfirmationData.expirationDate,
+        newUser.emailConfirmationData.isConfirmed,
+      ],
+    );
+
     const userView = {
       id: newUser.id,
       login: newUser.accountData.login,
@@ -87,15 +112,15 @@ export class UsersPgSqlRepository {
     email: string,
     recoveryCode: string,
   ): Promise<boolean> {
-    const result = await this.userModel.updateOne(
-      { 'accountData.email': email },
-      {
-        $set: {
-          'accountData.recoveryCode': recoveryCode,
-        },
-      },
+    const result = await this.dataSource.query(
+      `
+    UPDATE users
+    SET accountData.recoveryCode = $1
+    WHERE accountData.email = $2
+  `,
+      [recoveryCode, email],
     );
-    return result.matchedCount == 1;
+    return result.rowCount == 1;
   }
 
   async updateUserSaltAndHash(
@@ -103,20 +128,25 @@ export class UsersPgSqlRepository {
     passwordSalt: string,
     passwordHash: string,
   ) {
-    const result = await this.userModel.updateOne(
-      { 'accountData.recoveryCode': recoveryCode },
-      {
-        $set: {
-          'accountData.passwordSalt': passwordSalt,
-          'accountData.passwordHash': passwordHash,
-        },
-      },
+    const result = await this.dataSource.query(
+      `
+    UPDATE users
+    SET passwordSalt = $1, passwordHash = $2
+    WHERE recoveryCode = $3
+  `,
+      [passwordSalt, passwordHash, recoveryCode],
     );
-    return result.matchedCount == 1;
+    return result.rowCount == 1;
   }
   async deleteUser(params: { id: string }): Promise<boolean> {
-    const result = await this.userModel.deleteOne({ id: params.id });
-    return result.deletedCount === 1;
+    const result = await this.dataSource.query(
+      `
+    DELETE FROM users
+    WHERE id = $1
+  `,
+      [params.id],
+    );
+    return result.rowCount === 1;
   }
   async userEmailConfirmationAccept(confirmationCode: any): Promise<boolean> {
     const resultOfUpdate = await this.userModel.updateOne(
@@ -142,6 +172,6 @@ export class UsersPgSqlRepository {
     const user = await this.userModel.findOne({
       'emailConfirmationData.confirmationCode': confirmationCode,
     });
-    return user; }
+    return user;
+  }
 }
-*/

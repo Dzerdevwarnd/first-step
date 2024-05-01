@@ -28,7 +28,7 @@ export class UsersService {
       : this.usersPgSqlRepository;
   }
 
-  async findUser(id: string): Promise<UserDbType | null> {
+  async findUser(id: string) {
     const repo = process.env.UserRepository;
     const user = await this.usersRepository.findUser(id);
     return user;

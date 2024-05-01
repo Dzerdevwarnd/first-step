@@ -69,8 +69,8 @@ export class AuthController {
     const user = await this.usersService.findUser(userId);
     const userInfo = {
       userId: userId,
-      login: user!.accountData.login,
-      email: user!.accountData.email,
+      login: user.login || user!.accountData.login,
+      email: user.email || user!.accountData.email,
     };
     res.status(200).send(userInfo);
     return;
