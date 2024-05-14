@@ -49,9 +49,9 @@ import { SecurityController } from './endPointsEntities/security/securityControl
 import { TestController } from './endPointsEntities/testing/testing.controller';
 import { UsersController } from './endPointsEntities/users/users.controller';
 import { User, UserSchema } from './endPointsEntities/users/users.mongo.scheme';
-import { UsersPgSqlRepository } from './endPointsEntities/users/users.postgreSQLRepository';
-import { UsersMongoRepository } from './endPointsEntities/users/users.repository';
 import { UsersService } from './endPointsEntities/users/users.service';
+import { UsersMongoRepository } from './endPointsEntities/users/usersMongo.repository';
+import { UsersPgSqlRepository } from './endPointsEntities/users/usersPgSql.Repository';
 import { PostLikesRepository } from './posts/postLikes/postLikes.repository';
 import { PostLike, PostLikeSchema } from './posts/postLikes/postLikes.scheme';
 import { PostLikesService } from './posts/postLikes/postLikes.service';

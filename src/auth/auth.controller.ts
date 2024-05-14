@@ -18,12 +18,12 @@ import { RefreshTokensMetaRepository } from 'src/DBEntities/refreshTokenMeta/ref
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { EmailAdapter } from 'src/application/emailAdapter/emailAdapter';
 import { JwtService } from 'src/application/jwt/jwtService';
-import { UsersMongoRepository } from 'src/endPointsEntities/users/users.repository';
 import { UsersService } from 'src/endPointsEntities/users/users.service';
 import {
   CreateUserInputModelType,
   UserDbType,
 } from 'src/endPointsEntities/users/users.types';
+import { UsersMongoRepository } from 'src/endPointsEntities/users/usersMongo.repository';
 import { settings } from 'src/settings';
 import { AuthService } from './auth.service';
 import {

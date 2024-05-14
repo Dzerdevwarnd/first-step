@@ -6,7 +6,7 @@ import {
   ValidatorConstraintInterface,
   registerDecorator,
 } from 'class-validator';
-import { UsersMongoRepository } from 'src/endPointsEntities/users/users.repository';
+import { UsersMongoRepository } from 'src/endPointsEntities/users/usersMongo.repository';
 
 @ValidatorConstraint({ async: true })
 @Injectable()

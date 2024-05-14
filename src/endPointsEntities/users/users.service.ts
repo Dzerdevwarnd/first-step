@@ -4,9 +4,9 @@ import { RefreshTokensMetaRepository } from 'src/DBEntities/refreshTokenMeta/ref
 import { JwtService } from 'src/application/jwt/jwtService';
 import { PostsRepository } from 'src/posts/posts.repository';
 import { v4 as uuidv4 } from 'uuid';
-import { UsersPgSqlRepository } from './users.postgreSQLRepository';
-import { UsersMongoRepository } from './users.repository';
 import { UserDbType, userViewType, usersPaginationType } from './users.types';
+import { UsersMongoRepository } from './usersMongo.repository';
+import { UsersPgSqlRepository } from './usersPgSql.Repository';
 import bcrypt = require('bcrypt');
 ///
 @Injectable()
@@ -34,7 +34,7 @@ export class UsersService {
     return user;
   }
   async returnUsersWithPagination(query: any): Promise<usersPaginationType> {
-    return await this.usersMongoRepository.returnUsersWithPagination(query);
+    return await this.usersRepository.returnUsersWithPagination(query);
   }
   async createUser(body: {
     login: string;
@@ -59,11 +59,11 @@ export class UsersService {
         isConfirmed: true,
       },
     };
-    const userView = await this.usersMongoRepository.createUser(newUser);
+    const userView = await this.usersRepository.createUser(newUser);
     return userView;
   }
   async deleteUser(params: { id: string }): Promise<boolean> {
-    const resultBoolean = await this.usersMongoRepository.deleteUser(params);
+    const resultBoolean = await this.usersRepository.deleteUser(params);
     return resultBoolean;
   }
   async generateHash(password: string, passwordSalt: string) {
@@ -78,7 +78,7 @@ export class UsersService {
     loginOrEmail: string,
     password: string,
   ): Promise<UserDbType | undefined> {
-    const user = await this.usersMongoRepository.findDBUser(loginOrEmail);
+    const user = await this.usersRepository.findDBUser(loginOrEmail);
     if (!user) {
       return undefined;
     }
@@ -93,16 +93,12 @@ export class UsersService {
   }
   async userEmailConfirmationAccept(confirmationCode: any): Promise<boolean> {
     const isConfirmationAccept =
-      await this.usersMongoRepository.userEmailConfirmationAccept(
-        confirmationCode,
-      );
+      await this.usersRepository.userEmailConfirmationAccept(confirmationCode);
     return isConfirmationAccept;
   }
   async findDBUserByConfirmationCode(confirmationCode: any) {
     const user =
-      await this.usersMongoRepository.findDBUserByConfirmationCode(
-        confirmationCode,
-      );
+      await this.usersRepository.findDBUserByConfirmationCode(confirmationCode);
     return user;
   }
   async getUserIdFromRefreshToken(
@@ -119,7 +115,7 @@ export class UsersService {
     email: string,
     recoveryCode: string,
   ): Promise<boolean> {
-    const result = await this.usersMongoRepository.updateRecoveryCode(
+    const result = await this.usersRepository.updateRecoveryCode(
       email,
       recoveryCode,
     );
@@ -131,7 +127,7 @@ export class UsersService {
   ): Promise<boolean> {
     const passwordSalt = await this.generateSalt();
     const passwordHash = await this.generateHash(newPassword, passwordSalt);
-    const result = await this.usersMongoRepository.updateUserSaltAndHash(
+    const result = await this.usersRepository.updateUserSaltAndHash(
       recoveryCode,
       passwordSalt,
       passwordHash,

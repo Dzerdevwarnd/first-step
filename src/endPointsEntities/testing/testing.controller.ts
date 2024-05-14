@@ -1,6 +1,7 @@
 /* eslint-disable prefer-const */
 import { Controller, Delete, Res } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { InjectDataSource } from '@nestjs/typeorm';
 import { Response } from 'express';
 import { Model } from 'mongoose';
 import {
@@ -17,6 +18,7 @@ import {
   BlogDocument,
 } from 'src/endPointsEntities/blogs/blogs.mongo.scheme';
 import { Post, PostDocument } from 'src/posts/posts.mongo.scheme';
+import { DataSource } from 'typeorm';
 import { User, UserDocument } from '../users/users.mongo.scheme';
 
 @Controller('testing')
@@ -30,6 +32,7 @@ export class TestController {
     private blacklistTokenModel: Model<BlacklistTokenDocument>,
     @InjectModel(RefreshTokenMeta.name)
     private refreshTokensMetaModel: Model<RefreshTokenMetaDocument>,
+    @InjectDataSource() protected dataSource: DataSource,
   ) {}
 
   @Delete('all-data')
@@ -47,6 +50,12 @@ export class TestController {
     let resultOfDeleteRefreshTokenMeta =
       await this.refreshTokensMetaModel.deleteMany({});
     res.sendStatus(204);
+    67716;
+
+    const tables = ['Users'];
+    for (const table of tables) {
+      await this.dataSource.query(`DELETE FROM "${table}"`);
+    }
     return;
   }
 }

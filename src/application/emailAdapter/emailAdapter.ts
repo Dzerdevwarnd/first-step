@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
-import { UsersMongoRepository } from 'src/endPointsEntities/users/users.repository';
+import { UsersMongoRepository } from 'src/endPointsEntities/users/usersMongo.repository';
 
 @Injectable()
 export class EmailAdapter {

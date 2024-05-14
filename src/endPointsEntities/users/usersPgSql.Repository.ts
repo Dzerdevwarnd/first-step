@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 import { UserDbType, userViewType, usersPaginationType } from './users.types';
 
 @Injectable()
@@ -8,7 +9,7 @@ export class UsersPgSqlRepository {
   constructor(@InjectDataSource() protected dataSource: DataSource) {}
   async findUser(id: string): Promise<UserDbType | null> {
     const user = await this.dataSource.query(
-      `SELECT id, email, login, "createdAt"
+      `SELECT "id", "email", "login", "createdAt"
 		FROM public."Users" u
 	WHERE u.id = $1`,
       [id],
@@ -20,8 +21,8 @@ export class UsersPgSqlRepository {
     const pageSize = Number(query.pageSize) || 10;
     const page = Number(query.pageNumber) || 1;
     const sortBy: string = query.sortBy || 'createdAt';
-    const searchLoginTerm: string = query.searchLoginTerm || '';
-    const searchEmailTerm: string = query.searchEmailTerm || '';
+    const searchLoginTerm: string = query.searchLoginTerm || '%';
+    const searchEmailTerm: string = query.searchEmailTerm || '%';
     let sortDirection = query.sortDirection || 'desc';
     if (sortDirection === 'desc') {
       sortDirection = 'DESC';
@@ -30,40 +31,28 @@ export class UsersPgSqlRepository {
     }
     const users = await this.dataSource.query(
       `
-      SELECT * FROM users
+      SELECT id,login,email,"createdAt" FROM "Users"
       WHERE login ILIKE $1 OR email ILIKE $2
-      ORDER BY $3  $4
-      OFFSET $5 LIMIT $6
+      ORDER BY "${sortBy}" ${sortDirection}
+      OFFSET $3 LIMIT $4
   `,
-      [
-        searchLoginTerm,
-        searchEmailTerm,
-        sortBy,
-        sortDirection,
-        (page - 1) * pageSize,
-        pageSize,
-      ],
+      [searchLoginTerm, searchEmailTerm, (page - 1) * pageSize, pageSize],
     );
-    const totalCount = await this.dataSource.query(
+    const totalCountQuery = await this.dataSource.query(
       `
-    SELECT COUNT(*) FROM users
-    WHERE accountData.login ILIKE $1 OR accountData.email ILIKE $2
+    SELECT COUNT(*) FROM "Users"
+    WHERE login ILIKE $1 OR email ILIKE $2
 `,
       [searchLoginTerm, searchEmailTerm],
     );
+    const totalCount = parseInt(totalCountQuery[0].count, 10);
     const pagesCount = Math.ceil(totalCount / pageSize);
-    const usersView = users.map(({ id, accountData }) => ({
-      id,
-      login: accountData.login,
-      email: accountData.email,
-      createdAt: accountData.createdAt,
-    }));
     const usersPagination = {
       pagesCount: pagesCount,
       page: Number(page),
       pageSize: pageSize,
       totalCount: totalCount,
-      items: usersView,
+      items: users,
     };
     return usersPagination;
   }
@@ -71,8 +60,8 @@ export class UsersPgSqlRepository {
   async findDBUser(loginOrEmail: string): Promise<UserDbType | undefined> {
     const user = await this.dataSource.query(
       `
-    SELECT * FROM users
-    WHERE accountData.email = $1 OR accountData.login = $1
+    SELECT * FROM "Users"
+    WHERE email = $1 OR login = $1
     LIMIT 1
 `,
       [loginOrEmail],
@@ -83,7 +72,7 @@ export class UsersPgSqlRepository {
   async createUser(newUser: UserDbType): Promise<userViewType> {
     const result = await this.dataSource.query(
       `
-    INSERT INTO users (id, login, email, createdAt, passwordSalt, passwordHash, confirmationCode, expirationDate, isConfirmed)
+    INSERT INTO "Users" ("id", "login", "email", "createdAt", "passwordSalt", "passwordHash", "confirmationCode", "expirationDate", "isConfirmed")
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 `,
       [
@@ -114,9 +103,9 @@ export class UsersPgSqlRepository {
   ): Promise<boolean> {
     const result = await this.dataSource.query(
       `
-    UPDATE users
-    SET accountData.recoveryCode = $1
-    WHERE accountData.email = $2
+    UPDATE "Users"
+    SET recoveryCode = $1
+    WHERE email = $2
   `,
       [recoveryCode, email],
     );
@@ -130,9 +119,9 @@ export class UsersPgSqlRepository {
   ) {
     const result = await this.dataSource.query(
       `
-    UPDATE users
-    SET passwordSalt = $1, passwordHash = $2
-    WHERE recoveryCode = $3
+    UPDATE "Users"
+    SET "passwordSalt" = $1, "passwordHash" = $2
+    WHERE "recoveryCode" = $3
   `,
       [passwordSalt, passwordHash, recoveryCode],
     );
@@ -141,37 +130,50 @@ export class UsersPgSqlRepository {
   async deleteUser(params: { id: string }): Promise<boolean> {
     const result = await this.dataSource.query(
       `
-    DELETE FROM users
+    DELETE FROM "Users"
     WHERE id = $1
   `,
       [params.id],
     );
-    return result.rowCount === 1;
+    return result[1] >= 1;
   }
+
   async userEmailConfirmationAccept(confirmationCode: any): Promise<boolean> {
-    const resultOfUpdate = await this.userModel.updateOne(
-      { 'emailConfirmationData.confirmationCode': confirmationCode },
-      { $set: { 'emailConfirmationData.isConfirmed': true } },
+    const resultOfUpdate = await this.dataSource.query(
+      `
+    UPDATE "Users"
+    SET "isConfirmed" = true
+    WHERE "confirmationCode" = $1
+  `,
+      [confirmationCode],
     );
-    return resultOfUpdate.modifiedCount === 1;
+    return resultOfUpdate.rowCount === 1;
   }
 
   async userConfirmationCodeUpdate(email: string) {
     const confirmationCode = await uuidv4();
-    const resultOfUpdate = await this.userModel.updateOne(
-      { 'accountData.email': email },
-      { $set: { 'emailConfirmationData.confirmationCode': confirmationCode } },
+    const resultOfUpdate = await this.dataSource.query(
+      `
+    UPDATE "Users"
+    SET "confirmationCode" = $1
+    WHERE email = $2
+  `,
+      [confirmationCode, email],
     );
-    if (resultOfUpdate.matchedCount === 1) {
+    if (resultOfUpdate.rowCount === 1) {
       return confirmationCode;
     } else {
       return;
     }
   }
   async findDBUserByConfirmationCode(confirmationCode: any) {
-    const user = await this.userModel.findOne({
-      'emailConfirmationData.confirmationCode': confirmationCode,
-    });
+    const user = await this.dataSource.query(
+      `
+    SELECT * FROM "Users"
+    WHERE "confirmationCode" = $1
+`,
+      [confirmationCode],
+    );
     return user;
   }
 }
