@@ -16,6 +16,7 @@ import { Request, Response } from 'express';
 import { JwtService } from 'src/application/jwt/jwtService';
 import { AccessTokenAuthGuard } from 'src/auth/guards/accessToken.auth.guard';
 import { PostsService } from 'src/posts/posts.service';
+import { currentUser, requestUserWithUserId } from 'src/types/req.user';
 import { CommentsService } from './comments.service';
 import {
   CommentUpdateInputModelType,
@@ -84,6 +85,7 @@ export class CommentsController {
     @Req() req: Request,
     @Headers() headers: { authorization: string },
     @Param() params: { id: string },
+    @currentUser() requestUser: requestUserWithUserId,
     @Body() body: CommentUpdateInputModelType,
     @Res() res: Response,
   ) {
@@ -95,7 +97,7 @@ export class CommentsController {
       res.sendStatus(404);
       return;
     }
-    if (comment.commentatorInfo.userId !== req.user!.userId) {
+    if (comment.commentatorInfo.userId !== requestUser.userId) {
       res.sendStatus(403);
       return;
     }
@@ -137,6 +139,7 @@ export class CommentsController {
   @Delete(':id')
   async deleteComment(
     @Req() req: Request,
+    @currentUser() requestUser: requestUserWithUserId, //withid
     @Headers() headers: { authorization: string },
     @Param() params: { id },
     @Res() res: Response,
@@ -149,7 +152,7 @@ export class CommentsController {
       res.sendStatus(404);
       return;
     }
-    if (comment.commentatorInfo.userId !== req.user!.userId) {
+    if (comment.commentatorInfo.userId !== requestUser.userId) {
       res.sendStatus(403);
       return;
     }

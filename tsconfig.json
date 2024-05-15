@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "typeRoots": ["./node_modules/@types", "src/types/index.d.ts"],
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
@@ -17,5 +18,8 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false
-  }
+  },
+  "include": [
+    "src/**/*" // Это включает все файлы TypeScript в папке src
+  ]
 }

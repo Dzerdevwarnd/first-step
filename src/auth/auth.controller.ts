@@ -25,6 +25,11 @@ import {
 } from 'src/endPointsEntities/users/users.types';
 import { UsersMongoRepository } from 'src/endPointsEntities/users/usersMongo.repository';
 import { settings } from 'src/settings';
+import {
+  currentUser,
+  requestUserWithDeviceId,
+  requestUserWithUserId,
+} from 'src/types/req.user';
 import { AuthService } from './auth.service';
 import {
   EmailInputModelType,
@@ -54,6 +59,7 @@ export class AuthController {
   async getInformationAboutMe(
     @Query() query: { object },
     @Headers() headers: { authorization: string },
+    @currentUser() requestUser: requestUserWithUserId,
     @Res() res: Response,
   ) {
     if (!headers.authorization) {
@@ -80,13 +86,14 @@ export class AuthController {
   @Post('/login')
   async userLogin(
     @Req() req: Request,
+    @currentUser() requestUser: any,
     @Ip() ip: string,
     @Headers() headers: { authorization: string },
     @Res() res: Response,
   ) {
     const deviceId = String(Date.now());
     const accessToken = await this.jwtService.createAccessToken(
-      req.user,
+      requestUser.user,
       settings.accessTokenLifeTime,
     );
     const refreshToken = await this.jwtService.createRefreshToken(
@@ -96,7 +103,7 @@ export class AuthController {
     const ipAddress = ip || headers['x-forwarded-for'] || headers['x-real-ip'];
     const isCreated =
       await this.refreshTokenMetaRepository.createRefreshTokenMeta(
-        req.user!.id,
+        requestUser.id,
         deviceId,
         headers['user-agent'] || 'unknown',
         ipAddress,
@@ -121,6 +128,7 @@ export class AuthController {
   async refreshAccessAndRefreshTokens(
     @Req() req: Request,
     @Res() res: Response,
+    @currentUser() requestUser: requestUserWithDeviceId,
   ) {
     const tokenInBlackList =
       await this.blacklistRepository.findTokenInBlacklist(
@@ -146,7 +154,7 @@ export class AuthController {
     }
     const tokens = await this.authService.refreshTokens(
       user!,
-      req.user.deviceId,
+      requestUser.deviceId,
     );
     if (!tokens?.accessToken || !tokens.refreshToken) {
       res.sendStatus(401);
@@ -170,7 +178,7 @@ export class AuthController {
     };
     const isUpdated =
       await this.refreshTokenMetaRepository.updateRefreshTokenMeta(
-        req.user.deviceId,
+        requestUser.deviceId,
         RefreshTokenMetaUpd,
       );
     if (!isUpdated) {
