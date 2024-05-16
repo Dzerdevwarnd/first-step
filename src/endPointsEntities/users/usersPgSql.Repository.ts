@@ -66,7 +66,7 @@ export class UsersPgSqlRepository {
 `,
       [loginOrEmail],
     );
-    return user;
+    return user[0] || undefined;
   }
 
   async createUser(newUser: UserDbType): Promise<userViewType> {
@@ -177,3 +177,4 @@ export class UsersPgSqlRepository {
     return user;
   }
 }
+//

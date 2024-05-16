@@ -79,17 +79,17 @@ export class UsersService {
     password: string,
   ): Promise<UserDbType | undefined> {
     const user = await this.usersRepository.findDBUser(loginOrEmail);
+    console.log(user);
     if (!user) {
       return undefined;
     }
-    if (
-      user.accountData.passwordHash !==
-      (await this.generateHash(password, user.accountData.passwordSalt))
-    ) {
+    const passwordSalt = user.accountData?.passwordSalt || user.passwordSalt;
+    const passwordHash = user.accountData?.passwordHash || user.passwordHash;
+    if (passwordHash !== (await this.generateHash(password, passwordSalt))) {
       return undefined;
     } else {
       return user;
-    }
+    } //
   }
   async userEmailConfirmationAccept(confirmationCode: any): Promise<boolean> {
     const isConfirmationAccept =

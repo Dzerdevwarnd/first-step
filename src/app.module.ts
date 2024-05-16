@@ -47,6 +47,7 @@ import { FindBlogByIdUseCase } from './endPointsEntities/blogs/use-cases/findBlo
 import { PostBlogUseCase } from './endPointsEntities/blogs/use-cases/postBlog';
 import { ReturnBlogsWithPaginationUseCase } from './endPointsEntities/blogs/use-cases/returnBlogsWithPagination';
 import { UpdateBlogUseCase } from './endPointsEntities/blogs/use-cases/updateBlog';
+import { SaController } from './endPointsEntities/sa/sa.contoreller';
 import { SecurityController } from './endPointsEntities/security/securityController';
 import { TestController } from './endPointsEntities/testing/testing.controller';
 import { UsersController } from './endPointsEntities/users/users.controller';
@@ -151,6 +152,7 @@ const useCases = [
     CommentsController,
     SecurityController,
     AuthController,
+    SaController,
   ],
   providers: [
     PostsService,

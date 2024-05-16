@@ -521,6 +521,47 @@ window.onload = function() {
             }
           }
         }
+      },
+      "/sa/users": {
+        "get": {
+          "operationId": "SaController_getUsersWithPagination",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        },
+        "post": {
+          "operationId": "SaController_createUser",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateUserInputModelType"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          }
+        }
+      },
+      "/sa/users/{id}": {
+        "delete": {
+          "operationId": "SaController_deleteUserByID",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        }
       }
     },
     "info": {
