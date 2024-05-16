@@ -7,8 +7,10 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { join } from 'path';
 import { BlacklistRepository } from './DBEntities/blacklistTokens/blacklistTokens.repository';
 import {
   BlacklistToken,
@@ -98,6 +100,10 @@ const useCases = [
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'swagger-static'),
+      serveRoot: process.env.NODE_ENV === 'development' ? '/' : '/swagger',
+    }),
     ThrottlerModule.forRoot([
       {
         ttl: 10000,
