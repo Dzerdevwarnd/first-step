@@ -5,7 +5,7 @@ import { Blog, BlogDocument } from './blogs.mongo.scheme';
 import { blogDBType, blogViewType, blogsPaginationType } from './blogs.types';
 
 @Injectable()
-export class BlogsRepository {
+export class BlogsMongoRepository {
   constructor(@InjectModel(Blog.name) private blogModel: Model<BlogDocument>) {}
   async returnBlogsWithPagination(query: any): Promise<blogsPaginationType> {
     const pageSize = Number(query.pageSize) || 10;

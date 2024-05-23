@@ -41,7 +41,7 @@ import { CommentsRepository } from './comments/comments.repository';
 import { CommentsService } from './comments/comments.service';
 import { BlogsController } from './endPointsEntities/blogs/blogs.controller';
 import { Blog, BlogSchema } from './endPointsEntities/blogs/blogs.mongo.scheme';
-import { BlogsRepository } from './endPointsEntities/blogs/blogs.repository';
+import { BlogsRepository } from './endPointsEntities/blogs/blogs.mongoRepository';
 import { DeleteBlogUseCase } from './endPointsEntities/blogs/use-cases/deleteBlog';
 import { FindBlogByIdUseCase } from './endPointsEntities/blogs/use-cases/findBlogById';
 import { PostBlogUseCase } from './endPointsEntities/blogs/use-cases/postBlog';

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from 'src/application/jwt/jwtService';
 import { CommentLikesService } from 'src/comments/commentLikes/commentLikesService';
-import { BlogsRepository } from 'src/endPointsEntities/blogs/blogs.repository';
+import { BlogsRepository } from 'src/endPointsEntities/blogs/blogs.mongoRepository';
 import { UsersMongoRepository } from 'src/endPointsEntities/users/usersMongo.repository';
 import { PostsRepository } from 'src/posts/posts.repository';
 import { CommentsRepository } from './comments.repository';

@@ -6,16 +6,16 @@ import {
   ValidatorConstraintInterface,
   registerDecorator,
 } from 'class-validator';
-import { UsersMongoRepository } from 'src/endPointsEntities/users/usersMongo.repository';
+import { UsersService } from 'src/endPointsEntities/users/users.service';
 
 @ValidatorConstraint({ async: true })
 @Injectable()
 export class LoginAlreadyInUseConstraint
   implements ValidatorConstraintInterface
 {
-  constructor(protected usersMongoRepository: UsersMongoRepository) {}
+  constructor(protected usersService: UsersService) {}
   async validate(login: any, args: ValidationArguments) {
-    const user = await this.usersMongoRepository.findDBUser(login);
+    const user = await this.usersService.findDBUser(login);
     if (user) {
       return false;
     }

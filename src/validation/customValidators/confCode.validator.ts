@@ -16,13 +16,18 @@ export class ConfirmationCodeValidationConstraint
   constructor(protected usersService: UsersService) {}
   async validate(code: any, args: ValidationArguments) {
     const user = await this.usersService.findDBUserByConfirmationCode(code);
+    console.log(user);
     if (!user) {
       return false;
     }
-    if (new Date() > user.emailConfirmationData.expirationDate) {
+    const expirationDate =
+      user.emailConfirmationData?.expirationDate || user.expirationDate;
+    if (new Date() > expirationDate) {
       return false;
     }
-    if (user?.emailConfirmationData.isConfirmed === true) {
+    const isConfirmed =
+      user.emailConfirmationData?.isConfirmed || user.isConfirmed;
+    if (isConfirmed === true) {
       return false;
     }
     return true;

@@ -91,7 +91,11 @@ export class AuthService {
         isConfirmed: false,
       },
     };
-    const userView = await this.usersMongoRepository.createUser(newUser);
+    const userView = await this.usersService.createUser({
+      login,
+      password,
+      email,
+    });
     return userView;
   }
   async addTokensInBlacklist(

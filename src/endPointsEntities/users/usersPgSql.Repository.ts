@@ -14,7 +14,7 @@ export class UsersPgSqlRepository {
 	WHERE u.id = $1`,
       [id],
     );
-    return user;
+    return user[0] || undefined;
   }
 
   async returnUsersWithPagination(query: any): Promise<usersPaginationType> {
@@ -33,17 +33,22 @@ export class UsersPgSqlRepository {
       `
       SELECT id,login,email,"createdAt" FROM "Users"
       WHERE login ILIKE $1 OR email ILIKE $2
-      ORDER BY "${sortBy}" ${sortDirection}
+      ORDER BY "${sortBy}" COLLATE "C" ${sortDirection}
       OFFSET $3 LIMIT $4
   `,
-      [searchLoginTerm, searchEmailTerm, (page - 1) * pageSize, pageSize],
+      [
+        `%${searchLoginTerm}%`,
+        `%${searchEmailTerm}%`,
+        (page - 1) * pageSize,
+        pageSize,
+      ],
     );
     const totalCountQuery = await this.dataSource.query(
       `
     SELECT COUNT(*) FROM "Users"
     WHERE login ILIKE $1 OR email ILIKE $2
 `,
-      [searchLoginTerm, searchEmailTerm],
+      [`%${searchLoginTerm}%`, `%${searchEmailTerm}%`],
     );
     const totalCount = parseInt(totalCountQuery[0].count, 10);
     const pagesCount = Math.ceil(totalCount / pageSize);
@@ -79,7 +84,7 @@ export class UsersPgSqlRepository {
         newUser.id,
         newUser.accountData.login,
         newUser.accountData.email,
-        newUser.accountData.createdAt,
+        newUser.accountData.createdAt.toISOString(),
         newUser.accountData.passwordSalt,
         newUser.accountData.passwordHash,
         newUser.emailConfirmationData.confirmationCode,
@@ -135,7 +140,7 @@ export class UsersPgSqlRepository {
   `,
       [params.id],
     );
-    return result[1] >= 1;
+    return result[1] === 1;
   }
 
   async userEmailConfirmationAccept(confirmationCode: any): Promise<boolean> {
@@ -147,7 +152,7 @@ export class UsersPgSqlRepository {
   `,
       [confirmationCode],
     );
-    return resultOfUpdate.rowCount === 1;
+    return resultOfUpdate[1] === 1;
   }
 
   async userConfirmationCodeUpdate(email: string) {
@@ -171,10 +176,11 @@ export class UsersPgSqlRepository {
       `
     SELECT * FROM "Users"
     WHERE "confirmationCode" = $1
+    LIMIT 1
 `,
       [confirmationCode],
     );
-    return user;
+    return user[0] || undefined;
   }
 }
 //

@@ -1,5 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BlogsRepository } from '../blogs.repository';
+import { BlogsMongoRepository } from '../blogs.mongoRepository';
+import { BlogsPgSqlRepository } from '../blogs.postgreRepository';
 import {
   CreateBlogInputModelType,
   blogDBType,
@@ -12,7 +13,19 @@ export class PostBlogCommand {
 
 @CommandHandler(PostBlogCommand)
 export class PostBlogUseCase implements ICommandHandler<PostBlogCommand> {
-  constructor(protected blogsRepository: BlogsRepository) {}
+  private blogsRepository;
+  constructor(
+    protected blogsMongoRepository: BlogsMongoRepository,
+    protected blogsPgSqlRepository: BlogsPgSqlRepository,
+  ) {
+    this.blogsRepository = this.getUsersRepository();
+  }
+
+  private getUsersRepository() {
+    return process.env.USERS_REPOSITORY === 'Mongo'
+      ? this.blogsMongoRepository
+      : this.blogsPgSqlRepository;
+  }
   async execute(command: PostBlogCommand): Promise<blogViewType> {
     const createdDate = new Date();
     const newBlog: blogDBType = {

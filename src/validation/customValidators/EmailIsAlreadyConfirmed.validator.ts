@@ -6,17 +6,19 @@ import {
   ValidatorConstraintInterface,
   registerDecorator,
 } from 'class-validator';
-import { UsersMongoRepository } from 'src/endPointsEntities/users/usersMongo.repository';
+import { UsersService } from 'src/endPointsEntities/users/users.service';
 
 @ValidatorConstraint({ async: true })
 @Injectable()
 export class IsEmailIsAlreadyConfirmedConstraint
   implements ValidatorConstraintInterface
 {
-  constructor(protected userRepository: UsersMongoRepository) {}
+  constructor(protected usersService: UsersService) {}
   async validate(email: any, args: ValidationArguments) {
-    const user = await this.userRepository.findDBUser(email);
-    if (user?.emailConfirmationData.isConfirmed === true) {
+    const user: any = await this.usersService.findDBUser(email);
+    const isConfirmed =
+      user?.emailConfirmationData?.isConfirmed || user?.isConfirmed;
+    if (isConfirmed === true) {
       return false;
     }
     return true;

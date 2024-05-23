@@ -93,7 +93,7 @@ export class AuthController {
   ) {
     const deviceId = String(Date.now());
     const accessToken = await this.jwtService.createAccessToken(
-      requestUser.user,
+      requestUser,
       settings.accessTokenLifeTime,
     );
     const refreshToken = await this.jwtService.createRefreshToken(
@@ -146,8 +146,7 @@ export class AuthController {
       res.sendStatus(401);
       return;
     }
-    const user: UserDbType | null =
-      await this.usersMongoRepository.findUser(userId);
+    const user: UserDbType | null = await this.usersService.findUser(userId);
     if (!user) {
       res.sendStatus(401);
       return;
@@ -281,7 +280,7 @@ export class AuthController {
     @Body() body: EmailResendingModelType,
     @Res() res: Response,
   ) {
-    await this.usersMongoRepository.userConfirmationCodeUpdate(body.email);
+    await this.usersService.userConfirmationCodeUpdate(body.email);
     await this.emailAdapter.sendConfirmEmail(body.email);
     res.sendStatus(204);
     return;
@@ -329,3 +328,4 @@ export class AuthController {
     return;
   }
 }
+//

@@ -29,10 +29,14 @@ export class UsersService {
   }
 
   async findUser(id: string) {
-    const repo = process.env.UserRepository;
     const user = await this.usersRepository.findUser(id);
     return user;
   }
+
+  async findDBUser(loginOrEmail) {
+    return await this.usersRepository.findDBUser(loginOrEmail);
+  }
+
   async returnUsersWithPagination(query: any): Promise<usersPaginationType> {
     return await this.usersRepository.returnUsersWithPagination(query);
   }
@@ -56,7 +60,7 @@ export class UsersService {
       emailConfirmationData: {
         confirmationCode: uuidv4(),
         expirationDate: add(new Date(), { hours: 1, minutes: 3 }),
-        isConfirmed: true,
+        isConfirmed: false,
       },
     };
     const userView = await this.usersRepository.createUser(newUser);
@@ -79,13 +83,16 @@ export class UsersService {
     password: string,
   ): Promise<UserDbType | undefined> {
     const user = await this.usersRepository.findDBUser(loginOrEmail);
-    console.log(user);
     if (!user) {
       return undefined;
     }
     const passwordSalt = user.accountData?.passwordSalt || user.passwordSalt;
     const passwordHash = user.accountData?.passwordHash || user.passwordHash;
-    if (passwordHash !== (await this.generateHash(password, passwordSalt))) {
+    const passwordNowGenerateHash = await this.generateHash(
+      password,
+      passwordSalt,
+    );
+    if (passwordHash !== passwordNowGenerateHash) {
       return undefined;
     } else {
       return user;
@@ -133,5 +140,15 @@ export class UsersService {
       passwordHash,
     );
     return result;
+  }
+
+  async userConfirmationCodeUpdate(email: string) {
+    const confirmationCode =
+      await this.usersRepository.userConfirmationCodeUpdate(email);
+    if (confirmationCode) {
+      return confirmationCode;
+    } else {
+      return;
+    }
   }
 }
