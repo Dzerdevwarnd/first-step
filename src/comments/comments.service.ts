@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from 'src/application/jwt/jwtService';
 import { CommentLikesService } from 'src/comments/commentLikes/commentLikesService';
-import { BlogsRepository } from 'src/endPointsEntities/blogs/blogs.mongoRepository';
 import { UsersMongoRepository } from 'src/endPointsEntities/users/usersMongo.repository';
-import { PostsRepository } from 'src/posts/posts.repository';
-import { CommentsRepository } from './comments.repository';
+import { PostsMongoRepository } from 'src/posts/posts.mongoRepository';
+import { CommentsMongoRepository } from './comments.MongoRepository';
+import { CommentsPgSqlRepository } from './comments.PgSql';
 import {
   CommentDBType,
   CommentViewType,
@@ -13,14 +13,23 @@ import {
 
 @Injectable()
 export class CommentsService {
+  private commentsRepository;
   constructor(
-    protected commentsRepository: CommentsRepository,
-    protected blogsRepository: BlogsRepository,
-    protected postsReposittory: PostsRepository,
+    protected commentsMongoRepository: CommentsMongoRepository,
+    protected commentsPgSqlRepository: CommentsPgSqlRepository,
+    protected postsReposittory: PostsMongoRepository,
     protected commentLikesService: CommentLikesService,
     protected usersMongoRepository: UsersMongoRepository,
     protected jwtService: JwtService,
-  ) {}
+  ) {
+    this.commentsRepository = this.getCommentsRepository();
+  }
+
+  private getCommentsRepository() {
+    return process.env.USERS_REPOSITORY === 'Mongo'
+      ? this.commentsMongoRepository
+      : this.commentsPgSqlRepository;
+  }
   async findComment(
     commentId: string,
     userId: string,

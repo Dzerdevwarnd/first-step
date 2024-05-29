@@ -22,8 +22,8 @@ import { CommentCreateInputModelType } from 'src/comments/comments.types';
 import { PostsService } from './posts.service';
 import {
   CreatePostInputModelType,
-  UpdatePostInputModelType,
   UpdatePostLikeStatusInputModelType,
+  UpdatePostMongoInputModelType,
   postsByBlogIdPaginationType,
 } from './posts.types';
 import { CreatePostCommand } from './use-cases/createPost';
@@ -157,7 +157,7 @@ export class PostsController {
   async updatePost(
     @Param() params: { id: string },
     @Body()
-    body: UpdatePostInputModelType,
+    body: UpdatePostMongoInputModelType,
     @Res() res: Response,
   ) {
     const ResultOfUpdatePost = await this.commandBus.execute(
@@ -201,8 +201,11 @@ export class PostsController {
   }
 
   @UseGuards(BasicAuthGuard)
-  @Delete(':id')
-  async deleteBlogByID(@Param() params: { id }, @Res() res: Response) {
+  @Delete(':postId')
+  async deleteBlogByID(
+    @Param() params: { postId: string },
+    @Res() res: Response,
+  ) {
     const resultOfDelete = await await this.commandBus.execute(
       new deletePostCommand(params),
     );

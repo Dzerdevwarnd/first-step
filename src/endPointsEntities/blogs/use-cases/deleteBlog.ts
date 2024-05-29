@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { BlogsPgSqlRepository } from '../blogs.PgSqlRepository';
 import { BlogsMongoRepository } from '../blogs.mongoRepository';
-import { BlogsPgSqlRepository } from '../blogs.postgreRepository';
 
 export class DeleteBlogCommand {
   constructor(public params: { id: string }) {}
@@ -13,10 +13,10 @@ export class DeleteBlogUseCase implements ICommandHandler<DeleteBlogCommand> {
     protected blogsMongoRepository: BlogsMongoRepository,
     protected blogsPgSqlRepository: BlogsPgSqlRepository,
   ) {
-    this.blogsRepository = this.getUsersRepository();
+    this.blogsRepository = this.getBlogsRepository();
   }
 
-  private getUsersRepository() {
+  private getBlogsRepository() {
     return process.env.USERS_REPOSITORY === 'Mongo'
       ? this.blogsMongoRepository
       : this.blogsPgSqlRepository;

@@ -52,7 +52,7 @@ export class TestController {
     res.sendStatus(204);
     67716;
 
-    const tables = ['Users'];
+    const tables = ['Users', 'Blogs', 'Posts'];
     for (const table of tables) {
       await this.dataSource.query(`DELETE FROM "${table}"`);
     }

@@ -29,7 +29,7 @@ export class CreatePostByBlogIdInputModelType {
   content: string;
 }
 
-export class UpdatePostInputModelType {
+export class UpdatePostMongoInputModelType {
   @Length(1, 30)
   @NotContains('  ', { message: 'Property should not contain spaces' })
   title: string;
@@ -43,6 +43,18 @@ export class UpdatePostInputModelType {
   @NotContains('  ', { message: 'Property should not contain spaces' })
   @blogExistValidation()
   blogId: string;
+}
+
+export class UpdatePostPgSqlInputModelType {
+  @Length(1, 30)
+  @NotContains('  ', { message: 'Property should not contain spaces' })
+  title: string;
+  @Length(1, 100)
+  @NotContains('  ', { message: 'Property should not contain spaces' })
+  shortDescription: string;
+  @Length(1, 1000)
+  @NotContains('  ', { message: 'Property should not contain spaces' })
+  content: string;
 }
 
 export class UpdatePostLikeStatusInputModelType {

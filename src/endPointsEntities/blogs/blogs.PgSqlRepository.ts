@@ -1,17 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { Model } from 'mongoose';
 import { DataSource } from 'typeorm';
-import { Blog, BlogDocument } from './blogs.mongo.scheme';
 import { blogDBType, blogViewType, blogsPaginationType } from './blogs.types';
 
 @Injectable()
 export class BlogsPgSqlRepository {
-  constructor(
-    @InjectModel(Blog.name) private blogModel: Model<BlogDocument>,
-    @InjectDataSource() protected dataSource: DataSource,
-  ) {}
+  constructor(@InjectDataSource() protected dataSource: DataSource) {}
   async returnBlogsWithPagination(query: any): Promise<blogsPaginationType> {
     const pageSize = Number(query.pageSize) || 10;
     const page = Number(query.pageNumber) || 1;
@@ -19,9 +13,9 @@ export class BlogsPgSqlRepository {
     const searchNameTerm: string = query.searchNameTerm || '';
     let sortDirection = query.sortDirection || 'desc';
     if (sortDirection === 'desc') {
-      sortDirection = -1;
+      sortDirection = 'DESC';
     } else {
-      sortDirection = 1;
+      sortDirection = 'ASC';
     }
     const blogs = await this.dataSource.query(
       `
@@ -65,14 +59,14 @@ export class BlogsPgSqlRepository {
     const result = await this.dataSource.query(
       `
     INSERT INTO "Blogs" (id,name,description,"websiteUrl","createdAt","isMembership")
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    VALUES ($1, $2, $3, $4, $5, $6)
 `,
       [
         newBlog.id,
         newBlog.name,
         newBlog.description,
-        newBlog.createdAt.toISOString(),
         newBlog.websiteUrl,
+        newBlog.createdAt.toISOString(),
         newBlog.isMembership,
       ],
     );
@@ -101,7 +95,7 @@ export class BlogsPgSqlRepository {
 			`,
       [id, body.name, body.description, body.websiteUrl],
     );
-    return result.rows.length === 1;
+    return result[0] === 1;
   }
   async deleteBlog(params: { id: string }): Promise<boolean> {
     const result = await this.dataSource.query(

@@ -1,5 +1,5 @@
 /*import { Injectable } from '@nestjs/common';
-import { PostsRepository } from 'src/posts/posts.repository';
+import { PostsMongoRepository } from 'src/posts/posts.repository';
 import { postsByBlogIdPaginationType } from 'src/posts/posts.types';
 import { BlogsRepository } from './blogs.repository';
 import { blogDBType, blogViewType, blogsPaginationType } from './blogs.types';
@@ -8,7 +8,7 @@ import { blogDBType, blogViewType, blogsPaginationType } from './blogs.types';
 export class BlogsService {
   constructor(
     protected blogsRepository: BlogsRepository,
-    protected postsRepository: PostsRepository,
+    protected postsRepository: PostsMongoRepository,
   ) {}
   async returnBlogsWithPagination(query: any): Promise<blogsPaginationType> {
     return this.blogsRepository.returnBlogsWithPagination(query);

@@ -1,9 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import { PostLikesService } from '../postLikes/postLikes.service';
-import { Post, PostDocument } from '../posts.mongo.scheme';
-import { PostsRepository } from '../posts.repository';
+import { PostsPgSqlRepository } from '../posts.PgSqlRepository';
+import { PostsMongoRepository } from '../posts.mongoRepository';
 import { postViewType } from '../posts.types';
 
 export class FindPostCommand {
@@ -15,23 +13,32 @@ export class FindPostCommand {
 
 @CommandHandler(FindPostCommand)
 export class FindPostUseCase implements ICommandHandler<FindPostCommand> {
+  private postsRepository;
   constructor(
-    @InjectModel(Post.name) private postModel: Model<PostDocument>,
-    protected postsRepository: PostsRepository,
+    protected postsMongoRepository: PostsMongoRepository,
+    protected postsPgSqlRepository: PostsPgSqlRepository,
     protected postLikesService: PostLikesService,
-  ) {}
+  ) {
+    this.postsRepository = this.getPostsRepository();
+  }
+
+  private getPostsRepository() {
+    return process.env.USERS_REPOSITORY === 'Mongo'
+      ? this.postsMongoRepository
+      : this.postsPgSqlRepository;
+  }
   async execute(command: FindPostCommand): Promise<postViewType | null> {
     const foundPost = await this.postsRepository.findPost(command.params);
     if (!foundPost) {
       return null;
     }
-    const like = await this.postLikesService.findPostLikeFromUser(
+    /*    const like = await this.postLikesService.findPostLikeFromUser(
       command.userId,
       command.params.id,
     );
     const last3DBLikes = await this.postLikesService.findLast3Likes(
       foundPost.id,
-    );
+    ); */
     const postView = {
       title: foundPost.title,
       id: foundPost.id,
@@ -41,10 +48,10 @@ export class FindPostUseCase implements ICommandHandler<FindPostCommand> {
       blogName: foundPost.blogName,
       createdAt: foundPost.createdAt,
       extendedLikesInfo: {
-        likesCount: foundPost.likesInfo.likesCount,
-        dislikesCount: foundPost.likesInfo.dislikesCount,
-        myStatus: like?.likeStatus || 'None',
-        newestLikes: last3DBLikes || [],
+        likesCount: foundPost.likesInfo.likesCount || 0,
+        dislikesCount: foundPost.likesInfo.dislikesCount || 0,
+        myStatus: /* like?.likeStatus || */ 'None',
+        newestLikes: /* last3DBLikes || */ [],
       },
     };
     return postView;

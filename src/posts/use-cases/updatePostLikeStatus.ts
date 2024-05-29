@@ -2,7 +2,8 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtService } from 'src/application/jwt/jwtService';
 import { UsersService } from 'src/endPointsEntities/users/users.service';
 import { PostLikesService } from '../postLikes/postLikes.service';
-import { PostsRepository } from '../posts.repository';
+import { PostsPgSqlRepository } from '../posts.PgSqlRepository';
+import { PostsMongoRepository } from '../posts.mongoRepository';
 import { PostsService } from '../posts.service';
 
 export class updatePostLikeStatusCommand {
@@ -19,13 +20,23 @@ export class updatePostLikeStatusCommand {
 export class updatePostLikeStatusUseCase
   implements ICommandHandler<updatePostLikeStatusCommand>
 {
+  private postsRepository;
   constructor(
-    protected postsRepository: PostsRepository,
+    protected postsMongoRepository: PostsMongoRepository,
+    protected postsPgSqlRepository: PostsPgSqlRepository,
     protected jwtService: JwtService,
     protected postsService: PostsService,
     protected postLikesService: PostLikesService,
     protected usersService: UsersService,
-  ) {}
+  ) {
+    this.postsRepository = this.getPostsRepository();
+  }
+
+  private getPostsRepository() {
+    return process.env.USERS_REPOSITORY === 'Mongo'
+      ? this.postsMongoRepository
+      : this.postsPgSqlRepository;
+  }
   async execute(command: updatePostLikeStatusCommand): Promise<boolean> {
     const userId = await this.jwtService.verifyAndGetUserIdByToken(
       command.accessToken,

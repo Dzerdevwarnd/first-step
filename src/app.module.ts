@@ -35,13 +35,14 @@ import {
 } from './comments/commentLikes/commentLikes.mongo.scheme';
 import { CommentLikesRepository } from './comments/commentLikes/commentLikesRepository';
 import { CommentLikesService } from './comments/commentLikes/commentLikesService';
+import { CommentsRepository } from './comments/comments.MongoRepository';
 import { CommentsController } from './comments/comments.controller';
 import { Comment, CommentSchema } from './comments/comments.mongo.scheme';
-import { CommentsRepository } from './comments/comments.repository';
 import { CommentsService } from './comments/comments.service';
+import { BlogsPgSqlRepository } from './endPointsEntities/blogs/blogs.PgSqlRepository';
 import { BlogsController } from './endPointsEntities/blogs/blogs.controller';
 import { Blog, BlogSchema } from './endPointsEntities/blogs/blogs.mongo.scheme';
-import { BlogsRepository } from './endPointsEntities/blogs/blogs.mongoRepository';
+import { BlogsMongoRepository } from './endPointsEntities/blogs/blogs.mongoRepository';
 import { DeleteBlogUseCase } from './endPointsEntities/blogs/use-cases/deleteBlog';
 import { FindBlogByIdUseCase } from './endPointsEntities/blogs/use-cases/findBlogById';
 import { PostBlogUseCase } from './endPointsEntities/blogs/use-cases/postBlog';
@@ -58,9 +59,10 @@ import { UsersPgSqlRepository } from './endPointsEntities/users/usersPgSql.Repos
 import { PostLikesRepository } from './posts/postLikes/postLikes.repository';
 import { PostLike, PostLikeSchema } from './posts/postLikes/postLikes.scheme';
 import { PostLikesService } from './posts/postLikes/postLikes.service';
+import { PostsPgSqlRepository } from './posts/posts.PgSqlRepository';
 import { PostsController } from './posts/posts.controller';
 import { Post, PostSchema } from './posts/posts.mongo.scheme';
-import { PostsRepository } from './posts/posts.repository';
+import { PostsMongoRepository } from './posts/posts.mongoRepository';
 import { PostsService } from './posts/posts.service';
 import { CreatePostUseCase } from './posts/use-cases/createPost';
 import { createPostByBlogIdUseCase } from './posts/use-cases/createPostByBlogId';
@@ -138,7 +140,7 @@ const useCases = [
       host: 'localhost',
       port: 5432,
       username: 'nodejs',
-      password: 'nodejs',
+      password: 'nodejs', //
       database: 'Homework',
       autoLoadEntities: false,
       synchronize: false,
@@ -158,8 +160,10 @@ const useCases = [
     PostsService,
     UsersService,
     CommentsService,
-    BlogsRepository,
-    PostsRepository,
+    BlogsMongoRepository,
+    BlogsPgSqlRepository,
+    PostsMongoRepository,
+    PostsPgSqlRepository,
     UsersPgSqlRepository,
     UsersMongoRepository,
     CommentsRepository,

@@ -2,23 +2,32 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from 'src/application/jwt/jwtService';
-import { BlogsRepository } from 'src/endPointsEntities/blogs/blogs.mongoRepository';
 import { UsersService } from 'src/endPointsEntities/users/users.service';
 import { PostLikesService } from 'src/posts/postLikes/postLikes.service';
+import { PostsPgSqlRepository } from './posts.PgSqlRepository';
 import { Post, PostDocument } from './posts.mongo.scheme';
-import { PostsRepository } from './posts.repository';
+import { PostsMongoRepository } from './posts.mongoRepository';
 import { postViewType } from './posts.types';
 
 @Injectable()
 export class PostsService {
+  private postsRepository;
   constructor(
     @InjectModel(Post.name) private postModel: Model<PostDocument>,
-    protected blogsRepository: BlogsRepository,
-    protected postsRepository: PostsRepository,
+    protected postsMongoRepository: PostsMongoRepository,
+    protected postsPgSqlRepository: PostsPgSqlRepository,
     protected postLikesService: PostLikesService,
     protected jwtService: JwtService,
     protected usersService: UsersService,
-  ) {}
+  ) {
+    this.postsRepository = this.getPostsRepository();
+  }
+
+  private getPostsRepository() {
+    return process.env.USERS_REPOSITORY === 'Mongo'
+      ? this.postsMongoRepository
+      : this.postsPgSqlRepository;
+  }
   /*async getPostsWithPagination(
     query: any,
     userId: string,
@@ -83,8 +92,8 @@ export class PostsService {
       blogName: foundPost.blogName,
       createdAt: foundPost.createdAt,
       extendedLikesInfo: {
-        likesCount: foundPost.likesInfo.likesCount,
-        dislikesCount: foundPost.likesInfo.dislikesCount,
+        likesCount: foundPost.likesInfo?.likesCount || 0,
+        dislikesCount: foundPost.likesInfo?.dislikesCount || 0,
         myStatus: like?.likeStatus || 'None',
         newestLikes: last3DBLikes || [],
       },

@@ -1,5 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PostsRepository } from '../posts.repository';
+import { PostsPgSqlRepository } from '../posts.PgSqlRepository';
+import { PostsMongoRepository } from '../posts.mongoRepository';
 import { postDBType, postViewType } from '../posts.types';
 
 export class CreatePostCommand {
@@ -15,7 +16,19 @@ export class CreatePostCommand {
 
 @CommandHandler(CreatePostCommand)
 export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
-  constructor(protected postsRepository: PostsRepository) {}
+  private postsRepository;
+  constructor(
+    protected postsMongoRepository: PostsMongoRepository,
+    protected postsPgSqlRepository: PostsPgSqlRepository,
+  ) {
+    this.postsRepository = this.getPostsRepository();
+  }
+
+  private getPostsRepository() {
+    return process.env.USERS_REPOSITORY === 'Mongo'
+      ? this.postsMongoRepository
+      : this.postsPgSqlRepository;
+  }
   async execute(command: CreatePostCommand): Promise<postViewType> {
     const createdDate = new Date();
     const newPost: postDBType = {

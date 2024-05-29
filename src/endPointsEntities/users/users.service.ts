@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { add } from 'date-fns';
 import { RefreshTokensMetaRepository } from 'src/DBEntities/refreshTokenMeta/refreshTokenMeta.repository';
 import { JwtService } from 'src/application/jwt/jwtService';
-import { PostsRepository } from 'src/posts/posts.repository';
+import { PostsMongoRepository } from 'src/posts/posts.mongoRepository';
 import { v4 as uuidv4 } from 'uuid';
 import { UserDbType, userViewType, usersPaginationType } from './users.types';
 import { UsersMongoRepository } from './usersMongo.repository';
@@ -15,7 +15,7 @@ export class UsersService {
   constructor(
     protected usersPgSqlRepository: UsersPgSqlRepository,
     protected usersMongoRepository: UsersMongoRepository,
-    protected postsRepository: PostsRepository,
+    protected postsRepository: PostsMongoRepository,
     protected jwtService: JwtService,
     protected refreshTokensMetaRepository: RefreshTokensMetaRepository,
   ) {

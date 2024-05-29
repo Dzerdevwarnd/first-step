@@ -10,12 +10,12 @@ import {
 } from './posts.types';
 
 @Injectable()
-export class PostsRepository {
+export class PostsMongoRepository {
   constructor(
     @InjectModel(Post.name) private postModel: Model<PostDocument>,
     protected postLikesService: PostLikesService,
   ) {}
-  async findPostsWithQuery(query: any): Promise<postDBType[]> {
+  async findPostsWithQuery(query: any) {
     const pageSize = Number(query?.pageSize) || 10;
     const page = Number(query?.pageNumber) || 1;
     const sortBy: string = query?.sortBy ?? 'createdAt';
@@ -32,7 +32,7 @@ export class PostsRepository {
       .limit(pageSize)
       .lean();
     const totalCount = await this.postModel.countDocuments();
-    return posts;
+    return { posts, totalCount };
   }
   async findPost(params: { id: string }): Promise<postDBType | null> {
     const post: postDBType | null = await this.postModel.findOne({

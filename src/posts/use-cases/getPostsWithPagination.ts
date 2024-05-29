@@ -1,9 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { PostLikesService } from '../postLikes/postLikes.service';
-import { Post, PostDocument } from '../posts.mongo.scheme';
-import { PostsRepository } from '../posts.repository';
+import { PostLikesRepository } from '../postLikes/postLikes.repository';
+import { PostsPgSqlRepository } from '../posts.PgSqlRepository';
+import { PostsMongoRepository } from '../posts.mongoRepository';
 import { postViewType, postsByBlogIdPaginationType } from '../posts.types';
 
 export class GetPostsWithPaginationCommand {
@@ -17,19 +15,28 @@ export class GetPostsWithPaginationCommand {
 export class GetPostsWithPaginationUseCase
   implements ICommandHandler<GetPostsWithPaginationCommand>
 {
+  private postsRepository;
   constructor(
-    @InjectModel(Post.name) private postModel: Model<PostDocument>,
-    protected postsRepository: PostsRepository,
-    protected postLikesService: PostLikesService,
-  ) {}
+    protected postsMongoRepository: PostsMongoRepository,
+    protected postsPgSqlRepository: PostsPgSqlRepository,
+    protected postLikesService: PostLikesRepository,
+  ) {
+    this.postsRepository = this.getUsersRepository();
+  }
+
+  private getUsersRepository() {
+    return process.env.USERS_REPOSITORY === 'Mongo'
+      ? this.postsMongoRepository
+      : this.postsPgSqlRepository;
+  }
   async execute(
     command: GetPostsWithPaginationCommand,
   ): Promise<postsByBlogIdPaginationType> {
-    const postsDB = await this.postsRepository.findPostsWithQuery(
+    const postsDBAndTotalCount = await this.postsRepository.findPostsWithQuery(
       command.query,
     );
     const postsView: postViewType[] = [];
-    for (const post of postsDB) {
+    for (const post of postsDBAndTotalCount.posts) {
       const like = await this.postLikesService.findPostLikeFromUser(
         command.userId,
         post.id,
@@ -44,8 +51,8 @@ export class GetPostsWithPaginationUseCase
         blogName: post.blogName,
         createdAt: post.createdAt,
         extendedLikesInfo: {
-          likesCount: post.likesInfo.likesCount,
-          dislikesCount: post.likesInfo.dislikesCount,
+          likesCount: post.likesInfo?.likesCount || 0,
+          dislikesCount: post.likesInfo?.dislikesCount || 0,
           myStatus: like?.likeStatus || 'None',
           newestLikes: last3DBLikes || [],
         },
@@ -53,7 +60,7 @@ export class GetPostsWithPaginationUseCase
 
       postsView.push(postView);
     }
-    const totalCount = await this.postModel.countDocuments();
+    const totalCount = postsDBAndTotalCount.totalCount;
     const pageSize = command.query.pageSize || 10;
     const pagesCount = Math.ceil(totalCount / pageSize);
     const postsPagination = {

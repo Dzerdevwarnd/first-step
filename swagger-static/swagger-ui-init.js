@@ -169,20 +169,11 @@ window.onload = function() {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UpdatePostInputModelType"
+                  "$ref": "#/components/schemas/UpdatePostMongoInputModelType"
                 }
               }
             }
           },
-          "responses": {
-            "200": {
-              "description": ""
-            }
-          }
-        },
-        "delete": {
-          "operationId": "PostsController_deleteBlogByID",
-          "parameters": [],
           "responses": {
             "200": {
               "description": ""
@@ -234,6 +225,17 @@ window.onload = function() {
               }
             }
           },
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        }
+      },
+      "/posts/{postId}": {
+        "delete": {
+          "operationId": "PostsController_deleteBlogByID",
+          "parameters": [],
           "responses": {
             "200": {
               "description": ""
@@ -522,6 +524,126 @@ window.onload = function() {
           }
         }
       },
+      "/sa/blogs": {
+        "get": {
+          "operationId": "SaController_getBlogsWithPagination",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        },
+        "post": {
+          "operationId": "SaController_postBlog",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateBlogInputModelType"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          }
+        }
+      },
+      "/sa/blogs/{id}/posts": {
+        "get": {
+          "operationId": "SaController_getPostsByBlogId",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        },
+        "post": {
+          "operationId": "SaController_createPostByBlogId",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatePostByBlogIdInputModelType"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          }
+        }
+      },
+      "/sa/blogs/{id}": {
+        "put": {
+          "operationId": "SaController_updateBlog",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateBlogInputModelType"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        },
+        "delete": {
+          "operationId": "SaController_deleteBlogByID",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        }
+      },
+      "/sa/blogs/{blogId}/posts/{postId}": {
+        "put": {
+          "operationId": "SaController_updatePost",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdatePostPgSqlInputModelType"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        },
+        "delete": {
+          "operationId": "SaController_deletePostByID",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        }
+      },
       "/sa/users": {
         "get": {
           "operationId": "SaController_getUsersWithPagination",
@@ -599,7 +721,7 @@ window.onload = function() {
           "type": "object",
           "properties": {}
         },
-        "UpdatePostInputModelType": {
+        "UpdatePostMongoInputModelType": {
           "type": "object",
           "properties": {}
         },
@@ -632,6 +754,10 @@ window.onload = function() {
           "properties": {}
         },
         "RecoveryCodeAndNewPasswordType": {
+          "type": "object",
+          "properties": {}
+        },
+        "UpdatePostPgSqlInputModelType": {
           "type": "object",
           "properties": {}
         }

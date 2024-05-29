@@ -15,7 +15,8 @@ import { CommandBus } from '@nestjs/cqrs';
 import { Response } from 'express';
 import { JwtService } from 'src/application/jwt/jwtService';
 import { BasicAuthGuard } from 'src/auth/guards/basic.auth.guard';
-import { PostsRepository } from 'src/posts/posts.repository';
+import { PostsPgSqlRepository } from 'src/posts/posts.PgSqlRepository';
+import { PostsMongoRepository } from 'src/posts/posts.mongoRepository';
 import { PostsService } from 'src/posts/posts.service';
 import { CreatePostByBlogIdInputModelType } from 'src/posts/posts.types';
 import { createPostByBlogIdCommand } from 'src/posts/use-cases/createPostByBlogId';
@@ -31,12 +32,23 @@ import { UpdateBlogCommand } from './use-cases/updateBlog';
 
 @Controller('blogs')
 export class BlogsController {
+  private postsRepository;
   constructor(
     private commandBus: CommandBus,
     protected postsService: PostsService,
     protected jwtService: JwtService,
-    protected postsRepository: PostsRepository,
-  ) {}
+    protected postsMongoRepository: PostsMongoRepository,
+    protected postsPgSqlRepository: PostsPgSqlRepository,
+  ) {
+    this.postsRepository = this.getPostsRepository();
+  }
+
+  private getPostsRepository() {
+    return process.env.USERS_REPOSITORY === 'Mongo'
+      ? this.postsMongoRepository
+      : this.postsPgSqlRepository;
+  }
+
   @Get()
   async getBlogsWithPagination(@Query() query: string) {
     const blogsPagination = this.commandBus.execute(
