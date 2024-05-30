@@ -97,7 +97,11 @@ export class CommentsController {
       res.sendStatus(404);
       return;
     }
-    if (comment.commentatorInfo.userId !== requestUser.userId) {
+    if (
+      comment.commentatorInfo.userId !== requestUser.userId &&
+      // @ts-expect-error comment.user id must be in comment.commentatorInfo
+      comment.userId !== requestUser.userId
+    ) {
       res.sendStatus(403);
       return;
     }
@@ -152,7 +156,11 @@ export class CommentsController {
       res.sendStatus(404);
       return;
     }
-    if (comment.commentatorInfo.userId !== requestUser.userId) {
+    if (
+      comment.commentatorInfo?.userId !== requestUser.userId &&
+      // @ts-expect-error comment.user id must be in comment.commentatorInfo
+      comment.userId !== requestUser.userId
+    ) {
       res.sendStatus(403);
       return;
     }

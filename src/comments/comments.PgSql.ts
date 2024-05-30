@@ -25,7 +25,7 @@ export class CommentsPgSqlRepository {
       return null;
     }
 
-    return foundComment;
+    return foundComment[0];
   }
 
   async findDBCommentsByPostIdWithoutLikeStatus(
@@ -50,7 +50,21 @@ export class CommentsPgSqlRepository {
   `,
       [`%${postId}%`, (page - 1) * pageSize, pageSize],
     );
-    return commentsDB;
+    const commentsView = commentsDB.map((comment) => ({
+      id: comment.id,
+      content: comment.content,
+      commentatorInfo: {
+        userId: comment.userId,
+        userLogin: comment.userLogin,
+      },
+      createdAt: comment.createdAt,
+      likesInfo: {
+        likesCount: comment.likesCount,
+        dislikesCount: comment.dislikesCount,
+        myStatus: 'None',
+      },
+    }));
+    return commentsView;
   }
 
   async findCommentsByPostId(
