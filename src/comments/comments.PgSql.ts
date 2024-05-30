@@ -16,7 +16,7 @@ export class CommentsPgSqlRepository {
   ): Promise<CommentViewType | null> {
     const foundComment = await this.dataSource.query(
       `
-      SELECT id,content,"commentatorInfo","userId","userLogin","createdAt","likesCount","dislikesCount","myStatus" FROM "Comments"
+      SELECT id,content,"userId","userLogin","createdAt","likesCount","dislikesCount","myStatus" FROM "Comments"
       WHERE id ILIKE $1
   `,
       [commentId],
@@ -166,7 +166,7 @@ export class CommentsPgSqlRepository {
   ): Promise<CommentViewType> {
     const result = await this.dataSource.query(
       `
-    INSERT INTO "Comments" (id,"postId",content,"createdAt","userId","userLogin","likesCount","dislikesCount")
+    INSERT INTO "Comments" (id,"postId",content,"createdAt","userId","userLogin","likesCount","dislikesCount","myStatus")
     VALUES ($1, $2, $3, $4, $5, $6,$7,$8,$9)
 `,
       [
@@ -198,3 +198,4 @@ export class CommentsPgSqlRepository {
     return viewComment;
   }
 }
+//

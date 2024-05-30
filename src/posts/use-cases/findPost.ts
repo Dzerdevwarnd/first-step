@@ -32,13 +32,13 @@ export class FindPostUseCase implements ICommandHandler<FindPostCommand> {
     if (!foundPost) {
       return null;
     }
-    /*    const like = await this.postLikesService.findPostLikeFromUser(
+    const like = await this.postLikesService.findPostLikeFromUser(
       command.userId,
       command.params.id,
     );
     const last3DBLikes = await this.postLikesService.findLast3Likes(
       foundPost.id,
-    ); */
+    );
     const postView = {
       title: foundPost.title,
       id: foundPost.id,
@@ -50,8 +50,8 @@ export class FindPostUseCase implements ICommandHandler<FindPostCommand> {
       extendedLikesInfo: {
         likesCount: foundPost.likesInfo.likesCount || 0,
         dislikesCount: foundPost.likesInfo.dislikesCount || 0,
-        myStatus: /* like?.likeStatus || */ 'None',
-        newestLikes: /* last3DBLikes || */ [],
+        myStatus: like?.likeStatus || 'None',
+        newestLikes: last3DBLikes || [],
       },
     };
     return postView;

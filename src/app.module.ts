@@ -29,13 +29,15 @@ import { AccessTokenAuthStrategy } from './auth/strategies/accessToken.strategy'
 import { BasicStrategy } from './auth/strategies/basic.strategy';
 import { LocalStrategy } from './auth/strategies/local.strategy';
 import { RefreshTokenAuthStrategy } from './auth/strategies/refreshToken.strategy';
+import { CommentLikesPgSqlRepository } from './comments/commentLikes/commentLikes.PgSqlRepository';
 import {
   CommentLike,
   CommentLikeSchema,
 } from './comments/commentLikes/commentLikes.mongo.scheme';
-import { CommentLikesRepository } from './comments/commentLikes/commentLikesRepository';
+import { CommentLikesMongoRepository } from './comments/commentLikes/commentLikesRepository';
 import { CommentLikesService } from './comments/commentLikes/commentLikesService';
-import { CommentsRepository } from './comments/comments.MongoRepository';
+import { CommentsMongoRepository } from './comments/comments.MongoRepository';
+import { CommentsPgSqlRepository } from './comments/comments.PgSql';
 import { CommentsController } from './comments/comments.controller';
 import { Comment, CommentSchema } from './comments/comments.mongo.scheme';
 import { CommentsService } from './comments/comments.service';
@@ -56,7 +58,8 @@ import { User, UserSchema } from './endPointsEntities/users/users.mongo.scheme';
 import { UsersService } from './endPointsEntities/users/users.service';
 import { UsersMongoRepository } from './endPointsEntities/users/usersMongo.repository';
 import { UsersPgSqlRepository } from './endPointsEntities/users/usersPgSql.Repository';
-import { PostLikesRepository } from './posts/postLikes/postLikes.repository';
+import { PostLikesMongoRepository } from './posts/postLikes/postLikes.MongoRepository';
+import { PostLikesPgSqlRepository } from './posts/postLikes/postLikes.PgSqlRepository';
 import { PostLike, PostLikeSchema } from './posts/postLikes/postLikes.scheme';
 import { PostLikesService } from './posts/postLikes/postLikes.service';
 import { PostsPgSqlRepository } from './posts/posts.PgSqlRepository';
@@ -166,13 +169,16 @@ const useCases = [
     PostsPgSqlRepository,
     UsersPgSqlRepository,
     UsersMongoRepository,
-    CommentsRepository,
+    CommentsMongoRepository,
+    CommentsPgSqlRepository,
     RefreshTokensMetaRepository,
-    PostLikesRepository,
+    PostLikesMongoRepository,
+    PostLikesPgSqlRepository,
     PostLikesService,
     JwtService,
     EmailAdapter,
-    CommentLikesRepository,
+    CommentLikesMongoRepository,
+    CommentLikesPgSqlRepository,
     CommentLikesService,
     BlacklistRepository,
     AuthService,

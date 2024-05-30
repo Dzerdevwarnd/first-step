@@ -5,7 +5,7 @@ import { PostLike, PostLikeDocument } from './postLikes.scheme';
 import { postLikeViewType } from './postLikes.types';
 
 @Injectable()
-export class PostLikesRepository {
+export class PostLikesMongoRepository {
   constructor(
     @InjectModel(PostLike.name)
     private postLikeModel: Model<PostLikeDocument>,

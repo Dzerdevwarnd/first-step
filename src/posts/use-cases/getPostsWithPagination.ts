@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PostLikesRepository } from '../postLikes/postLikes.repository';
+import { PostLikesService } from '../postLikes/postLikes.service';
 import { PostsPgSqlRepository } from '../posts.PgSqlRepository';
 import { PostsMongoRepository } from '../posts.mongoRepository';
 import { postViewType, postsByBlogIdPaginationType } from '../posts.types';
@@ -19,7 +19,7 @@ export class GetPostsWithPaginationUseCase
   constructor(
     protected postsMongoRepository: PostsMongoRepository,
     protected postsPgSqlRepository: PostsPgSqlRepository,
-    protected postLikesService: PostLikesRepository,
+    protected postLikesService: PostLikesService,
   ) {
     this.postsRepository = this.getUsersRepository();
   }

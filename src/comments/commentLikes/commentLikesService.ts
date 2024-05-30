@@ -1,10 +1,23 @@
 import { Injectable } from '@nestjs/common';
+import { CommentLikesPgSqlRepository } from './commentLikes.PgSqlRepository';
 import { commentLikeDBType } from './commentLikes.types';
-import { CommentLikesRepository } from './commentLikesRepository';
+import { CommentLikesMongoRepository } from './commentLikesRepository';
 
 @Injectable()
 export class CommentLikesService {
-  constructor(protected commentLikesRepository: CommentLikesRepository) {}
+  private commentLikesRepository;
+  constructor(
+    protected commentLikesMongoRepository: CommentLikesMongoRepository,
+    protected commentsLikePgSqlRepository: CommentLikesPgSqlRepository,
+  ) {
+    this.commentLikesRepository = this.getCommentLikeRepository();
+  }
+
+  private getCommentLikeRepository() {
+    return process.env.USERS_REPOSITORY === 'Mongo'
+      ? this.commentLikesMongoRepository
+      : this.commentsLikePgSqlRepository;
+  }
   async findCommentLikeFromUser(userId: string, commentId: string) {
     const like = await this.commentLikesRepository.findCommentLikeFromUser(
       userId,

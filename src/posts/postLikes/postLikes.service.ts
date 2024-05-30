@@ -1,10 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { PostLikesRepository } from './postLikes.repository';
+import { PostLikesMongoRepository } from './postLikes.MongoRepository';
+import { PostLikesPgSqlRepository } from './postLikes.PgSqlRepository';
 import { postLikeDBType } from './postLikes.types';
 
 @Injectable()
 export class PostLikesService {
-  constructor(protected postLikesRepository: PostLikesRepository) {}
+  private postLikesRepository;
+  constructor(
+    protected postLikesMongoRepository: PostLikesMongoRepository,
+    protected postLikesPgSqlRepository: PostLikesPgSqlRepository,
+  ) {
+    this.postLikesRepository = this.getPostLikeRepository();
+  }
+  private getPostLikeRepository() {
+    return process.env.USERS_REPOSITORY === 'Mongo'
+      ? this.postLikesMongoRepository
+      : this.postLikesPgSqlRepository;
+  }
   async findPostLikeFromUser(userId: string, postId: string) {
     const like = await this.postLikesRepository.findPostLikeFromUser(
       userId,

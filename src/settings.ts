@@ -6,8 +6,8 @@ export const settings = {
     process.env.MONGO_URL ||
     `mongodb+srv://admin:qwerty123@cluster0.hzh4nyr.mongodb.net/${dbName}?retryWrites=true&w=majority`,
   JWT_SECRET: process.env.JWT_SECRET || '123',
-  accessTokenLifeTime: '10000',
-  refreshTokenLifeTime: '20000',
+  accessTokenLifeTime: '10000000',
+  refreshTokenLifeTime: '20000000',
   recoveryCodeLifeTime: '1000000',
   basicAuthLogin: 'admin',
   basicAuthPassword: 'qwerty',

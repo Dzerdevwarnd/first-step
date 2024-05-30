@@ -171,17 +171,17 @@ export class PostsPgSqlRepository {
     likesCount: number,
     dislikesCount: number,
   ): Promise<boolean> {
-    /*const resultOfUpdate = await this.postModel.updateOne(
-      { id: postId },
-      {
-        $set: {
-          'likesInfo.likesCount': likesCount,
-          'likesInfo.dislikesCount': dislikesCount,
-        },
-      },
+    const result = await this.dataSource.query(
+      `
+			UPDATE "Posts"
+			SET "likesCount" = $2,
+					"dislikesCount" = $3,
+			WHERE "id" = $1
+			RETURNING *
+			`,
+      [postId, likesCount, dislikesCount],
     );
-    return resultOfUpdate.matchedCount === 1;*/
-    return true;
+    return result[1] === 1;
   }
 
   async deletePost(params: {

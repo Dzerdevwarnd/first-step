@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { CommentLike, CommentLikeDocument } from './commentLikes.mongo.scheme';
 
 @Injectable()
-export class CommentLikesRepository {
+export class CommentLikesMongoRepository {
   constructor(
     @InjectModel(CommentLike.name)
     private commentLikeModel: Model<CommentLikeDocument>,

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from 'src/application/jwt/jwtService';
 import { CommentLikesService } from 'src/comments/commentLikes/commentLikesService';
-import { UsersMongoRepository } from 'src/endPointsEntities/users/usersMongo.repository';
+import { UsersService } from 'src/endPointsEntities/users/users.service';
 import { PostsMongoRepository } from 'src/posts/posts.mongoRepository';
 import { CommentsMongoRepository } from './comments.MongoRepository';
 import { CommentsPgSqlRepository } from './comments.PgSql';
@@ -19,7 +19,7 @@ export class CommentsService {
     protected commentsPgSqlRepository: CommentsPgSqlRepository,
     protected postsReposittory: PostsMongoRepository,
     protected commentLikesService: CommentLikesService,
-    protected usersMongoRepository: UsersMongoRepository,
+    protected usersService: UsersService,
     protected jwtService: JwtService,
   ) {
     this.commentsRepository = this.getCommentsRepository();
@@ -68,13 +68,14 @@ export class CommentsService {
         id: comment.id,
         content: comment.content,
         commentatorInfo: {
-          userId: comment.commentatorInfo.userId,
-          userLogin: comment.commentatorInfo.userLogin,
+          userId: comment.commentatorInfo?.userId || comment.userId,
+          userLogin: comment.commentatorInfo?.userLogin || comment.userLogin,
         },
         createdAt: comment.createdAt,
         likesInfo: {
-          likesCount: comment.likesInfo.likesCount,
-          dislikesCount: comment.likesInfo.dislikesCount,
+          likesCount: comment.likesInfo?.likesCount || comment.likesCount,
+          dislikesCount:
+            comment.likesInfo?.dislikesCount || comment.dislikesCount,
           myStatus: like?.likeStatus || 'None',
         },
       };
@@ -182,7 +183,7 @@ export class CommentsService {
     token: string,
   ): Promise<CommentViewType | null> {
     const userId = await this.jwtService.verifyAndGetUserIdByToken(token);
-    const user = await this.usersMongoRepository.findUser(userId!);
+    const user = await this.usersService.findUser(userId!);
     if (!user) {
       return;
     }
@@ -190,7 +191,7 @@ export class CommentsService {
       String(Date.now()),
       id,
       body.content,
-      { userId: user.id, userLogin: user.accountData.login },
+      { userId: user.id, userLogin: user.accountData?.login || user.login },
       new Date(),
     );
     const commentView = await this.commentsRepository.createComment(
