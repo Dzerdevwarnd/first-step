@@ -98,7 +98,7 @@ export class PostsController {
       query,
       userId,
     );
-    if (commentsPagination?.items.length === 0) {
+    if (commentsPagination?.items?.length === 0) {
       res.sendStatus(404);
       return;
     } else {

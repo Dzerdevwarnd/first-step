@@ -21,7 +21,7 @@ export class PostsService {
     protected usersService: UsersService,
   ) {
     this.postsRepository = this.getPostsRepository();
-  }
+  } //
 
   private getPostsRepository() {
     return process.env.USERS_REPOSITORY === 'Mongo'
@@ -273,3 +273,4 @@ export class PostsService {
   }
   */
 }
+//

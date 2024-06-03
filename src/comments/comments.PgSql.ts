@@ -10,10 +10,7 @@ import {
 @Injectable()
 export class CommentsPgSqlRepository {
   constructor(@InjectDataSource() protected dataSource: DataSource) {}
-  async findComment(
-    commentId: string,
-    userLikeStatus: string,
-  ): Promise<CommentViewType | null> {
+  async findComment(commentId: string): Promise<CommentViewType | null> {
     const foundComment = await this.dataSource.query(
       `
       SELECT id,content,"userId","userLogin","createdAt","likesCount","dislikesCount","myStatus" FROM "Comments"
@@ -28,10 +25,7 @@ export class CommentsPgSqlRepository {
     return foundComment[0];
   }
 
-  async findDBCommentsByPostIdWithoutLikeStatus(
-    postId: string,
-    query: any,
-  ): Promise<CommentDBType[] | null> {
+  async findDBCommentsByPostIdWithoutLikeStatus(postId: string, query: any) {
     const pageSize = Number(query?.pageSize) || 10;
     const page = Number(query?.pageNumber) || 1;
     const sortBy: string = query?.sortBy ?? 'createdAt';
@@ -116,7 +110,7 @@ export class CommentsPgSqlRepository {
     const totalCountQuery = await this.dataSource.query(
       `
     SELECT COUNT(*) FROM "Comments"
-    WHERE postId ILIKE $1 
+    WHERE "postId" ILIKE $1 
 `,
       [`%${id}%`],
     );
@@ -148,7 +142,7 @@ export class CommentsPgSqlRepository {
     const resultOfUpdate = await this.dataSource.query(
       `
 			UPDATE "Comments"
-			SET "content" = $2,
+			SET "content" = $2
 			WHERE "id" = $1
 			RETURNING *
 			`,

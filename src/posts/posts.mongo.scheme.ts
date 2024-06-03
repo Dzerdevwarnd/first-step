@@ -13,7 +13,7 @@ export class LikesInfo {
 }
 
 export const LikesInfoSchema = SchemaFactory.createForClass(LikesInfo);
-
+//
 @Schema()
 export class Post {
   @Prop({ required: true })

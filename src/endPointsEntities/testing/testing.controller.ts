@@ -58,7 +58,7 @@ export class TestController {
       'Posts',
       'PostLikes',
       'Comments',
-      'CommentsLikes',
+      'CommentLikes',
     ];
     for (const table of tables) {
       await this.dataSource.query(`DELETE FROM "${table}"`);
@@ -66,3 +66,4 @@ export class TestController {
     return;
   }
 }
+//

@@ -87,12 +87,12 @@ export class PostsPgSqlRepository {
     );
     const postsView: postViewType[] = [];
     for (const post of posts) {
-      /*      const like = await this.postLikesService.findPostLikeFromUser(
+      const like = await this.postLikesService.findPostLikeFromUser(
         userId,
         post.id,
       );
       const last3DBLikes = await this.postLikesService.findLast3Likes(post.id);
-			*/
+
       const postView = {
         title: post.title,
         id: post.id,
@@ -104,8 +104,8 @@ export class PostsPgSqlRepository {
         extendedLikesInfo: {
           likesCount: post.likesInfo?.likesCount || 0,
           dislikesCount: post.likesInfo?.dislikesCount || 0,
-          myStatus: /* like?.likeStatus*/ 'None',
-          newestLikes: /*last3DBLikes*/ [],
+          myStatus: like?.likeStatus || 'None',
+          newestLikes: last3DBLikes || [],
         },
       };
       postsView.push(postView);
@@ -175,7 +175,7 @@ export class PostsPgSqlRepository {
       `
 			UPDATE "Posts"
 			SET "likesCount" = $2,
-					"dislikesCount" = $3,
+					"dislikesCount" = $3
 			WHERE "id" = $1
 			RETURNING *
 			`,

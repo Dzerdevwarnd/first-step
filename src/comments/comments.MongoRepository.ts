@@ -13,30 +13,13 @@ export class CommentsMongoRepository {
   constructor(
     @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
   ) {}
-  async findComment(
-    commentId: string,
-    userLikeStatus: string,
-  ): Promise<CommentViewType | null> {
+  async findComment(commentId: string): Promise<CommentDBType | null> {
     const foundComment = await this.commentModel.findOne({ id: commentId });
     if (!foundComment) {
       return null;
     }
-    const viewComment: CommentViewType = new CommentViewType(
-      foundComment.id,
-      foundComment.content,
-      {
-        userId: foundComment.commentatorInfo.userId,
-        userLogin: foundComment.commentatorInfo.userLogin,
-      },
-      foundComment.createdAt,
-      {
-        likesCount: foundComment.likesInfo.likesCount,
-        dislikesCount: foundComment.likesInfo.dislikesCount,
-        myStatus: userLikeStatus,
-      },
-    );
 
-    return viewComment;
+    return foundComment;
   }
 
   async findDBCommentsByPostIdWithoutLikeStatus(

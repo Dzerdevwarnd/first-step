@@ -22,11 +22,13 @@ export class PostLikesPgSqlRepository {
       `
 			SELECT "userId", "login", "addedAt" 
 			FROM "PostLikes"
+      WHERE "postId" = $1
 			ORDER BY "addedAt" DESC
 			LIMIT 3
   `,
+      [postId],
     );
-    if ((last3Likes.length = 0)) {
+    if (!last3Likes[0]) {
       return undefined;
     }
     return last3Likes;
@@ -37,14 +39,15 @@ export class PostLikesPgSqlRepository {
     postId: string;
     likeStatus: string;
     login: string;
+    addedAt: string;
   }) {
     const result = await this.dataSource.query(
       `
-    INSERT INTO "PostLikes" ("userId","postId","likeStatus","login")
-    VALUES ($1, $2, $3,$4)
+    INSERT INTO "PostLikes" ("userId","postId","likeStatus","login","addedAt")
+    VALUES ($1, $2, $3,$4,$5)
     RETURNING *
 `,
-      [like.userId, like.postId, like.likeStatus, like.login],
+      [like.userId, like.postId, like.likeStatus, like.login, like.addedAt],
     );
     return result.length == 1;
   }

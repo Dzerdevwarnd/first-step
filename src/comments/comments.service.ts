@@ -38,59 +38,44 @@ export class CommentsService {
       userId,
       commentId,
     );
-    const userLikeStatus = like?.likeStatus || 'None';
-    const comment = await this.commentsRepository.findComment(
-      commentId,
-      userLikeStatus,
-    );
-    return comment;
+    const comment = await this.commentsRepository.findComment(commentId);
+    if (!comment) {
+      return null;
+    }
+    const commentView = {
+      id: comment.id,
+      content: comment.content,
+      commentatorInfo: {
+        userId: comment.commentatorInfo?.userId || comment.userId,
+        userLogin: comment.commentatorInfo?.userLogin || comment.userLogin,
+      },
+      createdAt: comment.createdAt,
+      likesInfo: {
+        likesCount: comment.likesInfo?.likesCount || comment.likesCount,
+        dislikesCount:
+          comment.likesInfo?.dislikesCount || comment.dislikesCount,
+        myStatus: like?.likeStatus || 'None',
+      },
+    };
+    return commentView;
   }
   async findCommentsByPostId(
     postId: string,
     query: any,
     userId: string,
   ): Promise<CommentsPaginationType | null> {
-    const commentsDB =
-      await this.commentsRepository.findDBCommentsByPostIdWithoutLikeStatus(
-        postId,
-        query,
-      );
-    if (!commentsDB) {
+    const commentsPagination =
+      await this.commentsRepository.findCommentsByPostId(postId, query);
+    if (!commentsPagination) {
       return null;
     }
-    const commentsView: CommentViewType[] = [];
-    for (const comment of commentsDB) {
+    for (const comment of commentsPagination.items) {
       const like = await this.commentLikesService.findCommentLikeFromUser(
         userId,
         comment.id,
       );
-      const commentView = {
-        id: comment.id,
-        content: comment.content,
-        commentatorInfo: {
-          userId: comment.commentatorInfo?.userId || comment.userId,
-          userLogin: comment.commentatorInfo?.userLogin || comment.userLogin,
-        },
-        createdAt: comment.createdAt,
-        likesInfo: {
-          likesCount: comment.likesInfo?.likesCount || comment.likesCount,
-          dislikesCount:
-            comment.likesInfo?.dislikesCount || comment.dislikesCount,
-          myStatus: like?.likeStatus || 'None',
-        },
-      };
-      commentsView.push(commentView);
+      comment.likesInfo.myStatus = like?.likeStatus || 'None';
     }
-    const totalCount = commentsDB.length;
-    const pagesCount = Math.ceil(totalCount / Number(query?.pageSize) || 1);
-    const commentsPagination: CommentsPaginationType =
-      new CommentsPaginationType(
-        pagesCount,
-        Number(query?.pageNumber) || 1,
-        Number(query?.pageSize) || 10,
-        totalCount,
-        commentsView,
-      );
     return commentsPagination;
   }
   async deleteComment(commentId: string): Promise<boolean> {
@@ -201,3 +186,4 @@ export class CommentsService {
     return commentView;
   }
 }
+//

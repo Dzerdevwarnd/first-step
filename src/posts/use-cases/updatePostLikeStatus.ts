@@ -94,12 +94,13 @@ export class updatePostLikeStatusUseCase
     }
     const like = await this.postLikesService.findPostLikeFromUser(userId, id);
     const user = await this.usersService.findUser(userId);
+    const login = user?.accountData?.login || user.userLogin;
     if (!like) {
       await this.postLikesService.addLikeToBdFromUser(
         userId,
         id,
         command.body.likeStatus,
-        user?.accountData.login,
+        user?.accountData?.login,
       );
       return true;
     } else {
