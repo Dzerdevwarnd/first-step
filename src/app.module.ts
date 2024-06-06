@@ -144,7 +144,7 @@ const useCases = [
       port: 5432,
       username: 'nodejs',
       password: 'nodejs', //
-      database: 'Homework',
+      database: 'Homework1',
       autoLoadEntities: false,
       synchronize: false,
     }),
