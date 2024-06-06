@@ -22,7 +22,7 @@ export class PostLikesPgSqlRepository {
       `
 			SELECT "userId", "login", "addedAt" 
 			FROM "PostLikes"
-      WHERE "postId" = $1
+      WHERE "postId" = $1 AND "likeStatus" = 'Like'
 			ORDER BY "addedAt" DESC
 			LIMIT 3
   `,
@@ -39,7 +39,7 @@ export class PostLikesPgSqlRepository {
     postId: string;
     likeStatus: string;
     login: string;
-    addedAt: string;
+    addedAt: Date;
   }) {
     const result = await this.dataSource.query(
       `
@@ -47,7 +47,13 @@ export class PostLikesPgSqlRepository {
     VALUES ($1, $2, $3,$4,$5)
     RETURNING *
 `,
-      [like.userId, like.postId, like.likeStatus, like.login, like.addedAt],
+      [
+        like.userId,
+        like.postId,
+        like.likeStatus,
+        like.login,
+        like.addedAt.toISOString(),
+      ],
     );
     return result.length == 1;
   }

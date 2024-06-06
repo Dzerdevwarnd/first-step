@@ -95,7 +95,7 @@ export class BlogsPgSqlRepository {
 			`,
       [id, body.name, body.description, body.websiteUrl],
     );
-    return result[0] === 1;
+    return result[1] === 1;
   }
   async deleteBlog(params: { id: string }): Promise<boolean> {
     const result = await this.dataSource.query(

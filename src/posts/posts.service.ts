@@ -7,7 +7,6 @@ import { PostLikesService } from 'src/posts/postLikes/postLikes.service';
 import { PostsPgSqlRepository } from './posts.PgSqlRepository';
 import { Post, PostDocument } from './posts.mongo.scheme';
 import { PostsMongoRepository } from './posts.mongoRepository';
-import { postViewType } from './posts.types';
 
 @Injectable()
 export class PostsService {
@@ -68,10 +67,7 @@ export class PostsService {
     return postsPagination;
   }
 */
-  async findPost(
-    params: { id: string },
-    userId: string,
-  ): Promise<postViewType | null> {
+  async findPost(params: { id: string }, userId: string) {
     const foundPost = await this.postsRepository.findPost(params);
     if (!foundPost) {
       return null;
@@ -92,8 +88,9 @@ export class PostsService {
       blogName: foundPost.blogName,
       createdAt: foundPost.createdAt,
       extendedLikesInfo: {
-        likesCount: foundPost.likesInfo?.likesCount || 0,
-        dislikesCount: foundPost.likesInfo?.dislikesCount || 0,
+        likesCount: foundPost.likesInfo?.likesCount || foundPost.likesCount,
+        dislikesCount:
+          foundPost.likesInfo?.dislikesCount || foundPost.dislikesCount,
         myStatus: like?.likeStatus || 'None',
         newestLikes: last3DBLikes || [],
       },

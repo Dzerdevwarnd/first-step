@@ -26,7 +26,7 @@ export class PostsPgSqlRepository {
     }
     const posts = await this.dataSource.query(
       `
-      SELECT id,title,"shortDescription","content","blogId","blogName","createdAt" FROM "Posts"
+      SELECT id,title,"shortDescription","content","blogId","blogName","createdAt","likesCount","dislikesCount" FROM "Posts"
       ORDER BY "${sortBy}" COLLATE "C" ${sortDirection}
       OFFSET $1 LIMIT $2
   `,
@@ -44,7 +44,7 @@ export class PostsPgSqlRepository {
   async findPost(params: { id: string }): Promise<postDBType | null> {
     const post = await this.dataSource.query(
       `
-      SELECT id,title,"shortDescription","content","blogId","blogName","createdAt" FROM "Posts"
+      SELECT id,title,"shortDescription","content","blogId","blogName","createdAt","likesCount","dislikesCount" FROM "Posts"
 			WHERE id ILIKE $1
   `,
       [params.id],
@@ -78,7 +78,7 @@ export class PostsPgSqlRepository {
     }
     const posts = await this.dataSource.query(
       `
-      SELECT id,title,"shortDescription","content","blogId","blogName","createdAt" FROM "Posts"
+      SELECT * FROM "Posts"
 			WHERE "blogId" ILIKE $1
       ORDER BY "${sortBy}" COLLATE "C" ${sortDirection}
       OFFSET $2 LIMIT $3
@@ -102,8 +102,8 @@ export class PostsPgSqlRepository {
         blogName: post.blogName,
         createdAt: post.createdAt,
         extendedLikesInfo: {
-          likesCount: post.likesInfo?.likesCount || 0,
-          dislikesCount: post.likesInfo?.dislikesCount || 0,
+          likesCount: post.likesInfo?.likesCount || post.likesCount,
+          dislikesCount: post.likesInfo?.dislikesCount || post.dislikesCount,
           myStatus: like?.likeStatus || 'None',
           newestLikes: last3DBLikes || [],
         },
@@ -128,8 +128,8 @@ export class PostsPgSqlRepository {
   async createPost(newPost: postDBType): Promise<boolean> {
     const result = await this.dataSource.query(
       `
-    INSERT INTO "Posts" (id,title,"shortDescription","content","blogId","blogName","createdAt")
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
+    INSERT INTO "Posts" (id,title,"shortDescription","content","blogId","blogName","createdAt","likesCount","dislikesCount")
+    VALUES ($1, $2, $3, $4, $5, $6, $7,$8,$9)
 `,
       [
         newPost.id,
@@ -139,6 +139,8 @@ export class PostsPgSqlRepository {
         newPost.blogId,
         newPost.blogName,
         newPost.createdAt.toISOString(),
+        newPost.likesInfo.likesCount,
+        newPost.likesInfo.dislikesCount,
       ],
     );
     return result[1] == 1;
@@ -198,3 +200,4 @@ export class PostsPgSqlRepository {
     return result[1] === 1;
   }
 }
+////

@@ -14,7 +14,7 @@ export class CommentsPgSqlRepository {
     const foundComment = await this.dataSource.query(
       `
       SELECT id,content,"userId","userLogin","createdAt","likesCount","dislikesCount","myStatus" FROM "Comments"
-      WHERE id ILIKE $1
+      WHERE "id" ILIKE $1
   `,
       [commentId],
     );
@@ -159,7 +159,7 @@ export class CommentsPgSqlRepository {
     const resultOfUpdate = await this.dataSource.query(
       `
 			UPDATE "Comments"
-			SET "likesCount" = $2, "dislikesCount" = $3,
+			SET "likesCount" = $2, "dislikesCount" = $3
 			WHERE "id" = $1
 			RETURNING *
 			`,

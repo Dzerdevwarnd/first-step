@@ -42,7 +42,7 @@ export class updatePostLikeStatusUseCase
       command.accessToken,
     );
     const id = command.id;
-    const post = await this.postsService.findPost({ id }, userId);
+    const post: any = await this.postsService.findPost({ id }, userId);
     let likesCount = post!.extendedLikesInfo.likesCount;
     let dislikesCount = post!.extendedLikesInfo.dislikesCount;
     if (
@@ -94,13 +94,13 @@ export class updatePostLikeStatusUseCase
     }
     const like = await this.postLikesService.findPostLikeFromUser(userId, id);
     const user = await this.usersService.findUser(userId);
-    const login = user?.accountData?.login || user.userLogin;
+    const login = user?.accountData?.login || user.login;
     if (!like) {
       await this.postLikesService.addLikeToBdFromUser(
         userId,
         id,
         command.body.likeStatus,
-        user?.accountData?.login,
+        login,
       );
       return true;
     } else {

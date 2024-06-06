@@ -1,4 +1,4 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+/* import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostLikesService } from '../postLikes/postLikes.service';
 import { PostsPgSqlRepository } from '../posts.PgSqlRepository';
 import { PostsMongoRepository } from '../posts.mongoRepository';
@@ -48,8 +48,9 @@ export class FindPostUseCase implements ICommandHandler<FindPostCommand> {
       blogName: foundPost.blogName,
       createdAt: foundPost.createdAt,
       extendedLikesInfo: {
-        likesCount: foundPost.likesInfo.likesCount || 0,
-        dislikesCount: foundPost.likesInfo.dislikesCount || 0,
+        likesCount: foundPost.likesInfo.likesCount || foundPost.likesCount || 0,
+        dislikesCount:
+          foundPost.likesInfo.dislikesCount || foundPost.dislikesCount || 0,
         myStatus: like?.likeStatus || 'None',
         newestLikes: last3DBLikes || [],
       },
@@ -57,3 +58,4 @@ export class FindPostUseCase implements ICommandHandler<FindPostCommand> {
     return postView;
   }
 }
+ */
