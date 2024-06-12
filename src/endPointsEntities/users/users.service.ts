@@ -23,9 +23,15 @@ export class UsersService {
   }
 
   private getUsersRepository() {
-    return process.env.USERS_REPOSITORY === 'Mongo'
-      ? this.usersMongoRepository
-      : this.usersPgSqlRepository;
+    const repositories = {
+      Mongo: this.usersMongoRepository,
+      PgSql: this.usersPgSqlRepository,
+      TypeOrm: this.usersTypeOrmRepository,
+    };
+
+    return (
+      repositories[process.env.USERS_REPOSITORY] || this.usersPgSqlRepository
+    );
   }
 
   async findUser(id: string) {

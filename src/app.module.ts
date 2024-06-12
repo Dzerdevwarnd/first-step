@@ -54,6 +54,7 @@ import { SaController } from './endPointsEntities/sa/sa.contoreller';
 import { SecurityController } from './endPointsEntities/security/securityController';
 import { TestController } from './endPointsEntities/testing/testing.controller';
 import { UsersController } from './endPointsEntities/users/users.controller';
+import { UsersModule } from './endPointsEntities/users/users.module';
 import { User, UserSchema } from './endPointsEntities/users/users.mongo.scheme';
 import { UsersService } from './endPointsEntities/users/users.service';
 import { UsersMongoRepository } from './endPointsEntities/users/usersMongo.repository';
@@ -145,9 +146,10 @@ const useCases = [
       username: 'nodejs',
       password: 'nodejs', //
       database: 'Homework1',
-      autoLoadEntities: false,
-      synchronize: false,
+      autoLoadEntities: true,
+      synchronize: true,
     }),
+    UsersModule,
   ],
   controllers: [
     TestController,
