@@ -1,4 +1,4 @@
-import { User } from 'src/endPointsEntities/users/users.entity';
+import { UserEntity } from 'src/endPointsEntities/users/users.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -6,7 +6,7 @@ export class RefreshTokenMetaEntity {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => UserEntity)
   @Column()
   userId: string;
 

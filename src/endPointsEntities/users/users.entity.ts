@@ -6,12 +6,12 @@ class AccountData {
   @Column()
   email: string;
   @Column()
-  createdAt: string;
+  createdAt: Date;
   @Column()
   passwordSalt: string;
   @Column()
   passwordHash: string;
-  @Column()
+  @Column({ nullable: true })
   recoveryCode: string;
 }
 
@@ -19,15 +19,15 @@ class EmailConfirmationData {
   @Column()
   confirmationCode: string;
   @Column()
-  expirationDate: string;
+  expirationDate: Date;
   @Column()
   isConfirmed: boolean;
 }
 
 @Entity()
-export class User {
+export class UserEntity {
   @PrimaryColumn()
-  id: number;
+  id: string;
 
   @Column(() => AccountData)
   accountData: AccountData;

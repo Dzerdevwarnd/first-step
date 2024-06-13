@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { JwtService } from 'src/application/jwt/jwtService';
-import { UsersService } from 'src/endPointsEntities/users/users.service';
 import { PostLikesService } from 'src/posts/postLikes/postLikes.service';
 import { PostsPgSqlRepository } from './posts.PgSqlRepository';
 import { Post, PostDocument } from './posts.mongo.scheme';
@@ -16,8 +14,6 @@ export class PostsService {
     protected postsMongoRepository: PostsMongoRepository,
     protected postsPgSqlRepository: PostsPgSqlRepository,
     protected postLikesService: PostLikesService,
-    protected jwtService: JwtService,
-    protected usersService: UsersService,
   ) {
     this.postsRepository = this.getPostsRepository();
   } //

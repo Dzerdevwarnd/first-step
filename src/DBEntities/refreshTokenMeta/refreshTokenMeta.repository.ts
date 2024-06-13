@@ -10,21 +10,13 @@ import {
 } from './refreshTokenMeta.scheme.types';
 
 @Injectable()
-export class RefreshTokensMetaRepository {
+export class RefreshTokensMetaMongoRepository {
   constructor(
     @InjectModel(RefreshTokenMeta.name)
     private refreshTokenMetaModel: Model<RefreshTokenMetaDocument>,
     protected jwtService: JwtService,
   ) {}
-  async createRefreshTokenMeta(userId, deviceId, title, ip) {
-    const refreshTokenMeta: refreshTokensMetaTypeDB = {
-      userId: userId,
-      deviceId: deviceId,
-      title: title,
-      ip: ip,
-      lastActiveDate: new Date(),
-      expiredAt: new Date(Date.now() + +settings.refreshTokenLifeTime),
-    };
+  async createRefreshTokenMeta(refreshTokenMeta: refreshTokensMetaTypeDB) {
     const expireDate = new Date( //@ts-expect-error Argument of type 'RegExpMatchArray' is not assignable to parameter of type 'string'.ts(2345)
       Date.now() + parseInt(settings.refreshTokenLifeTime.match(/\d+/)),
     );
@@ -63,38 +55,16 @@ export class RefreshTokensMetaRepository {
     const userId = refreshTokenMeta?.userId;
     return userId;
   }
-  async returnAllUserDevices(refreshToken: string) {
-    const deviceId =
-      await this.jwtService.verifyAndGetDeviceIdByToken(refreshToken);
-    if (!deviceId) {
-      return;
-    }
-    const UserId = await this.findUserIdByDeviceId(deviceId);
+  async returnAllUserDevices(UserId: string) {
     const devicesDB = await this.refreshTokenMetaModel
       .find({ userId: UserId })
       .lean();
-    const devicesView = [];
-    for (let i = 0; i < devicesDB.length; i++) {
-      const deviceView = {
-        ip: devicesDB[i].ip,
-        title: devicesDB[i].title,
-        deviceId: devicesDB[i].deviceId,
-        lastActiveDate: devicesDB[i].lastActiveDate,
-      };
-      devicesView.push(deviceView);
-    }
-    return devicesView;
+    return devicesDB;
   }
-  async deleteAllUserDevices(refreshToken: string) {
-    const deviceId =
-      await this.jwtService.verifyAndGetDeviceIdByToken(refreshToken);
-    if (!deviceId) {
-      return;
-    }
-    const UserId = await this.findUserIdByDeviceId(deviceId);
+  async deleteAllUserDevices(deviceId: string, userId: string) {
     const resultOfDelete = await this.refreshTokenMetaModel.deleteMany({
       deviceId: { $ne: deviceId },
-      userId: UserId,
+      userId: userId,
     });
     return resultOfDelete.acknowledged;
   }

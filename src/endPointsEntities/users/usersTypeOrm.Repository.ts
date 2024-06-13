@@ -1,49 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Model } from 'mongoose';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { User, UserDocument } from './users.mongo.scheme';
+import { UserEntity } from './users.entity';
 import { UserDbType, userViewType, usersPaginationType } from './users.types';
 
 @Injectable()
-export class UsersMongoRepository {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
-
-  async userEmailConfirmationAccept(confirmationCode: any): Promise<boolean> {
-    const resultOfUpdate = await this.userModel.updateOne(
-      { 'emailConfirmationData.confirmationCode': confirmationCode },
-      { $set: { 'emailConfirmationData.isConfirmed': true } },
-    );
-    return resultOfUpdate.modifiedCount === 1;
-  }
-
-  async userConfirmationCodeUpdate(email: string) {
-    const confirmationCode = await uuidv4();
-    const resultOfUpdate = await this.userModel.updateOne(
-      { 'accountData.email': email },
-      { $set: { 'emailConfirmationData.confirmationCode': confirmationCode } },
-    );
-    if (resultOfUpdate.matchedCount === 1) {
-      return confirmationCode;
-    } else {
-      return;
-    }
-  }
-  async findDBUserByConfirmationCode(confirmationCode: any) {
-    const user = await this.userModel.findOne({
-      'emailConfirmationData.confirmationCode': confirmationCode,
-    });
-    return user;
-  }
-}
-
-@Injectable()
-export class UsersService {
+export class UsersTypeOrmRepository {
   constructor(
-    @InjectRepository(User)
-    private readonly usersRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    private readonly usersRepository: Repository<UserEntity>,
   ) {}
 
   async findUser(id: string): Promise<UserDbType | null> {
@@ -58,9 +24,9 @@ export class UsersService {
     const searchEmailTerm: string = query.searchEmailTerm || '';
     let sortDirection = query.sortDirection || 'desc';
     if (sortDirection === 'desc') {
-      sortDirection = -1;
+      sortDirection = 'DESC';
     } else {
-      sortDirection = 1;
+      sortDirection = 'ASC';
     }
     const queryBuilder = this.usersRepository.createQueryBuilder('user');
 
@@ -152,14 +118,38 @@ export class UsersService {
   async userEmailConfirmationAccept(confirmationCode: any): Promise<boolean> {
     const resultOfUpdate = await this.usersRepository
       .createQueryBuilder()
-      .update(User)
-      // @ts-expect-error TypeOrm не может определить точно ли вложенные свойства есть у сущности
-      .set({ 'User.emailConfirmationData.isConfirmed': 'true' })
-      .where('EmailConfirmationData.confirmationCode = :confirmationCode', {
+      .update(UserEntity)
+      .set({ emailConfirmationData: { isConfirmed: true } })
+      .where('emailConfirmationData.confirmationCode = :confirmationCode', {
         confirmationCode,
       })
       .execute();
 
-    return resultOfUpdate.affected === 1; // Проверяем количество обновленных записей
+    return resultOfUpdate.affected === 1;
+  }
+  async userConfirmationCodeUpdate(email: string) {
+    const confirmationCode = await uuidv4();
+    const resultOfUpdate = await this.usersRepository
+      .createQueryBuilder()
+      .update(UserEntity)
+      .set({ emailConfirmationData: { confirmationCode: confirmationCode } })
+      .where('accountData.email = :email', { email })
+      .execute();
+
+    if (resultOfUpdate.affected === 1) {
+      return confirmationCode;
+    } else {
+      return undefined;
+    }
+  }
+  async findDBUserByConfirmationCode(confirmationCode: any) {
+    const user = await this.usersRepository
+      .createQueryBuilder('user')
+      .where(
+        'user.emailConfirmationData.confirmationCode = :confirmationCode',
+        { confirmationCode },
+      )
+      .getOne();
+    return user;
   }
 }

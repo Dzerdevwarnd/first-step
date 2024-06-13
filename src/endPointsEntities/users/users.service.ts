@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { add } from 'date-fns';
 import { RefreshTokensMetaRepository } from 'src/DBEntities/refreshTokenMeta/refreshTokenMeta.repository';
 import { JwtService } from 'src/application/jwt/jwtService';
-import { PostsMongoRepository } from 'src/posts/posts.mongoRepository';
 import { v4 as uuidv4 } from 'uuid';
 import { UserDbType, userViewType, usersPaginationType } from './users.types';
 import { UsersMongoRepository } from './usersMongo.repository';
 import { UsersPgSqlRepository } from './usersPgSql.Repository';
+import { UsersTypeOrmRepository } from './usersTypeOrm.Repository';
 import bcrypt = require('bcrypt');
 ///
 @Injectable()
@@ -15,7 +15,7 @@ export class UsersService {
   constructor(
     protected usersPgSqlRepository: UsersPgSqlRepository,
     protected usersMongoRepository: UsersMongoRepository,
-    protected postsRepository: PostsMongoRepository,
+    protected usersTypeOrmRepository: UsersTypeOrmRepository,
     protected jwtService: JwtService,
     protected refreshTokensMetaRepository: RefreshTokensMetaRepository,
   ) {
@@ -29,9 +29,7 @@ export class UsersService {
       TypeOrm: this.usersTypeOrmRepository,
     };
 
-    return (
-      repositories[process.env.USERS_REPOSITORY] || this.usersPgSqlRepository
-    );
+    return repositories[process.env.REPOSITORY] || this.usersMongoRepository;
   }
 
   async findUser(id: string) {

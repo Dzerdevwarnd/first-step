@@ -16,6 +16,7 @@ import {
   BlacklistToken,
   BlacklistTokenSchema,
 } from './DBEntities/blacklistTokens/blacklistTokens.scheme.types';
+import { RefreshTokenMetaEntity } from './DBEntities/refreshTokenMeta/refreshToken.entity';
 import { RefreshTokensMetaRepository } from './DBEntities/refreshTokenMeta/refreshTokenMeta.repository';
 import {
   RefreshTokenMeta,
@@ -53,12 +54,13 @@ import { UpdateBlogUseCase } from './endPointsEntities/blogs/use-cases/updateBlo
 import { SaController } from './endPointsEntities/sa/sa.contoreller';
 import { SecurityController } from './endPointsEntities/security/securityController';
 import { TestController } from './endPointsEntities/testing/testing.controller';
-import { UsersController } from './endPointsEntities/users/users.controller';
+import { UserEntity } from './endPointsEntities/users/users.entity';
 import { UsersModule } from './endPointsEntities/users/users.module';
 import { User, UserSchema } from './endPointsEntities/users/users.mongo.scheme';
 import { UsersService } from './endPointsEntities/users/users.service';
 import { UsersMongoRepository } from './endPointsEntities/users/usersMongo.repository';
 import { UsersPgSqlRepository } from './endPointsEntities/users/usersPgSql.Repository';
+import { UsersTypeOrmRepository } from './endPointsEntities/users/usersTypeOrm.Repository';
 import { PostLikesMongoRepository } from './posts/postLikes/postLikes.MongoRepository';
 import { PostLikesPgSqlRepository } from './posts/postLikes/postLikes.PgSqlRepository';
 import { PostLike, PostLikeSchema } from './posts/postLikes/postLikes.scheme';
@@ -129,6 +131,7 @@ const useCases = [
       settings.MONGO_URL, //|| `mongodb://0.0.0.0:27017/${1}`,
       //  { dbName: 'hm13' },
     ),
+    TypeOrmModule.forFeature([UserEntity, RefreshTokenMetaEntity]),
     MongooseModule.forFeature([
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
@@ -155,7 +158,6 @@ const useCases = [
     TestController,
     BlogsController,
     PostsController,
-    UsersController,
     CommentsController,
     SecurityController,
     AuthController,
@@ -163,14 +165,15 @@ const useCases = [
   ],
   providers: [
     PostsService,
-    UsersService,
     CommentsService,
     BlogsMongoRepository,
     BlogsPgSqlRepository,
     PostsMongoRepository,
     PostsPgSqlRepository,
+    UsersService,
     UsersPgSqlRepository,
     UsersMongoRepository,
+    UsersTypeOrmRepository,
     CommentsMongoRepository,
     CommentsPgSqlRepository,
     RefreshTokensMetaRepository,
@@ -200,4 +203,4 @@ const useCases = [
   ],
 })
 export class AppModule {}
-////
+/////////

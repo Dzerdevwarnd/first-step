@@ -243,47 +243,6 @@ window.onload = function() {
           }
         }
       },
-      "/users": {
-        "get": {
-          "operationId": "UsersController_getUsersWithPagination",
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": ""
-            }
-          }
-        },
-        "post": {
-          "operationId": "UsersController_createUser",
-          "parameters": [],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreateUserInputModelType"
-                }
-              }
-            }
-          },
-          "responses": {
-            "201": {
-              "description": ""
-            }
-          }
-        }
-      },
-      "/users/{id}": {
-        "delete": {
-          "operationId": "UsersController_deleteUserByID",
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": ""
-            }
-          }
-        }
-      },
       "/comments/{id}": {
         "get": {
           "operationId": "CommentsController_getPostById",
@@ -684,6 +643,47 @@ window.onload = function() {
             }
           }
         }
+      },
+      "/users": {
+        "get": {
+          "operationId": "UsersController_getUsersWithPagination",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        },
+        "post": {
+          "operationId": "UsersController_createUser",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateUserInputModelType"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          }
+        }
+      },
+      "/users/{id}": {
+        "delete": {
+          "operationId": "UsersController_deleteUserByID",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        }
       }
     },
     "info": {
@@ -729,15 +729,15 @@ window.onload = function() {
           "type": "object",
           "properties": {}
         },
-        "CreateUserInputModelType": {
-          "type": "object",
-          "properties": {}
-        },
         "CommentUpdateInputModelType": {
           "type": "object",
           "properties": {}
         },
         "UpdateCommentLikeStatusInputModelType": {
+          "type": "object",
+          "properties": {}
+        },
+        "CreateUserInputModelType": {
           "type": "object",
           "properties": {}
         },
