@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { add } from 'date-fns';
-import { RefreshTokensMetaRepository } from 'src/DBEntities/refreshTokenMeta/refreshTokenMeta.repository';
+import { RefreshTokensMetaService } from 'src/DBEntities/refreshTokenMeta/refreshTokenMeta.service';
 import { JwtService } from 'src/application/jwt/jwtService';
 import { v4 as uuidv4 } from 'uuid';
 import { UserDbType, userViewType, usersPaginationType } from './users.types';
@@ -17,7 +17,7 @@ export class UsersService {
     protected usersMongoRepository: UsersMongoRepository,
     protected usersTypeOrmRepository: UsersTypeOrmRepository,
     protected jwtService: JwtService,
-    protected refreshTokensMetaRepository: RefreshTokensMetaRepository,
+    protected refreshTokensMetaService: RefreshTokensMetaService,
   ) {
     this.usersRepository = this.getUsersRepository();
   }
@@ -118,7 +118,7 @@ export class UsersService {
     const deviceId =
       await this.jwtService.verifyAndGetDeviceIdByToken(refreshToken);
     const userId =
-      this.refreshTokensMetaRepository.findUserIdByDeviceId(deviceId);
+      await this.refreshTokensMetaService.findUserIdByDeviceId(deviceId);
     return userId;
   }
 

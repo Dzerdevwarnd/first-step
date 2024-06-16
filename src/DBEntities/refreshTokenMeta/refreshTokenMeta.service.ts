@@ -1,14 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from 'src/application/jwt/jwtService';
 import { settings } from 'src/settings';
+import { RefreshTokensMetaMongoRepository } from './refreshTokenMeta.MongoRepository';
+import { RefreshTokensMetaTypeOrmRepository } from './refreshTokenMeta.TypeOrmRepository';
 import { refreshTokensMetaTypeDB } from './refreshTokenMeta.scheme.types';
 
 @Injectable()
-export class RefreshTokensMetaMongoRepository {
+export class RefreshTokensMetaService {
   private refreshTokensMetaRepository;
   constructor(
     protected refreshTokensMetaMongoRepository: RefreshTokensMetaMongoRepository,
-
+    protected refreshTokensMetaTypeOrmRepository: RefreshTokensMetaTypeOrmRepository,
     protected jwtService: JwtService,
   ) {
     this.refreshTokensMetaRepository = this.getRefreshTokensMetaRepository();
@@ -40,7 +42,7 @@ export class RefreshTokensMetaMongoRepository {
         refreshTokenMeta,
       );
 
-    return result.length === true;
+    return result === true;
   }
   async updateRefreshTokenMeta(
     deviceId: string,
@@ -95,6 +97,7 @@ export class RefreshTokensMetaMongoRepository {
     });
     return resultOfDelete.acknowledged;
   }
+
   async deleteOneUserDeviceAndReturnStatusCode(
     requestDeviceId: string,
     refreshToken: string,
@@ -104,9 +107,10 @@ export class RefreshTokensMetaMongoRepository {
     if (!deviceId) {
       return 401;
     }
-    const requestRefreshTokensMeta = await this.refreshTokenMetaModel.findOne({
-      deviceId: requestDeviceId,
-    });
+    const requestRefreshTokensMeta =
+      await this.refreshTokensMetaRepository.findRefreshTokenMetaByDeviceId(
+        deviceId,
+      );
     if (!requestRefreshTokensMeta) {
       return 404;
     }
@@ -114,10 +118,11 @@ export class RefreshTokensMetaMongoRepository {
     if (userId !== requestRefreshTokensMeta?.userId) {
       return 403;
     }
-    const resultOfDelete = await this.refreshTokenMetaModel.deleteOne({
-      deviceId: requestDeviceId,
-    });
-    if (resultOfDelete.deletedCount === 0) {
+    const booleanResultOfDelete =
+      await this.refreshTokensMetaRepository.deleteRefreshTokenMetaByDeviceId(
+        deviceId,
+      );
+    if (booleanResultOfDelete === false) {
       return 404;
     }
     return 204;

@@ -49,20 +49,33 @@ export class TestController {
     // let resultOfDeleteIpRequests = await ipRequestModel.deleteMany({});
     let resultOfDeleteRefreshTokenMeta =
       await this.refreshTokensMetaModel.deleteMany({});
-    res.sendStatus(204);
-    67716;
 
-    const tables = [
-      'Users',
-      'Blogs',
-      'Posts',
-      'PostLikes',
-      'Comments',
-      'CommentLikes',
-    ];
-    for (const table of tables) {
-      await this.dataSource.query(`DELETE FROM "${table}"`);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+
+    const tables = await queryRunner.query(`
+        SELECT tablename 
+        FROM pg_tables 
+        WHERE schemaname = 'public'
+      `);
+
+    try {
+      await queryRunner.startTransaction();
+
+      for (const table of tables) {
+        await queryRunner.query(
+          `TRUNCATE TABLE "${table.tablename}" RESTART IDENTITY CASCADE`,
+        );
+      }
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
+    res.sendStatus(204);
     return;
   }
 }

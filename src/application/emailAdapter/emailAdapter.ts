@@ -1,14 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { UsersService } from 'src/endPointsEntities/users/users.service';
-import { UsersMongoRepository } from 'src/endPointsEntities/users/usersMongo.repository';
 
 @Injectable()
 export class EmailAdapter {
-  constructor(
-    protected usersMongoRepository: UsersMongoRepository,
-    protected usersService: UsersService,
-  ) {}
+  constructor(protected usersService: UsersService) {}
   async sendConfirmEmail(email: string) {
     const user = await this.usersService.findDBUser(email);
     const confirmationCode =

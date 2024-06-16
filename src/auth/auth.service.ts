@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { add } from 'date-fns';
-import { BlacklistRepository } from 'src/DBEntities/blacklistTokens/blacklistTokens.repository';
+import { BlacklistTokensService } from 'src/DBEntities/blacklistTokens/blacklistTokens.Service';
 import { JwtService } from 'src/application/jwt/jwtService';
 import { UsersService } from 'src/endPointsEntities/users/users.service';
 import {
@@ -17,7 +17,7 @@ export class AuthService {
     protected jwtService: JwtService,
     protected usersService: UsersService,
     protected usersMongoRepository: UsersMongoRepository,
-    protected blacklistRepository: BlacklistRepository,
+    protected blacklistTokensService: BlacklistTokensService,
   ) {}
   async validateUser(loginOrEmail: string, password: string) {
     const user = await this.usersService.checkCredentialsAndReturnUser(
@@ -102,7 +102,7 @@ export class AuthService {
     reqBody: { accessToken: string },
     reqCookies: { refreshToken: string },
   ) {
-    const isAdded = await this.blacklistRepository.addTokensInBlacklist(
+    const isAdded = await this.blacklistTokensService.addTokensInBlacklist(
       reqBody,
       reqCookies,
     );

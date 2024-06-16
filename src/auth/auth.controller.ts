@@ -11,11 +11,10 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { BlacklistRepository } from 'src/DBEntities/blacklistTokens/blacklistTokens.repository';
-import { RefreshTokensMetaRepository } from 'src/DBEntities/refreshTokenMeta/refreshTokenMeta.repository';
-
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { Request, Response } from 'express';
+import { BlacklistTokensService } from 'src/DBEntities/blacklistTokens/blacklistTokens.Service';
+import { RefreshTokensMetaService } from 'src/DBEntities/refreshTokenMeta/refreshTokenMeta.service';
 import { EmailAdapter } from 'src/application/emailAdapter/emailAdapter';
 import { JwtService } from 'src/application/jwt/jwtService';
 import { UsersService } from 'src/endPointsEntities/users/users.service';
@@ -49,8 +48,8 @@ export class AuthController {
     protected jwtService: JwtService,
     protected usersService: UsersService,
     protected usersMongoRepository: UsersMongoRepository,
-    protected blacklistRepository: BlacklistRepository,
-    protected refreshTokenMetaRepository: RefreshTokensMetaRepository,
+    protected blacklistRepository: BlacklistTokensService,
+    protected refreshTokenMetaService: RefreshTokensMetaService,
   ) {}
 
   @UseGuards(ThrottlerGuard)
@@ -101,13 +100,12 @@ export class AuthController {
       settings.refreshTokenLifeTime,
     );
     const ipAddress = ip || headers['x-forwarded-for'] || headers['x-real-ip'];
-    const isCreated =
-      await this.refreshTokenMetaRepository.createRefreshTokenMeta(
-        requestUser.id,
-        deviceId,
-        headers['user-agent'] || 'unknown',
-        ipAddress,
-      );
+    const isCreated = await this.refreshTokenMetaService.createRefreshTokenMeta(
+      requestUser.id,
+      deviceId,
+      headers['user-agent'] || 'unknown',
+      ipAddress,
+    );
     if (!isCreated) {
       res.status(400).send('RefreshTokenMeta error');
       return;
@@ -175,11 +173,10 @@ export class AuthController {
       lastActiveDate: new Date(),
       expiredAt: new Date(Date.now() + +settings.refreshTokenLifeTime),
     };
-    const isUpdated =
-      await this.refreshTokenMetaRepository.updateRefreshTokenMeta(
-        requestUser.deviceId,
-        RefreshTokenMetaUpd,
-      );
+    const isUpdated = await this.refreshTokenMetaService.updateRefreshTokenMeta(
+      requestUser.deviceId,
+      RefreshTokenMetaUpd,
+    );
     if (!isUpdated) {
       res.status(400).send('RefreshTokenMeta error');
       return;
@@ -217,7 +214,7 @@ export class AuthController {
       req.cookies.refreshToken,
     );
     const isDeletedFromRefreshTokenMeta =
-      await this.refreshTokenMetaRepository.deleteOneUserDeviceAndReturnStatusCode(
+      await this.refreshTokenMetaService.deleteOneUserDeviceAndReturnStatusCode(
         deviceId,
         req.cookies.refreshToken,
       );

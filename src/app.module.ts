@@ -11,18 +11,19 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
-import { BlacklistRepository } from './DBEntities/blacklistTokens/blacklistTokens.repository';
+import { BlacklistTokensModule } from './DBEntities/blacklistTokens/blacklistTokens.module';
 import {
   BlacklistToken,
   BlacklistTokenSchema,
 } from './DBEntities/blacklistTokens/blacklistTokens.scheme.types';
-import { RefreshTokenMetaEntity } from './DBEntities/refreshTokenMeta/refreshToken.entity';
-import { RefreshTokensMetaRepository } from './DBEntities/refreshTokenMeta/refreshTokenMeta.repository';
+import { RefreshTokenMetaEntity } from './DBEntities/refreshTokenMeta/refreshTokenMeta.entity';
+import { RefreshTokensMetaModule } from './DBEntities/refreshTokenMeta/refreshTokenMeta.module';
 import {
   RefreshTokenMeta,
   RefreshTokenMetaSchema,
 } from './DBEntities/refreshTokenMeta/refreshTokenMeta.scheme.types';
 import { EmailAdapter } from './application/emailAdapter/emailAdapter';
+import { myJwtModule } from './application/jwt/jwt.module';
 import { JwtService } from './application/jwt/jwtService';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
@@ -57,10 +58,6 @@ import { TestController } from './endPointsEntities/testing/testing.controller';
 import { UserEntity } from './endPointsEntities/users/users.entity';
 import { UsersModule } from './endPointsEntities/users/users.module';
 import { User, UserSchema } from './endPointsEntities/users/users.mongo.scheme';
-import { UsersService } from './endPointsEntities/users/users.service';
-import { UsersMongoRepository } from './endPointsEntities/users/usersMongo.repository';
-import { UsersPgSqlRepository } from './endPointsEntities/users/usersPgSql.Repository';
-import { UsersTypeOrmRepository } from './endPointsEntities/users/usersTypeOrm.Repository';
 import { PostLikesMongoRepository } from './posts/postLikes/postLikes.MongoRepository';
 import { PostLikesPgSqlRepository } from './posts/postLikes/postLikes.PgSqlRepository';
 import { PostLike, PostLikeSchema } from './posts/postLikes/postLikes.scheme';
@@ -85,14 +82,6 @@ import { isEmailAlreadyInUseConstraint } from './validation/customValidators/isE
 import { jwtKeyValidationConstraint } from './validation/customValidators/jwtKey.validator';
 import { LoginAlreadyInUseConstraint } from './validation/customValidators/loginInUse.validator';
 
-const usersRepositoryProvider = {
-  provide: 'usersRepository',
-  useClass:
-    process.env.Users_Repository === 'Mongo'
-      ? UsersMongoRepository
-      : UsersPgSqlRepository,
-};
-
 const useCases = [
   ReturnBlogsWithPaginationUseCase,
   DeleteBlogUseCase,
@@ -105,6 +94,13 @@ const useCases = [
   GetPostsWithPaginationUseCase,
   updatePostUseCase,
   updatePostLikeStatusUseCase,
+];
+
+const modules = [
+  UsersModule,
+  RefreshTokensMetaModule,
+  BlacklistTokensModule,
+  myJwtModule,
 ];
 
 @Module({
@@ -147,12 +143,12 @@ const useCases = [
       host: 'localhost',
       port: 5432,
       username: 'nodejs',
-      password: 'nodejs', //
+      password: 'nodejs', ///
       database: 'Homework1',
       autoLoadEntities: true,
       synchronize: true,
     }),
-    UsersModule,
+    ...modules,
   ],
   controllers: [
     TestController,
@@ -170,13 +166,8 @@ const useCases = [
     BlogsPgSqlRepository,
     PostsMongoRepository,
     PostsPgSqlRepository,
-    UsersService,
-    UsersPgSqlRepository,
-    UsersMongoRepository,
-    UsersTypeOrmRepository,
     CommentsMongoRepository,
     CommentsPgSqlRepository,
-    RefreshTokensMetaRepository,
     PostLikesMongoRepository,
     PostLikesPgSqlRepository,
     PostLikesService,
@@ -185,7 +176,6 @@ const useCases = [
     CommentLikesMongoRepository,
     CommentLikesPgSqlRepository,
     CommentLikesService,
-    BlacklistRepository,
     AuthService,
     LocalStrategy,
     BasicStrategy,
@@ -198,7 +188,6 @@ const useCases = [
     IsEmailIsAlreadyConfirmedConstraint,
     jwtKeyValidationConstraint,
     LoginAlreadyInUseConstraint,
-    usersRepositoryProvider,
     ...useCases,
   ],
 })

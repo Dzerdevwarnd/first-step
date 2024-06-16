@@ -91,11 +91,19 @@ export class UsersTypeOrmRepository {
     email: string,
     recoveryCode: string,
   ): Promise<boolean> {
-    const result = await this.usersRepository.update(
-      { accountData: { email } },
-      { accountData: { recoveryCode } },
-    );
-    return result.affected == 1;
+    const user = await this.usersRepository.findOne({
+      where: { accountData: { email: email } },
+    });
+
+    if (!user) {
+      return false;
+    }
+
+    user.accountData.recoveryCode = recoveryCode;
+
+    await this.usersRepository.save(user);
+
+    return true;
   }
 
   async updateUserSaltAndHash(
@@ -103,11 +111,20 @@ export class UsersTypeOrmRepository {
     passwordSalt: string,
     passwordHash: string,
   ) {
-    const result = await await this.usersRepository.update(
-      { accountData: { recoveryCode } },
-      { accountData: { passwordSalt, passwordHash } },
-    );
-    return result.affected == 1;
+    const user = await this.usersRepository.findOne({
+      where: { accountData: { recoveryCode: recoveryCode } },
+    });
+
+    if (!user) {
+      return false;
+    }
+
+    user.accountData.passwordSalt = passwordSalt;
+    user.accountData.passwordHash = passwordHash;
+
+    await this.usersRepository.save(user);
+
+    return true;
   }
 
   async deleteUser(params: { id: string }): Promise<boolean> {
@@ -116,6 +133,7 @@ export class UsersTypeOrmRepository {
   }
 
   async userEmailConfirmationAccept(confirmationCode: any): Promise<boolean> {
+    //Пример сложного аптейта
     const resultOfUpdate = await this.usersRepository
       .createQueryBuilder()
       .update(UserEntity)

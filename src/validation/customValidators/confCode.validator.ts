@@ -16,7 +16,6 @@ export class ConfirmationCodeValidationConstraint
   constructor(protected usersService: UsersService) {}
   async validate(code: any, args: ValidationArguments) {
     const user = await this.usersService.findDBUserByConfirmationCode(code);
-    console.log(user);
     if (!user) {
       return false;
     }

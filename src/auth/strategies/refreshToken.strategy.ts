@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { BlacklistRepository } from 'src/DBEntities/blacklistTokens/blacklistTokens.repository';
+import { BlacklistTokensService } from 'src/DBEntities/blacklistTokens/blacklistTokens.Service';
 import { settings } from 'src/settings';
 
 @Injectable()
@@ -10,7 +10,7 @@ export class RefreshTokenAuthStrategy extends PassportStrategy(
   Strategy,
   'refreshToken-strategy',
 ) {
-  constructor(private blacklistRepository: BlacklistRepository) {
+  constructor(private blacklistTokensService: BlacklistTokensService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         RefreshTokenAuthStrategy.extractJWT,
@@ -34,7 +34,7 @@ export class RefreshTokenAuthStrategy extends PassportStrategy(
 
   async validate(payload: any) {
     const tokenInBlackList =
-      await this.blacklistRepository.findTokenInBlacklist('');
+      await this.blacklistTokensService.findTokenInBlacklist('');
     if (tokenInBlackList) {
       throw new UnauthorizedException();
     }

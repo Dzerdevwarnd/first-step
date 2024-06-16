@@ -17,9 +17,6 @@ export class RefreshTokensMetaMongoRepository {
     protected jwtService: JwtService,
   ) {}
   async createRefreshTokenMeta(refreshTokenMeta: refreshTokensMetaTypeDB) {
-    const expireDate = new Date( //@ts-expect-error Argument of type 'RegExpMatchArray' is not assignable to parameter of type 'string'.ts(2345)
-      Date.now() + parseInt(settings.refreshTokenLifeTime.match(/\d+/)),
-    );
     const result =
       await this.refreshTokenMetaModel.insertMany(refreshTokenMeta);
 
@@ -68,31 +65,17 @@ export class RefreshTokensMetaMongoRepository {
     });
     return resultOfDelete.acknowledged;
   }
-  async deleteOneUserDeviceAndReturnStatusCode(
-    requestDeviceId: string,
-    refreshToken: string,
-  ) {
-    const deviceId =
-      await this.jwtService.verifyAndGetDeviceIdByToken(refreshToken);
-    if (!deviceId) {
-      return 401;
-    }
+  async findRefreshTokenMetaByDeviceId(deviceId: string) {
     const requestRefreshTokensMeta = await this.refreshTokenMetaModel.findOne({
-      deviceId: requestDeviceId,
+      deviceId: deviceId,
     });
-    if (!requestRefreshTokensMeta) {
-      return 404;
-    }
-    const userId = await this.findUserIdByDeviceId(deviceId);
-    if (userId !== requestRefreshTokensMeta?.userId) {
-      return 403;
-    }
+    return requestRefreshTokensMeta;
+  }
+
+  async deleteRefreshTokenMetaByDeviceId(deviceId: string): Promise<boolean> {
     const resultOfDelete = await this.refreshTokenMetaModel.deleteOne({
-      deviceId: requestDeviceId,
+      deviceId: deviceId,
     });
-    if (resultOfDelete.deletedCount === 0) {
-      return 404;
-    }
-    return 204;
+    return resultOfDelete.deletedCount === 1;
   }
 }

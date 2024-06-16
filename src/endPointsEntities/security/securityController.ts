@@ -1,17 +1,15 @@
 import { Controller, Delete, Get, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { RefreshTokensMetaRepository } from 'src/DBEntities/refreshTokenMeta/refreshTokenMeta.repository';
+import { RefreshTokensMetaService } from 'src/DBEntities/refreshTokenMeta/refreshTokenMeta.service';
 
 //export const securityRouter = Router({});
 
 @Controller('security')
 export class SecurityController {
-  constructor(
-    protected refreshTokensMetaRepository: RefreshTokensMetaRepository,
-  ) {}
+  constructor(protected RefreshTokensMetaService: RefreshTokensMetaService) {}
   @Get('/devices')
   async getAllUserDevices(@Res() res: Response, @Req() req: Request) {
-    const devices = await this.refreshTokensMetaRepository.returnAllUserDevices(
+    const devices = await this.RefreshTokensMetaService.returnAllUserDevices(
       req.cookies.refreshToken,
     );
     if (!devices) {
@@ -23,10 +21,9 @@ export class SecurityController {
   }
   @Delete('/devices')
   async deleteAllUserDevices(@Res() res: Response, @Req() req: Request) {
-    const isDeleted =
-      await this.refreshTokensMetaRepository.deleteAllUserDevices(
-        req.cookies.refreshToken,
-      );
+    const isDeleted = await this.RefreshTokensMetaService.deleteAllUserDevices(
+      req.cookies.refreshToken,
+    );
     if (!isDeleted) {
       res.sendStatus(401);
       return;
@@ -37,7 +34,7 @@ export class SecurityController {
   @Delete('/devices/:id')
   async deleteOneUserDevice(@Res() res: Response, @Req() req: Request) {
     const StatusCode =
-      await this.refreshTokensMetaRepository.deleteOneUserDeviceAndReturnStatusCode(
+      await this.RefreshTokensMetaService.deleteOneUserDeviceAndReturnStatusCode(
         req.params.id,
         req.cookies.refreshToken,
       );
