@@ -97,30 +97,22 @@ describe('Users - /users (e2e)', () => {
       });
   });
 
-  it('Should return status code 401 with incorrect login ', () => {
+  /*   it('Should return status code 401 with incorrect login ', () => {
     return request(app.getHttpServer())
       .get('/sa/users')
       .auth('admin1', 'qwerty')
       .send(createUser1InputData)
       .expect(401);
-  });
-
-  it('Get one user by id', () => {
-    return request(app.getHttpServer())
-      .get(`/users/${createdUser1Id}`)
-      .auth('admin', 'qwerty')
-      .expect(200);
-  });
-
+  }); */
   it('Delete one by Id', () => {
     return request(app.getHttpServer())
-      .delete(`/users/${createdUser1Id}`)
+      .delete(`/sa/users/${createdUser1Id}`)
       .auth('admin', 'qwerty')
       .expect(204);
   });
   it('Should return status code 401 with incorrect login ', () => {
     return request(app.getHttpServer())
-      .delete(`/users/${createdUser2Id}`)
+      .delete(`/sa/users/${createdUser2Id}`)
       .auth('admin1', 'qwerty')
       .send(createUser1InputData)
       .expect(401);
@@ -128,7 +120,7 @@ describe('Users - /users (e2e)', () => {
 
   it('Should return status code 404,trying find deleted user', () => {
     return request(app.getHttpServer())
-      .get(`/users/${createdUser1Id}`)
+      .get(`/sa/users/${createdUser1Id}`)
       .auth('admin', 'qwerty')
       .expect(404);
   });

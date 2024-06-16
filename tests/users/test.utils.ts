@@ -1,12 +1,7 @@
 import { INestApplication } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { RefreshTokensMetaModule } from 'src/DBEntities/refreshTokenMeta/refreshTokenMeta.module';
-import { myJwtModule } from 'src/application/jwt/jwt.module';
-import { AuthModule } from 'src/auth/auth.module';
-import { UsersModule } from 'src/endPointsEntities/users/users.module';
-import { settings } from 'src/settings';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { AppModule } from 'src/app.module';
 import { DataSource } from 'typeorm';
 
 export const getAppAndCleanDB = async () => {
@@ -22,18 +17,7 @@ export const getAppAndCleanDB = async () => {
       synchronize: true,
     };
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [
-        TypeOrmModule.forRoot(options),
-        MongooseModule.forRoot(
-          settings.MONGO_URL, //|| `mongodb://0.0.0.0:27017/${1}`,
-          //  { dbName: 'hm13' },
-        ),
-        AuthModule,
-        UsersModule,
-        RefreshTokensMetaModule,
-        myJwtModule,
-      ],
-      providers: [],
+      imports: [AppModule],
     }).compile();
     const app: INestApplication = moduleFixture.createNestApplication();
     await app.init();
