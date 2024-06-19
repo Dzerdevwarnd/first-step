@@ -40,9 +40,14 @@ export class UsersTypeOrmRepository {
       );
     }
 
+    if (sortBy === 'login' || sortBy === 'email') {
+      queryBuilder.addOrderBy(`user.${sortBy} COLLATE "C"`, sortDirection);
+    } else {
+      queryBuilder.addOrderBy(`user.${sortBy}`, sortDirection);
+    }
+
     queryBuilder
-      .orderBy(`user.${sortBy}`, sortDirection)
-      .addOrderBy('user.createdAt', 'DESC')
+      .addOrderBy('user.createdAt', sortDirection)
       .skip((page - 1) * pageSize)
       .take(pageSize);
 

@@ -92,7 +92,7 @@ describe('Users - /users (e2e)', () => {
           page: 1,
           pageSize: 10,
           totalCount: 2,
-          items: [user1ViewData, user2ViewData],
+          items: [user2ViewData, user1ViewData],
         });
       });
   });

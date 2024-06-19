@@ -605,7 +605,7 @@ window.onload = function() {
       },
       "/sa/users": {
         "get": {
-          "operationId": "SaController_getUsersWithPagination",
+          "operationId": "SaUsersController_getUsersWithPagination",
           "parameters": [],
           "responses": {
             "200": {
@@ -614,7 +614,7 @@ window.onload = function() {
           }
         },
         "post": {
-          "operationId": "SaController_createUser",
+          "operationId": "SaUsersController_createUser",
           "parameters": [],
           "requestBody": {
             "required": true,
@@ -635,7 +635,7 @@ window.onload = function() {
       },
       "/sa/users/{id}": {
         "delete": {
-          "operationId": "SaController_deleteUserByID",
+          "operationId": "SaUsersController_deleteUserByID",
           "parameters": [],
           "responses": {
             "200": {

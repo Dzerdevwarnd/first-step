@@ -46,9 +46,11 @@ export class BlacklistTokensTypeOrmRepository {
     return !!result;
   }
 
-  async findTokenInBlacklist(
-    token: string,
-  ): Promise<BlackListTokenEntity | undefined> {
-    return this.blacklistTokenRepository.findOne({ where: { token: token } });
+  async findTokenInBlacklist(tokenObject: {
+    token: string;
+  }): Promise<BlackListTokenEntity | undefined> {
+    return this.blacklistTokenRepository.findOne({
+      where: { token: tokenObject.token },
+    });
   }
 }

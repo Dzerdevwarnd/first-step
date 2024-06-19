@@ -1,7 +1,14 @@
-import { INestApplication } from '@nestjs/common';
+import {
+  BadRequestException,
+  INestApplication,
+  ValidationPipe,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { useContainer } from 'class-validator';
+import * as cookieParser from 'cookie-parser';
 import { AppModule } from 'src/app.module';
+import { HttpExceptionFilter } from 'src/exception.filter';
 import { DataSource } from 'typeorm';
 
 export const getAppAndCleanDB = async () => {
@@ -20,6 +27,30 @@ export const getAppAndCleanDB = async () => {
       imports: [AppModule],
     }).compile();
     const app: INestApplication = moduleFixture.createNestApplication();
+    app.use(cookieParser());
+    app.useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        stopAtFirstError: true,
+        exceptionFactory: (errors) => {
+          const errorsForResposnse = [];
+          errors.forEach((e) => {
+            const constraintsKeys = Object.keys(e.constraints);
+            constraintsKeys.forEach((ckey) => {
+              errorsForResposnse.push({
+                message: e.constraints[ckey],
+                field: e.property,
+              });
+            });
+          });
+          throw new BadRequestException(errorsForResposnse);
+        },
+      }),
+    );
+    app.useGlobalFilters(new HttpExceptionFilter());
+    useContainer(app.select(AppModule), {
+      fallbackOnErrors: true,
+    });
     await app.init();
 
     const dataSource = await app.resolve(DataSource);

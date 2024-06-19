@@ -53,14 +53,11 @@ export class RefreshTokensMetaService {
         deviceId,
         refreshTokenMetaUpd,
       );
-    return result.matchedCount === 1;
+    return result === true;
   }
   async findUserIdByDeviceId(deviceId: string) {
-    const refreshTokenMeta =
-      await this.refreshTokensMetaRepository.findUserIdByDeviceId({
-        deviceId,
-      });
-    const userId = refreshTokenMeta?.userId;
+    const userId =
+      await this.refreshTokensMetaRepository.findUserIdByDeviceId(deviceId);
     return userId;
   }
   async returnAllUserDevices(refreshToken: string) {
@@ -91,10 +88,11 @@ export class RefreshTokensMetaService {
       return;
     }
     const userId = await this.findUserIdByDeviceId(deviceId);
-    const resultOfDelete = await this.refreshTokensMetaRepository.deleteMany({
-      deviceId,
-      userId,
-    });
+    const resultOfDelete =
+      await this.refreshTokensMetaRepository.deleteAllUserDevices({
+        deviceId,
+        userId,
+      });
     return resultOfDelete.acknowledged;
   }
 
@@ -102,6 +100,10 @@ export class RefreshTokensMetaService {
     requestDeviceId: string,
     refreshToken: string,
   ) {
+    const existingUser = this.findUserIdByDeviceId(requestDeviceId);
+    if (!existingUser) {
+      return 404;
+    }
     const deviceId =
       await this.jwtService.verifyAndGetDeviceIdByToken(refreshToken);
     if (!deviceId) {
@@ -114,8 +116,8 @@ export class RefreshTokensMetaService {
     if (!requestRefreshTokensMeta) {
       return 404;
     }
-    const userId = await this.findUserIdByDeviceId(deviceId);
-    if (userId !== requestRefreshTokensMeta?.userId) {
+    const userIdOwner = await this.findUserIdByDeviceId(requestDeviceId);
+    if (userIdOwner !== requestRefreshTokensMeta?.userId) {
       return 403;
     }
     const booleanResultOfDelete =

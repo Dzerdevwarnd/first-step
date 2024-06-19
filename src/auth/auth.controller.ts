@@ -178,7 +178,7 @@ export class AuthController {
       RefreshTokenMetaUpd,
     );
     if (!isUpdated) {
-      res.status(400).send('RefreshTokenMeta error');
+      res.status(400).send('RefreshTokenMeta error1');
       return;
     }
     res

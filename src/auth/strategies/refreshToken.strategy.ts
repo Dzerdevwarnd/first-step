@@ -10,34 +10,43 @@ export class RefreshTokenAuthStrategy extends PassportStrategy(
   Strategy,
   'refreshToken-strategy',
 ) {
+  private token: string | null = null;
   constructor(private blacklistTokensService: BlacklistTokensService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        RefreshTokenAuthStrategy.extractJWT,
+        (req: Request) => this.extractJWT(req),
         ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),
+      passReqToCallback: true,
       ignoreExpiration: false,
       secretOrKey: settings.JWT_SECRET,
     });
   }
 
-  private static extractJWT(req: Request): string | null {
+  private extractJWT(req: Request): string | null {
     if (
       req.cookies &&
       'refreshToken' in req.cookies &&
       req.cookies.refreshToken.length > 0
     ) {
+      this.token = req.cookies.refreshToken;
       return req.cookies.refreshToken;
     }
     return null;
   }
 
-  async validate(payload: any) {
-    const tokenInBlackList =
-      await this.blacklistTokensService.findTokenInBlacklist('');
-    if (tokenInBlackList) {
-      throw new UnauthorizedException();
+  async validate(req: Request, payload: any) {
+    const token = this.extractJWT(req);
+
+    if (!token) {
+      throw new UnauthorizedException('Token not found in cookies');
     }
+    const tokenInBlackList =
+      await this.blacklistTokensService.findTokenInBlacklist(token);
+    if (tokenInBlackList) {
+      throw new UnauthorizedException('Token found in blacklist');
+    }
+
     return { deviceId: payload.deviceId };
   }
 }

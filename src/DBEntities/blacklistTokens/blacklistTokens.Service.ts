@@ -31,14 +31,14 @@ export class BlacklistTokensService {
   ): Promise<boolean> {
     const accessTokenDB = {
       token: reqBody.accessToken,
-      expireDate: new Date( //@ts-expect-error type error
-        Date.now() + parseInt(settings.accessTokenLifeTime.match(/\d+/)),
+      expireDate: new Date(
+        Date.now() + parseInt(settings.accessTokenLifeTime) + 60000,
       ),
     };
     const refreshTokenDB = {
       token: reqCookies.refreshToken,
-      expireDate: new Date( //@ts-expect-error type error
-        Date.now() + parseInt(settings.refreshTokenLifeTime.match(/\d+/)),
+      expireDate: new Date(
+        Date.now() + parseInt(settings.refreshTokenLifeTime) + 60000,
       ),
     };
 
@@ -54,8 +54,8 @@ export class BlacklistTokensService {
   async addRefreshTokenInBlacklist(cookies): Promise<boolean> {
     const refreshTokenDB = {
       token: cookies.refreshToken,
-      expireDate: new Date( //@ts-expect-error type error
-        Date.now() + parseInt(settings.refreshTokenLifeTime.match(/\d+/)),
+      expireDate: new Date(
+        Date.now() + parseInt(settings.refreshTokenLifeTime) + +60000,
       ),
     };
     const resultBoolean =
