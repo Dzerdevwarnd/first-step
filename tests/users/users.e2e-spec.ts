@@ -1,8 +1,9 @@
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { getAppAndCleanDB } from './test.utils';
+import { getAppAndCleanDB } from '../test.utils';
 
 describe('Users - /users (e2e)', () => {
+  let startTestObject;
   let app: INestApplication;
 
   const createUser1InputData = {
@@ -34,13 +35,14 @@ describe('Users - /users (e2e)', () => {
   let createdUser2Id: string;
 
   beforeAll(async () => {
-    app = await getAppAndCleanDB();
+    startTestObject = await getAppAndCleanDB();
+    app = startTestObject.app;
   });
 
   it('Should return status code 401 with incorrect login ]', () => {
     return request(app.getHttpServer())
-      .post('/sa/users')
       .auth('admin1', 'qwerty')
+      .post('/sa/users')
       .send(createUser1InputData)
       .expect(401);
   });

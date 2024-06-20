@@ -1,3 +1,5 @@
+import { AppModule } from '@app/app.module';
+import { HttpExceptionFilter } from '@app/exception.filter';
 import {
   BadRequestException,
   INestApplication,
@@ -7,8 +9,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { useContainer } from 'class-validator';
 import * as cookieParser from 'cookie-parser';
-import { AppModule } from 'src/app.module';
-import { HttpExceptionFilter } from 'src/exception.filter';
 import { DataSource } from 'typeorm';
 
 export const getAppAndCleanDB = async () => {
@@ -66,7 +66,7 @@ END LOOP;
 END;
 $$ LANGUAGE plpgsql;
 SELECT truncate_tables('nodejs');`);
-    return app;
+    return { app, moduleFixture };
   } catch (error) {
     console.error('Error in getAppAndCleanDB:', error);
     throw error;
