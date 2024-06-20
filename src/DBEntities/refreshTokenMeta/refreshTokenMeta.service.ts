@@ -88,19 +88,19 @@ export class RefreshTokensMetaService {
       return;
     }
     const userId = await this.findUserIdByDeviceId(deviceId);
-    const resultOfDelete =
+    const resultOfDeleteBoolean =
       await this.refreshTokensMetaRepository.deleteAllUserDevices({
         deviceId,
         userId,
       });
-    return resultOfDelete.acknowledged;
+    return resultOfDeleteBoolean;
   }
 
   async deleteOneUserDeviceAndReturnStatusCode(
     requestDeviceId: string,
     refreshToken: string,
   ) {
-    const existingUser = this.findUserIdByDeviceId(requestDeviceId);
+    const existingUser = await this.findUserIdByDeviceId(requestDeviceId);
     if (!existingUser) {
       return 404;
     }
@@ -122,7 +122,7 @@ export class RefreshTokensMetaService {
     }
     const booleanResultOfDelete =
       await this.refreshTokensMetaRepository.deleteRefreshTokenMetaByDeviceId(
-        deviceId,
+        requestDeviceId,
       );
     if (booleanResultOfDelete === false) {
       return 404;

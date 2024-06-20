@@ -1,9 +1,18 @@
-import { Controller, Delete, Get, Req, Res } from '@nestjs/common';
+import { RefreshTokenAuthGuard } from '@app/auth/guards/refreshToken.auth.guard';
+import {
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { RefreshTokensMetaService } from 'src/DBEntities/refreshTokenMeta/refreshTokenMeta.service';
 
 //export const securityRouter = Router({});
-
+@UseGuards(RefreshTokenAuthGuard)
 @Controller('security')
 export class SecurityController {
   constructor(protected RefreshTokensMetaService: RefreshTokensMetaService) {}
@@ -19,6 +28,8 @@ export class SecurityController {
     res.status(200).send(devices);
     return;
   }
+
+  @UseGuards(RefreshTokenAuthGuard)
   @Delete('/devices')
   async deleteAllUserDevices(@Res() res: Response, @Req() req: Request) {
     const isDeleted = await this.RefreshTokensMetaService.deleteAllUserDevices(
@@ -31,8 +42,14 @@ export class SecurityController {
     res.sendStatus(204);
     return;
   }
+
+  @UseGuards(RefreshTokenAuthGuard)
   @Delete('/devices/:id')
-  async deleteOneUserDevice(@Res() res: Response, @Req() req: Request) {
+  async deleteOneUserDevice(
+    @Res() res: Response,
+    @Req() req: Request,
+    @Param() params: { id: string },
+  ) {
     const StatusCode =
       await this.RefreshTokensMetaService.deleteOneUserDeviceAndReturnStatusCode(
         req.params.id,

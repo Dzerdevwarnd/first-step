@@ -53,13 +53,13 @@ export class RefreshTokensMetaTypeOrmRepository {
     });
   }
 
-  async deleteAllUserDevices(
-    deviceId: string,
-    userId: string,
-  ): Promise<boolean> {
+  async deleteAllUserDevices(deviceIdAndUserId: {
+    deviceId: string;
+    userId: string;
+  }): Promise<boolean> {
     const resultOfDelete = await this.refreshTokenMetaRepository.delete({
-      userId: userId,
-      deviceId: Not(deviceId),
+      userId: deviceIdAndUserId.userId,
+      deviceId: Not(deviceIdAndUserId.deviceId),
     });
     return resultOfDelete.affected > 0;
   }
