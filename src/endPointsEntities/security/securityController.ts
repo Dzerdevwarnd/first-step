@@ -1,4 +1,5 @@
-import { RefreshTokenAuthGuard } from '@app/auth/guards/refreshToken.auth.guard';
+import { RefreshTokenAuthGuard } from '@app/src/auth/guards/refreshToken.auth.guard';
+import { RefreshTokensMetaService } from '@app/src/DBEntities/refreshTokenMeta/refreshTokenMeta.service';
 import {
   Controller,
   Delete,
@@ -9,7 +10,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { RefreshTokensMetaService } from 'src/DBEntities/refreshTokenMeta/refreshTokenMeta.service';
 
 //export const securityRouter = Router({});
 @UseGuards(RefreshTokenAuthGuard)

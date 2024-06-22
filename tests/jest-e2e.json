@@ -7,7 +7,7 @@
   },
   "setupFilesAfterEnv": ["<rootDir>/tests/jest.setup.ts"],
   "moduleNameMapper": {
-    "^src/(.*)$": "<rootDir>/src/$1"
+    "^@app/(.*)$": "<rootDir>/$1"
   },
   "collectCoverageFrom": ["**/*.(t|j)s"],
   "coverageDirectory": "./coverage",

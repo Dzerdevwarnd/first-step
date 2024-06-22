@@ -1,14 +1,14 @@
-import { Injectable } from '@nestjs/common';
-import { add } from 'date-fns';
-import { BlacklistTokensService } from 'src/DBEntities/blacklistTokens/blacklistTokens.Service';
-import { JwtService } from 'src/application/jwt/jwtService';
-import { UsersService } from 'src/endPointsEntities/users/users.service';
+import { BlacklistTokensService } from '@app/src/DBEntities/blacklistTokens/blacklistTokens.Service';
+import { JwtService } from '@app/src/application/jwt/jwtService';
+import { UsersService } from '@app/src/endPointsEntities/users/users.service';
 import {
   UserDbType,
   userViewType,
-} from 'src/endPointsEntities/users/users.types';
-import { UsersMongoRepository } from 'src/endPointsEntities/users/usersMongo.repository';
-import { settings } from 'src/settings';
+} from '@app/src/endPointsEntities/users/users.types';
+import { UsersMongoRepository } from '@app/src/endPointsEntities/users/usersMongo.repository';
+import { settings } from '@app/src/settings';
+import { Injectable } from '@nestjs/common';
+import { add } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()

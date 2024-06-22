@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { settings } from 'src/settings';
 import { JwtService } from './jwtService';
 
 @Module({
   imports: [
     JwtModule.register({
-      secret: settings.JWT_SECRET,
+      global: true,
+      secret: process.env.JWT_SECRET || '123',
     }),
   ],
   providers: [JwtService],

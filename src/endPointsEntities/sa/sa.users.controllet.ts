@@ -1,3 +1,5 @@
+import { JwtService } from '@app/src/application/jwt/jwtService';
+import { BasicAuthGuard } from '@app/src/auth/guards/basic.auth.guard';
 import {
   Body,
   Controller,
@@ -10,8 +12,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { JwtService } from 'src/application/jwt/jwtService';
-import { BasicAuthGuard } from 'src/auth/guards/basic.auth.guard';
 import { UsersService } from '../users/users.service';
 import {
   CreateUserInputModelType,

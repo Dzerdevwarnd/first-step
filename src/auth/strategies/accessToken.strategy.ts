@@ -1,8 +1,7 @@
+import { BlacklistTokensService } from '@app/src/DBEntities/blacklistTokens/blacklistTokens.Service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { BlacklistTokensService } from 'src/DBEntities/blacklistTokens/blacklistTokens.Service';
-import { settings } from 'src/settings';
 
 @Injectable()
 export class AccessTokenAuthStrategy extends PassportStrategy(
@@ -13,7 +12,7 @@ export class AccessTokenAuthStrategy extends PassportStrategy(
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: settings.JWT_SECRET,
+      secretOrKey: process.env.JWT_SECRET,
     });
   }
 

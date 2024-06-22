@@ -1,6 +1,6 @@
+import { JwtService } from '@app/src/application/jwt/jwtService';
+import { settings } from '@app/src/settings';
 import { Injectable } from '@nestjs/common';
-import { JwtService } from 'src/application/jwt/jwtService';
-import { settings } from 'src/settings';
 import { RefreshTokensMetaMongoRepository } from './refreshTokenMeta.MongoRepository';
 import { RefreshTokensMetaTypeOrmRepository } from './refreshTokenMeta.TypeOrmRepository';
 import { refreshTokensMetaTypeDB } from './refreshTokenMeta.scheme.types';

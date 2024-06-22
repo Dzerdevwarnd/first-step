@@ -1,3 +1,4 @@
+import { UsersService } from '@app/src/endPointsEntities/users/users.service';
 import { Injectable } from '@nestjs/common';
 import {
   ValidationArguments,
@@ -6,7 +7,6 @@ import {
   ValidatorConstraintInterface,
   registerDecorator,
 } from 'class-validator';
-import { UsersService } from 'src/endPointsEntities/users/users.service';
 
 @ValidatorConstraint({ async: true })
 @Injectable()

@@ -1,7 +1,7 @@
+import { myJwtModule } from '@app/src/application/jwt/jwt.module';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { myJwtModule } from 'src/application/jwt/jwt.module';
 import { RefreshTokensMetaMongoRepository } from './refreshTokenMeta.MongoRepository';
 import { RefreshTokensMetaTypeOrmRepository } from './refreshTokenMeta.TypeOrmRepository';
 import { RefreshTokenMetaEntity } from './refreshTokenMeta.entity';

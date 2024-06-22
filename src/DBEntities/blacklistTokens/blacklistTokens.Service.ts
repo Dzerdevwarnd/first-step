@@ -1,5 +1,5 @@
+import { settings } from '@app/src/settings';
 import { Injectable } from '@nestjs/common';
-import { settings } from 'src/settings';
 import { BlacklistTokensMongoRepository } from './blacklistTokens.MongoRepository';
 import { BlacklistTokensTypeOrmRepository } from './blacklistTokens.TypeOrmRepository';
 import { TokenDBType } from './blacklistTokens.scheme.types';

@@ -1,6 +1,6 @@
 /*import { Injectable } from '@nestjs/common';
-import { PostsMongoRepository } from 'src/posts/posts.repository';
-import { postsByBlogIdPaginationType } from 'src/posts/posts.types';
+import { PostsMongoRepository } from '@app/src/posts/posts.repository';
+import { postsByBlogIdPaginationType } from '@app/src/posts/posts.types';
 import { BlogsRepository } from './blogs.repository';
 import { blogDBType, blogViewType, blogsPaginationType } from './blogs.types';
 

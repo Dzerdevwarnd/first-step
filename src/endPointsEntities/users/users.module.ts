@@ -1,10 +1,10 @@
+import { RefreshTokenMetaEntity } from '@app/src/DBEntities/refreshTokenMeta/refreshTokenMeta.entity';
+import { RefreshTokensMetaModule } from '@app/src/DBEntities/refreshTokenMeta/refreshTokenMeta.module';
+import { myJwtModule } from '@app/src/application/jwt/jwt.module';
+import { BasicAuthGuard } from '@app/src/auth/guards/basic.auth.guard';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RefreshTokenMetaEntity } from 'src/DBEntities/refreshTokenMeta/refreshTokenMeta.entity';
-import { RefreshTokensMetaModule } from 'src/DBEntities/refreshTokenMeta/refreshTokenMeta.module';
-import { myJwtModule } from 'src/application/jwt/jwt.module';
-import { BasicAuthGuard } from 'src/auth/guards/basic.auth.guard';
 import { SaUsersController } from '../sa/sa.users.controllet';
 import { UsersController } from './users.controller';
 import { UserEntity } from './users.entity';

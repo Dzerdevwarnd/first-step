@@ -1,7 +1,7 @@
+import { settings } from '@app/src/settings';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { settings } from 'src/settings';
 import {
   BlacklistToken,
   BlacklistTokenDocument,

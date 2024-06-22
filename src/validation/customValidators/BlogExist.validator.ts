@@ -1,3 +1,4 @@
+import { FindBlogByIdCommand } from '@app/src/endPointsEntities/blogs/use-cases/findBlogById';
 import { Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import {
@@ -7,7 +8,6 @@ import {
   ValidatorConstraintInterface,
   registerDecorator,
 } from 'class-validator';
-import { FindBlogByIdCommand } from 'src/endPointsEntities/blogs/use-cases/findBlogById';
 
 @ValidatorConstraint({ async: true })
 @Injectable()

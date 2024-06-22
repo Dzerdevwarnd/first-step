@@ -1,12 +1,13 @@
+import { UserDbType } from '@app/src/endPointsEntities/users/users.types';
+import { settings } from '@app/src/settings';
 import { Injectable } from '@nestjs/common';
 import { JwtService as JwtNestService } from '@nestjs/jwt';
-import { UserDbType } from 'src/endPointsEntities/users/users.types';
-import { settings } from 'src/settings';
-
+//
 @Injectable()
 export class JwtService {
   constructor(private jwtNestService: JwtNestService) {}
   async createAccessToken(user: UserDbType, expirationTime: string) {
+    console.log('RequestUserID=', user.id);
     const AccessToken = this.jwtNestService.sign(
       { userId: user.id },
       { expiresIn: expirationTime },

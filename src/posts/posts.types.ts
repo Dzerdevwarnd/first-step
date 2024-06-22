@@ -1,5 +1,5 @@
+import { blogExistValidation } from '@app/src/validation/customValidators/BlogExist.validator';
 import { IsIn, Length, NotContains } from 'class-validator';
-import { blogExistValidation } from 'src/validation/customValidators/BlogExist.validator';
 
 export class CreatePostInputModelType {
   @Length(1, 30)

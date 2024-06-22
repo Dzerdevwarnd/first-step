@@ -1,4 +1,4 @@
-import { UserEntity } from 'src/endPointsEntities/users/users.entity';
+import { UserEntity } from '@app/src/endPointsEntities/users/users.entity';
 import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 
 @Entity()

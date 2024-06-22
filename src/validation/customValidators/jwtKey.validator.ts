@@ -6,7 +6,6 @@ import {
   ValidatorConstraintInterface,
   registerDecorator,
 } from 'class-validator';
-import { settings } from 'src/settings';
 
 @ValidatorConstraint({ async: true })
 export class jwtKeyValidationConstraint
@@ -16,7 +15,7 @@ export class jwtKeyValidationConstraint
   async validate(recoveryCode: any, args: ValidationArguments) {
     try {
       const result = await this.jwtService.verifyAsync(recoveryCode, {
-        secret: settings.JWT_SECRET,
+        secret: process.env.JWT_SECRET,
       });
     } catch (error) {
       return false;

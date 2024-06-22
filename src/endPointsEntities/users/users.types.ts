@@ -1,6 +1,6 @@
+import { isEmailAlreadyInUse } from '@app/src/validation/customValidators/isEmailAlreadyInUse.validator';
+import { LoginAlreadyInUse } from '@app/src/validation/customValidators/loginInUse.validator';
 import { IsEmail, Length } from 'class-validator';
-import { isEmailAlreadyInUse } from 'src/validation/customValidators/isEmailAlreadyInUse.validator';
-import { LoginAlreadyInUse } from 'src/validation/customValidators/loginInUse.validator';
 
 export class CreateUserInputModelType {
   @LoginAlreadyInUse({ message: 'Email is already in use' })

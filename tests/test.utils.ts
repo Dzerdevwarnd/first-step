@@ -1,5 +1,5 @@
-import { AppModule } from '@app/app.module';
-import { HttpExceptionFilter } from '@app/exception.filter';
+import { AppModule } from '@app/src/app.module';
+import { HttpExceptionFilter } from '@app/src/exception.filter';
 import {
   BadRequestException,
   INestApplication,

@@ -1,5 +1,5 @@
+import { RefreshTokensMetaModule } from '@app/src/DBEntities/refreshTokenMeta/refreshTokenMeta.module';
 import { Module } from '@nestjs/common';
-import { RefreshTokensMetaModule } from 'src/DBEntities/refreshTokenMeta/refreshTokenMeta.module';
 import { SecurityController } from './securityController';
 
 @Module({

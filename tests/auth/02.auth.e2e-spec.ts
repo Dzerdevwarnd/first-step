@@ -1,15 +1,19 @@
-import { UsersService } from '@app/endPointsEntities/users/users.service';
-import { UserDbType } from '@app/endPointsEntities/users/users.types';
+import { UsersService } from '@app/src/endPointsEntities/users/users.service';
+import { UserDbType } from '@app/src/endPointsEntities/users/users.types';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { getAppAndCleanDB } from '../test.utils';
 
-describe('Users - /users (e2e)', () => {
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+describe('Auth - /Auth (e2e)', () => {
   let startTestObject;
   let app: INestApplication;
   let moduleFixture;
   let userService: UsersService;
-  let user3:UserDbType
+  let user3: UserDbType;
 
   let confirmationCode: string;
 
@@ -41,13 +45,11 @@ describe('Users - /users (e2e)', () => {
   };
   let createdUser2Id: string;
 
-  const createUser3RegistrationData = {
+  const registrationUser3InputData = {
     login: 'string',
     password: 'zk1O61ah-g',
     email: 'dzerdevwarnd2@gmail.com',
   };
-
-  
 
   beforeAll(async () => {
     startTestObject = await getAppAndCleanDB();
@@ -97,7 +99,11 @@ describe('Users - /users (e2e)', () => {
         loginOrEmail: createUser1InputData.login,
         password: createUser1InputData.password,
       })
-      .expect(200);
+      .expect(200)
+      .catch((error) => {
+        console.error('Request failed:', error.message);
+        throw error;
+      });
   });
 
   it('should return error if passed wrong login or password; status 401 ]', () => {
@@ -113,77 +119,93 @@ describe('Users - /users (e2e)', () => {
   it('should send email with new code if user exists but not confirmed yet; status 204 ]', () => {
     return request(app.getHttpServer())
       .post('/auth/registration')
-      .send(createUser3RegistrationData)
+      .send(registrationUser3InputData)
       .expect(204);
   });
 
   it(' should return error if email or login already exist; status 400; ]', () => {
     return request(app.getHttpServer())
       .post('/auth/registration')
-      .send(createUser3RegistrationData)
+      .send(registrationUser3InputData)
       .expect(400);
   });
 
-  it(' should send email with new code if user exists but not confirmed yet; status 204 ]',async () => {
+  it(' should send email with new code if user exists but not confirmed yet; status 204 ]', async () => {
     await request(app.getHttpServer())
       .post('/auth/registration-email-resending')
       .send({
-        email: createUser3RegistrationData.email,
+        email: registrationUser3InputData.email,
       })
-      .expect(204);  
-      const user3 = await userService.findUser(createUser3RegistrationData.email);
-      expect(user3).toBeDefined();
-      expect(user3.accountData.email).toBe(createUser3RegistrationData.email);
-      });
-  });
-  //
-  it('Should return 2 users with pagination', () => {
-    return request(app.getHttpServer())
-      .get('/sa/users')
-      .auth('admin', 'qwerty')
-      .expect(200)
-      .then(({ body }) => {
-        body.items[0].createdAt = new Date(body.createdAt);
-        body.items[1].createdAt = new Date(body.createdAt);
-        expect(body).toEqual({
-          pagesCount: 1,
-          page: 1,
-          pageSize: 10,
-          totalCount: 2,
-          items: [user2ViewData, user1ViewData],
-        });
-      });
+      .expect(204);
+    user3 = await userService.findUser(registrationUser3InputData.email);
+    expect(user3).toBeDefined();
+    expect(user3.accountData.email).toBe(registrationUser3InputData.email);
   });
 
-  /*   it('Should return status code 401 with incorrect login ', () => {
-    return request(app.getHttpServer())
-      .get('/sa/users')
-      .auth('admin1', 'qwerty')
-      .send(createUser1InputData)
-      .expect(401);
-  }); */
-  it('Delete one by Id', () => {
-    return request(app.getHttpServer())
-      .delete(`/sa/users/${createdUser1Id}`)
-      .auth('admin', 'qwerty')
+  it(' should confirm registration by email; status 204;]', async () => {
+    await request(app.getHttpServer())
+      .post('/auth/registration-confirmation')
+      .send({
+        code: user3.emailConfirmationData.confirmationCode,
+      })
       .expect(204);
   });
-  it('Should return status code 401 with incorrect login ', () => {
-    return request(app.getHttpServer())
-      .delete(`/sa/users/${createdUser2Id}`)
-      .auth('admin1', 'qwerty')
-      .send(createUser1InputData)
-      .expect(401);
+
+  it('should return error if code already confirmed; status 400;', async () => {
+    await request(app.getHttpServer())
+      .post('/auth/registration-confirmation')
+      .send({
+        code: user3.emailConfirmationData.confirmationCode,
+      })
+      .expect(400);
+
+    it('should return error if email already confirmed; status 400;', async () => {
+      await request(app.getHttpServer())
+        .post('/auth/registration-email-resending')
+        .send({
+          email: registrationUser3InputData.email,
+        })
+        .expect(400);
+    });
   });
 
-  it('Should return status code 404,trying find deleted user', () => {
-    return request(app.getHttpServer())
-      .get(`/sa/users/${createdUser1Id}`)
-      .auth('admin', 'qwerty')
-      .expect(404);
+  it('should sign in user; status 200; content: JWT token;', async () => {
+    await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        loginOrEmail: registrationUser3InputData.email,
+        password: registrationUser3InputData.password,
+      })
+      .expect(200);
   });
 
-  afterAll(async () => {
-    await app.close();
+  it('should return error if passed body is incorrect; status 400; ]', () => {
+    return request(app.getHttpServer())
+      .post('/auth/registration')
+      .send({
+        email: '',
+        login: '12345',
+        password: 'string',
+      })
+      .expect(400);
+  });
+
+  it(' should return error if code doesnt exist; status 400;]', async () => {
+    await request(app.getHttpServer())
+      .post('/auth/registration-confirmation')
+      .send({
+        code: '12345',
+      })
+      .expect(400);
+  });
+
+  it('should return error if user email doesnt exist; status 400;', async () => {
+    await request(app.getHttpServer())
+      .post('/auth/registration-email-resending')
+      .send({
+        email: '12345@gmail.com',
+      })
+      .expect(400);
   });
 });
+/////////

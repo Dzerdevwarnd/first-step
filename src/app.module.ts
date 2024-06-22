@@ -5,7 +5,6 @@ const configModule = getConfigModule;
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
-import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -25,7 +24,6 @@ import {
 } from './DBEntities/refreshTokenMeta/refreshTokenMeta.scheme.types';
 import { EmailAdapter } from './application/emailAdapter/emailAdapter';
 import { myJwtModule } from './application/jwt/jwt.module';
-import { JwtService } from './application/jwt/jwtService';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { AccessTokenAuthStrategy } from './auth/strategies/accessToken.strategy';
@@ -120,11 +118,6 @@ const modules = [
     CqrsModule,
     configModule,
     PassportModule,
-    JwtModule.register({
-      global: true,
-      secret: settings.JWT_SECRET,
-      signOptions: { expiresIn: settings.accessTokenLifeTime + 'ms' },
-    }),
     MongooseModule.forRoot(
       settings.MONGO_URL, //|| `mongodb://0.0.0.0:27017/${1}`,
       //  { dbName: 'hm13' },
@@ -145,7 +138,7 @@ const modules = [
       host: 'localhost',
       port: 5432,
       username: 'nodejs',
-      password: 'nodejs', ///
+      password: 'nodejs', ////
       database: 'Homework1',
       autoLoadEntities: true,
       synchronize: true,
@@ -173,7 +166,6 @@ const modules = [
     PostLikesMongoRepository,
     PostLikesPgSqlRepository,
     PostLikesService,
-    JwtService,
     EmailAdapter,
     CommentLikesMongoRepository,
     CommentLikesPgSqlRepository,
@@ -204,7 +196,6 @@ const modules = [
     PostLikesMongoRepository,
     PostLikesPgSqlRepository,
     PostLikesService,
-    JwtService,
     EmailAdapter,
     CommentLikesMongoRepository,
     CommentLikesPgSqlRepository,
@@ -225,4 +216,4 @@ const modules = [
   ],
 })
 export class AppModule {}
-//////////
+///////////

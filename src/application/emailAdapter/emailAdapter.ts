@@ -1,6 +1,6 @@
+import { UsersService } from '@app/src/endPointsEntities/users/users.service';
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
-import { UsersService } from 'src/endPointsEntities/users/users.service';
 
 @Injectable()
 export class EmailAdapter {

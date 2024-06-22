@@ -1,4 +1,20 @@
 /* eslint-disable prefer-const */
+import { BlacklistTokensService } from '@app/src/DBEntities/blacklistTokens/blacklistTokens.Service';
+import { RefreshTokensMetaService } from '@app/src/DBEntities/refreshTokenMeta/refreshTokenMeta.service';
+import { EmailAdapter } from '@app/src/application/emailAdapter/emailAdapter';
+import { JwtService } from '@app/src/application/jwt/jwtService';
+import { UsersService } from '@app/src/endPointsEntities/users/users.service';
+import {
+  CreateUserInputModelType,
+  UserDbType,
+} from '@app/src/endPointsEntities/users/users.types';
+import { UsersMongoRepository } from '@app/src/endPointsEntities/users/usersMongo.repository';
+import { settings } from '@app/src/settings';
+import {
+  currentUser,
+  requestUserWithDeviceId,
+  requestUserWithUserId,
+} from '@app/src/types/req.user';
 import {
   Body,
   Controller,
@@ -13,22 +29,6 @@ import {
 } from '@nestjs/common';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { Request, Response } from 'express';
-import { BlacklistTokensService } from 'src/DBEntities/blacklistTokens/blacklistTokens.Service';
-import { RefreshTokensMetaService } from 'src/DBEntities/refreshTokenMeta/refreshTokenMeta.service';
-import { EmailAdapter } from 'src/application/emailAdapter/emailAdapter';
-import { JwtService } from 'src/application/jwt/jwtService';
-import { UsersService } from 'src/endPointsEntities/users/users.service';
-import {
-  CreateUserInputModelType,
-  UserDbType,
-} from 'src/endPointsEntities/users/users.types';
-import { UsersMongoRepository } from 'src/endPointsEntities/users/usersMongo.repository';
-import { settings } from 'src/settings';
-import {
-  currentUser,
-  requestUserWithDeviceId,
-  requestUserWithUserId,
-} from 'src/types/req.user';
 import { AuthService } from './auth.service';
 import {
   EmailInputModelType,
@@ -91,6 +91,7 @@ export class AuthController {
     @Res() res: Response,
   ) {
     const deviceId = String(Date.now());
+    /*     console.log('RequestUser=', requestUser); */
     const accessToken = await this.jwtService.createAccessToken(
       requestUser,
       settings.accessTokenLifeTime,
@@ -325,4 +326,4 @@ export class AuthController {
     return;
   }
 }
-//
+////

@@ -1,7 +1,7 @@
+import { PostLikesService } from '@app/src/posts/postLikes/postLikes.service';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { PostLikesService } from 'src/posts/postLikes/postLikes.service';
 import { PostsPgSqlRepository } from './posts.PgSqlRepository';
 import { Post, PostDocument } from './posts.mongo.scheme';
 import { PostsMongoRepository } from './posts.mongoRepository';

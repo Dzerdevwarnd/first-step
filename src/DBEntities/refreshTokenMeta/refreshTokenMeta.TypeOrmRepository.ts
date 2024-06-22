@@ -1,7 +1,7 @@
+import { JwtService } from '@app/src/application/jwt/jwtService';
+import { settings } from '@app/src/settings';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { JwtService } from 'src/application/jwt/jwtService';
-import { settings } from 'src/settings';
 import { Not, Repository } from 'typeorm';
 import { RefreshTokenMetaEntity } from './refreshTokenMeta.entity';
 

@@ -1,6 +1,6 @@
+import { PostLikesService } from '@app/src/posts/postLikes/postLikes.service';
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { PostLikesService } from 'src/posts/postLikes/postLikes.service';
 import { DataSource } from 'typeorm';
 import {
   postDBType,

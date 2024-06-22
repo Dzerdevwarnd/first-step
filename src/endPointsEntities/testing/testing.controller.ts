@@ -1,23 +1,23 @@
 /* eslint-disable prefer-const */
+import {
+  BlacklistToken,
+  BlacklistTokenDocument,
+} from '@app/src/DBEntities/blacklistTokens/blacklistTokens.scheme.types';
+import {
+  RefreshTokenMeta,
+  RefreshTokenMetaDocument,
+} from '@app/src/DBEntities/refreshTokenMeta/refreshTokenMeta.scheme.types';
+import { Comment } from '@app/src/comments/comments.mongo.scheme';
+import {
+  Blog,
+  BlogDocument,
+} from '@app/src/endPointsEntities/blogs/blogs.mongo.scheme';
+import { Post, PostDocument } from '@app/src/posts/posts.mongo.scheme';
 import { Controller, Delete, Res } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Response } from 'express';
 import { Model } from 'mongoose';
-import {
-  BlacklistToken,
-  BlacklistTokenDocument,
-} from 'src/DBEntities/blacklistTokens/blacklistTokens.scheme.types';
-import {
-  RefreshTokenMeta,
-  RefreshTokenMetaDocument,
-} from 'src/DBEntities/refreshTokenMeta/refreshTokenMeta.scheme.types';
-import { Comment } from 'src/comments/comments.mongo.scheme';
-import {
-  Blog,
-  BlogDocument,
-} from 'src/endPointsEntities/blogs/blogs.mongo.scheme';
-import { Post, PostDocument } from 'src/posts/posts.mongo.scheme';
 import { DataSource } from 'typeorm';
 import { User, UserDocument } from '../users/users.mongo.scheme';
 

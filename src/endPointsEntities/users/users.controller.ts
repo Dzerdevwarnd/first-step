@@ -1,3 +1,4 @@
+import { BasicAuthGuard } from '@app/src/auth/guards/basic.auth.guard';
 import {
   Body,
   Controller,
@@ -10,7 +11,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { BasicAuthGuard } from 'src/auth/guards/basic.auth.guard';
 import { UsersService } from './users.service';
 import { CreateUserInputModelType, usersPaginationType } from './users.types';
 

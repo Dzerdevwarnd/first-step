@@ -41,8 +41,8 @@ describe('Users - /users (e2e)', () => {
 
   it('Should return status code 401 with incorrect login ]', () => {
     return request(app.getHttpServer())
-      .auth('admin1', 'qwerty')
       .post('/sa/users')
+      .auth('admin1', 'qwerty')
       .send(createUser1InputData)
       .expect(401);
   });

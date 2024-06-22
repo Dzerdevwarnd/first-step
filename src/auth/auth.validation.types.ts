@@ -1,9 +1,9 @@
-import { confirmationCodeValidation } from 'src/validation/customValidators/confCode.validator';
+import { confirmationCodeValidation } from '@app/src/validation/customValidators/confCode.validator';
 
+import { IsEmailIsAlreadyConfirmed } from '@app/src/validation/customValidators/EmailIsAlreadyConfirmed.validator';
+import { IsEmailExistInDB } from '@app/src/validation/customValidators/emailExistInDB.validator';
+import { jwtKeyValidation } from '@app/src/validation/customValidators/jwtKey.validator';
 import { IsEmail, Length } from 'class-validator';
-import { IsEmailIsAlreadyConfirmed } from 'src/validation/customValidators/EmailIsAlreadyConfirmed.validator';
-import { IsEmailExistInDB } from 'src/validation/customValidators/emailExistInDB.validator';
-import { jwtKeyValidation } from 'src/validation/customValidators/jwtKey.validator';
 
 export class EmailInputModelType {
   @IsEmail()

@@ -1,7 +1,7 @@
+import { BlacklistTokensModule } from '@app/src/DBEntities/blacklistTokens/blacklistTokens.module';
+import { RefreshTokensMetaModule } from '@app/src/DBEntities/refreshTokenMeta/refreshTokenMeta.module';
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
-import { BlacklistTokensModule } from 'src/DBEntities/blacklistTokens/blacklistTokens.module';
-import { RefreshTokensMetaModule } from 'src/DBEntities/refreshTokenMeta/refreshTokenMeta.module';
 import { BasicStrategy } from './strategies/basic.strategy';
 
 const strategies = [
