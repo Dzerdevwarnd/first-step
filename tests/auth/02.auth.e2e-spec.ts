@@ -15,6 +15,11 @@ describe('Auth - /Auth (e2e)', () => {
   let userService: UsersService;
   let user3: UserDbType;
 
+  let user1AccessToken: string;
+  let user1RefreshToken: string;
+  let user3AccessToken: string;
+  let user3RefreshToken: string;
+  let user3InvalidRefreshToken: string;
   let confirmationCode: string;
 
   const createUser1InputData = {
@@ -96,14 +101,36 @@ describe('Auth - /Auth (e2e)', () => {
       });
   });
 
-  it('Should login user and return status code 200 ]', () => {
-    return request(app.getHttpServer())
+  it('Should login user1 and return status code 200 ]', async () => {
+    const response = await request(app.getHttpServer())
       .post('/auth/login')
       .send({
         loginOrEmail: createUser1InputData.login,
         password: createUser1InputData.password,
       })
-      .expect(200)
+      .expect(200);
+    user1AccessToken = response.body.accessToken;
+    user1RefreshToken = response.headers['set-cookie'][0];
+  });
+
+  it('should return the error when the access token has expired or there is no one in the headers; status 401', async () => {
+    await delay(11000);
+    return request(app.getHttpServer())
+      .get('/auth/me')
+      .set('Authorization', `Bearer ${user1AccessToken}`)
+      .expect(401)
+      .catch((error) => {
+        console.error('Request failed:', error.message);
+        throw error;
+      });
+  });
+
+  it('should return an error when the "refresh" token has expired or there is no one in the cookie;status 401', async () => {
+    await delay(11000);
+    return request(app.getHttpServer())
+      .post('/auth/refresh-token')
+      .set('Cookie', [`refreshToken=${user1RefreshToken}`])
+      .expect(401)
       .catch((error) => {
         console.error('Request failed:', error.message);
         throw error;
@@ -201,17 +228,61 @@ describe('Auth - /Auth (e2e)', () => {
   });
 
   it('should sign in user; status 200; content: JWT token;', async () => {
-    await request(app.getHttpServer())
+    const response = await request(app.getHttpServer())
       .post('/auth/login')
       .send({
         loginOrEmail: registrationUser3InputData.email,
         password: registrationUser3InputData.password,
       })
+      .expect(200);
+    user3AccessToken = response.body.accessToken;
+    user3RefreshToken = response.headers['set-cookie'][0];
+  });
+  ///
+  it('should refresh access and refresh tokens;status 200', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/auth/refresh-token')
+      .set('Cookie', `${user3RefreshToken}`)
       .expect(200)
       .catch((error) => {
         console.error('Request failed:', error.message);
         throw error;
       });
+    user3InvalidRefreshToken = user3RefreshToken;
+    user3AccessToken = response.body.accessToken;
+    user3RefreshToken = response.headers['set-cookie'][0];
+  });
+
+  it('should return an error if the "refresh" token has become invalid; status 401;', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/auth/refresh-token')
+      .set('Cookie', `${user3InvalidRefreshToken}`)
+      .expect(401);
+  });
+
+  it('should check "access" token and return current user data; status 200; content: current user data;', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/auth/me')
+      .set('Authorization', `Bearer ${user3AccessToken}`)
+      .expect(200);
+  });
+
+  it('should make logout; statuscode 204', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/auth/logout')
+      .set('Cookie', `${user3RefreshToken}`)
+      .expect(204)
+      .catch((error) => {
+        console.error('Request failed:', error.message);
+        throw error;
+      });
+  });
+
+  it(' should return an error if the "refresh" token has become invalid; status 401;', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/auth/logout')
+      .set('Cookie', `${user3InvalidRefreshToken}`)
+      .expect(401);
   });
 
   it('should return error if passed body is incorrect; status 400; ]', () => {

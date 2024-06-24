@@ -68,7 +68,6 @@ export class UsersService {
       },
     };
     const userView = await this.usersRepository.createUser(newUser);
-    console.log('Create User Id =', newUser.id);
     return userView;
   }
   async deleteUser(params: { id: string }): Promise<boolean> {
