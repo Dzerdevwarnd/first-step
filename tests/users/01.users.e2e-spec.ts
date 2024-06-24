@@ -44,7 +44,11 @@ describe('Users - /users (e2e)', () => {
       .post('/sa/users')
       .auth('admin1', 'qwerty')
       .send(createUser1InputData)
-      .expect(401);
+      .expect(401)
+      .catch((error) => {
+        console.error('Request failed:', error.message);
+        throw error;
+      });
   });
 
   it('Should Create User1]', () => {
@@ -78,7 +82,11 @@ describe('Users - /users (e2e)', () => {
       .post('/sa/users')
       .auth('admin', 'qwerty')
       .send({ login: '', password: '123321', email: 'dzerdevwarnd@gmail.com' })
-      .expect(400);
+      .expect(400)
+      .catch((error) => {
+        console.error('Request failed:', error.message);
+        throw error;
+      });
   });
 
   it('Should return 2 users with pagination', () => {
@@ -110,21 +118,33 @@ describe('Users - /users (e2e)', () => {
     return request(app.getHttpServer())
       .delete(`/sa/users/${createdUser1Id}`)
       .auth('admin', 'qwerty')
-      .expect(204);
+      .expect(204)
+      .catch((error) => {
+        console.error('Request failed:', error.message);
+        throw error;
+      });
   });
   it('Should return status code 401 with incorrect login ', () => {
     return request(app.getHttpServer())
       .delete(`/sa/users/${createdUser2Id}`)
       .auth('admin1', 'qwerty')
       .send(createUser1InputData)
-      .expect(401);
+      .expect(401)
+      .catch((error) => {
+        console.error('Request failed:', error.message);
+        throw error;
+      });
   });
 
   it('Should return status code 404,trying find deleted user', () => {
     return request(app.getHttpServer())
       .get(`/sa/users/${createdUser1Id}`)
       .auth('admin', 'qwerty')
-      .expect(404);
+      .expect(404)
+      .catch((error) => {
+        console.error('Request failed:', error.message);
+        throw error;
+      });
   });
 
   afterAll(async () => {

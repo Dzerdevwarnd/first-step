@@ -54,18 +54,31 @@ export const getAppAndCleanDB = async () => {
     await app.init();
 
     const dataSource = await app.resolve(DataSource);
-    await dataSource.query(`CREATE OR REPLACE FUNCTION truncate_tables(username IN VARCHAR) RETURNS void AS $$
-DECLARE
-statements CURSOR FOR
-		SELECT tablename FROM pg_tables
-		WHERE tableowner = username AND schemaname = 'public';
-BEGIN
-FOR stmt IN statements LOOP
-		EXECUTE 'TRUNCATE TABLE ' || quote_ident(stmt.tablename) || ' CASCADE;';
-END LOOP;
-END;
-$$ LANGUAGE plpgsql;
-SELECT truncate_tables('nodejs');`);
+    const queryRunner = dataSource.createQueryRunner();
+    await queryRunner.connect();
+
+    const tables = await queryRunner.query(`
+        SELECT tablename 
+        FROM pg_tables 
+        WHERE schemaname = 'public'
+      `);
+
+    try {
+      await queryRunner.startTransaction();
+
+      for (const table of tables) {
+        await queryRunner.query(
+          `TRUNCATE TABLE "${table.tablename}" RESTART IDENTITY CASCADE`,
+        );
+      }
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
     return { app, moduleFixture };
   } catch (error) {
     console.error('Error in getAppAndCleanDB:', error);

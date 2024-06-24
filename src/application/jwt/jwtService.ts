@@ -7,7 +7,6 @@ import { JwtService as JwtNestService } from '@nestjs/jwt';
 export class JwtService {
   constructor(private jwtNestService: JwtNestService) {}
   async createAccessToken(user: UserDbType, expirationTime: string) {
-    console.log('RequestUserID=', user.id);
     const AccessToken = this.jwtNestService.sign(
       { userId: user.id },
       { expiresIn: expirationTime },

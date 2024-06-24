@@ -1,12 +1,8 @@
 import { UserEntity } from '@app/src/endPointsEntities/users/users.entity';
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class RefreshTokenMetaEntity {
-  @ManyToOne(() => UserEntity)
-  @Column()
-  userId: string;
-
   @PrimaryColumn()
   deviceId: string;
   @Column()
@@ -17,4 +13,11 @@ export class RefreshTokenMetaEntity {
   lastActiveDate: Date;
   @Column()
   expiredAt: Date;
+  //
+  @ManyToOne(() => UserEntity)
+  @JoinColumn({ name: 'userId' })
+  user: UserEntity;
+
+  @Column()
+  userId: string;
 }

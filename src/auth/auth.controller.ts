@@ -90,6 +90,7 @@ export class AuthController {
     @Headers() headers: { authorization: string },
     @Res() res: Response,
   ) {
+    console.log('RequestUserID=', requestUser.id);
     const deviceId = String(Date.now());
     /*     console.log('RequestUser=', requestUser); */
     const accessToken = await this.jwtService.createAccessToken(
