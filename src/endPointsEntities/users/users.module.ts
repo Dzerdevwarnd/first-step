@@ -1,7 +1,9 @@
 import { RefreshTokensMetaModule } from '@app/src/DBEntities/refreshTokenMeta/refreshTokenMeta.module';
 import { myJwtModule } from '@app/src/application/jwt/jwt.module';
 import { BasicAuthGuard } from '@app/src/auth/guards/basic.auth.guard';
-import { Module } from '@nestjs/common';
+import { PostsModule } from '@app/src/posts/posts.module';
+import { ValidationModule } from '@app/src/validation/validation.module';
+import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SaUsersController } from '../sa/sa.users.controller';
@@ -19,6 +21,8 @@ import { UsersTypeOrmRepository } from './usersTypeOrm.Repository';
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     RefreshTokensMetaModule,
     myJwtModule,
+    forwardRef(() => ValidationModule),
+    forwardRef(() => PostsModule),
   ],
   providers: [
     UsersService,

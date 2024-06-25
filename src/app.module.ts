@@ -6,7 +6,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { MongooseModule } from '@nestjs/mongoose';
-import { PassportModule } from '@nestjs/passport';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -37,6 +36,7 @@ import { PostLikesPgSqlRepository } from './posts/postLikes/postLikes.PgSqlRepos
 import { PostLike, PostLikeSchema } from './posts/postLikes/postLikes.scheme';
 import { PostLikesService } from './posts/postLikes/postLikes.service';
 import { PostsController } from './posts/posts.controller';
+import { PostsModule } from './posts/posts.module';
 import { PostsService } from './posts/posts.service';
 import { settings } from './settings';
 import { ValidationModule } from './validation/validation.module';
@@ -49,6 +49,7 @@ const modules = [
   BlogsModule,
   AuthModule,
   ValidationModule,
+  PostsModule,
 ];
 
 @Module({
@@ -66,7 +67,6 @@ const modules = [
     ]),
     CqrsModule,
     configModule,
-    PassportModule,
     MongooseModule.forRoot(
       settings.MONGO_URL, //|| `mongodb://0.0.0.0:27017/${1}`,
       //  { dbName: 'hm13' },

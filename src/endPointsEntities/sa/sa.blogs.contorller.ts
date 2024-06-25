@@ -8,6 +8,7 @@ import {
 } from '@app/src/posts/posts.types';
 import { createPostByBlogIdCommand } from '@app/src/posts/use-cases/createPostByBlogId';
 import { deletePostCommand } from '@app/src/posts/use-cases/deletePost';
+import { GetPostsByBlogIdCommand } from '@app/src/posts/use-cases/getPostsByBlogsId';
 import { updatePostCommand } from '@app/src/posts/use-cases/updatePost';
 import {
   Body,
@@ -67,10 +68,8 @@ export class SaBlogsController {
         headers.authorization.split(' ')[1],
       );
     }
-    const foundPosts = await this.commandBus.execute( new findPostByBlogId
-      params,
-      query,
-      userId,
+    const foundPosts = await this.commandBus.execute(
+      new GetPostsByBlogIdCommand(params, query, userId),
     );
     if (!foundPosts) {
       res.sendStatus(404);

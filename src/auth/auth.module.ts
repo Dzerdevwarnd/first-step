@@ -1,8 +1,11 @@
 import { BlacklistTokensModule } from '@app/src/DBEntities/blacklistTokens/blacklistTokens.module';
 import { RefreshTokensMetaModule } from '@app/src/DBEntities/refreshTokenMeta/refreshTokenMeta.module';
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { EmailAdapter } from '../application/emailAdapter/emailAdapter';
+import { myJwtModule } from '../application/jwt/jwt.module';
+import { UsersModule } from '../endPointsEntities/users/users.module';
+import { PostsModule } from '../posts/posts.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AccessTokenAuthStrategy } from './strategies/accessToken.strategy';
@@ -18,7 +21,14 @@ const strategies = [
 ];
 
 @Module({
-  imports: [PassportModule, RefreshTokensMetaModule, BlacklistTokensModule],
+  imports: [
+    PassportModule,
+    RefreshTokensMetaModule,
+    BlacklistTokensModule,
+    UsersModule,
+    myJwtModule,
+    forwardRef(() => PostsModule),
+  ],
   providers: [...strategies, EmailAdapter, AuthService],
   controllers: [AuthController],
   exports: [...strategies, EmailAdapter, AuthService],
