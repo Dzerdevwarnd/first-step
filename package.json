@@ -18,7 +18,8 @@
     "test": "jest --config src/jest.config.js",
     "test:watch": "jest --config tests/jest-e2e.json --watch --runInBand",
     "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "circular:testing": "madge --ts-config ./tsconfig.json --circular --extensions js,ts src/"
   },
   "dependencies": {
     "@date-fns/upgrade": "^1.0.3",

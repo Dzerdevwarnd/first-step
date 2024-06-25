@@ -1,6 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BlogsPgSqlRepository } from '../blogs.PgSqlRepository';
 import { BlogsMongoRepository } from '../blogs.mongoRepository';
+import { BlogsTypeOrmRepository } from '../blogs.typeOrmRepository';
 
 export class UpdateBlogCommand {
   constructor(
@@ -15,14 +16,19 @@ export class UpdateBlogUseCase implements ICommandHandler<UpdateBlogCommand> {
   constructor(
     protected blogsMongoRepository: BlogsMongoRepository,
     protected blogsPgSqlRepository: BlogsPgSqlRepository,
+    protected blogsTypeOrmRepository: BlogsTypeOrmRepository,
   ) {
     this.blogsRepository = this.getBlogsRepository();
   }
 
   private getBlogsRepository() {
-    return process.env.USERS_REPOSITORY === 'Mongo'
-      ? this.blogsMongoRepository
-      : this.blogsPgSqlRepository;
+    const repositories = {
+      Mongo: this.blogsMongoRepository,
+      PgSql: this.blogsPgSqlRepository,
+      TypeOrm: this.blogsTypeOrmRepository,
+    };
+
+    return repositories[process.env.REPOSITORY] || this.blogsMongoRepository;
   }
   async execute(command: UpdateBlogCommand): Promise<boolean> {
     const resultBoolean = this.blogsRepository.updateBlog(

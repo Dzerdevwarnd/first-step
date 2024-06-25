@@ -1,7 +1,6 @@
 import { JwtService } from '@app/src/application/jwt/jwtService';
 import { BasicAuthGuard } from '@app/src/auth/guards/basic.auth.guard';
 import { PostsPgSqlRepository } from '@app/src/posts/posts.PgSqlRepository';
-import { PostsMongoRepository } from '@app/src/posts/posts.mongoRepository';
 import { PostsService } from '@app/src/posts/posts.service';
 import {
   CreatePostByBlogIdInputModelType,
@@ -35,30 +34,17 @@ import { PostBlogCommand } from '../blogs/use-cases/postBlog';
 import { ReturnBlogsWithPaginationCommand } from '../blogs/use-cases/returnBlogsWithPagination';
 import { UpdateBlogCommand } from '../blogs/use-cases/updateBlog';
 import { UsersService } from '../users/users.service';
-import {
-  CreateUserInputModelType,
-  usersPaginationType,
-} from '../users/users.types';
 
 @Controller('sa')
-export class SaController {
-  private postsRepository;
+export class SaBlogsController {
   constructor(
     protected postService: PostsService,
     protected commandBus: CommandBus,
     protected userService: UsersService,
     protected jwtService: JwtService,
-    protected postsMongoRepository: PostsMongoRepository,
     protected postsPgSqlRepository: PostsPgSqlRepository,
-  ) {
-    this.postsRepository = this.getPostsRepository();
-  }
+  ) {}
 
-  private getPostsRepository() {
-    return process.env.USERS_REPOSITORY === 'Mongo'
-      ? this.postsMongoRepository
-      : this.postsPgSqlRepository;
-  }
   @UseGuards(BasicAuthGuard)
   @Get('blogs')
   async getBlogsWithPagination(@Query() query: string) {
@@ -81,7 +67,7 @@ export class SaController {
         headers.authorization.split(' ')[1],
       );
     }
-    const foundPosts = await this.postsRepository.findPostsByBlogId(
+    const foundPosts = await this.commandBus.execute( new findPostByBlogId
       params,
       query,
       userId,
@@ -194,42 +180,6 @@ export class SaController {
       new deletePostCommand(params),
     );
     if (!resultOfDelete) {
-      res.sendStatus(404);
-      return;
-    } else {
-      res.sendStatus(204);
-      return;
-    }
-  }
-
-  @Get('users')
-  async getUsersWithPagination(
-    @Query() query: { object },
-    @Res() res: Response,
-  ) {
-    const usersPagination: usersPaginationType =
-      await this.userService.returnUsersWithPagination(query);
-    res.status(200).send(usersPagination);
-    return;
-  }
-
-  @UseGuards(BasicAuthGuard)
-  @Post('users')
-  async createUser(
-    @Body()
-    body: CreateUserInputModelType,
-    @Res() res: Response,
-  ) {
-    const newUser = await this.userService.createUser(body);
-    res.status(201).send(newUser);
-    return;
-  }
-
-  @UseGuards(BasicAuthGuard)
-  @Delete('users/:id')
-  async deleteUserByID(@Param() params: { id }, @Res() res: Response) {
-    const ResultOfDelete = await this.userService.deleteUser(params);
-    if (!ResultOfDelete) {
       res.sendStatus(404);
       return;
     } else {
