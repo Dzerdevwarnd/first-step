@@ -1,5 +1,5 @@
-import { UsersService } from '@app/src/endPointsEntities/users/users.service';
-import { UserDbType } from '@app/src/endPointsEntities/users/users.types';
+import { UsersService } from '@app/src/features/users/users.service';
+import { UserDbType } from '@app/src/features/users/users.types';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { getAppAndCleanDB } from '../test.utils';

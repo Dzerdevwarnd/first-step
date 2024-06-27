@@ -10,11 +10,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
-import { BlacklistTokensModule } from './DBEntities/blacklistTokens/blacklistTokens.module';
-import { RefreshTokensMetaModule } from './DBEntities/refreshTokenMeta/refreshTokenMeta.module';
 import { EmailAdapter } from './application/emailAdapter/emailAdapter';
 import { myJwtModule } from './application/jwt/jwt.module';
-import { AuthModule } from './auth/auth.module';
 import { CommentLikesPgSqlRepository } from './comments/commentLikes/commentLikes.PgSqlRepository';
 import {
   CommentLike,
@@ -27,17 +24,23 @@ import { CommentsPgSqlRepository } from './comments/comments.PgSql';
 import { CommentsController } from './comments/comments.controller';
 import { Comment, CommentSchema } from './comments/comments.mongo.scheme';
 import { CommentsService } from './comments/comments.service';
-import { BlogsModule } from './endPointsEntities/blogs/blogs.module';
-import { SecurityController } from './endPointsEntities/security/securityController';
-import { TestController } from './endPointsEntities/testing/testing.controller';
-import { UsersModule } from './endPointsEntities/users/users.module';
-import { PostLikesMongoRepository } from './posts/postLikes/postLikes.MongoRepository';
-import { PostLikesPgSqlRepository } from './posts/postLikes/postLikes.PgSqlRepository';
-import { PostLike, PostLikeSchema } from './posts/postLikes/postLikes.scheme';
-import { PostLikesService } from './posts/postLikes/postLikes.service';
-import { PostsController } from './posts/posts.controller';
-import { PostsModule } from './posts/posts.module';
-import { PostsService } from './posts/posts.service';
+import { AuthModule } from './features/auth/auth.module';
+import { BlacklistTokensModule } from './features/blacklistTokens/blacklistTokens.module';
+import { BlogsModule } from './features/blogs/blogs.module';
+import { PostLikesMongoRepository } from './features/posts/postLikes/postLikes.MongoRepository';
+import { PostLikesPgSqlRepository } from './features/posts/postLikes/postLikes.PgSqlRepository';
+import {
+  PostLike,
+  PostLikeSchema,
+} from './features/posts/postLikes/postLikes.scheme';
+import { PostLikesService } from './features/posts/postLikes/postLikes.service';
+import { PostsController } from './features/posts/posts.controller';
+import { PostsModule } from './features/posts/posts.module';
+import { PostsService } from './features/posts/posts.service';
+import { RefreshTokensMetaModule } from './features/refreshTokenMeta/refreshTokenMeta.module';
+import { SecurityController } from './features/security/securityController';
+import { TestController } from './features/testing/testing.controller';
+import { UsersModule } from './features/users/users.module';
 import { settings } from './settings';
 import { ValidationModule } from './validation/validation.module';
 

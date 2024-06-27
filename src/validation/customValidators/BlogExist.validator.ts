@@ -1,4 +1,4 @@
-import { FindBlogByIdCommand } from '@app/src/endPointsEntities/blogs/use-cases/findBlogById';
+import { FindBlogByIdCommand } from '@app/src/features/blogs/use-cases/findBlogById';
 import { Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import {

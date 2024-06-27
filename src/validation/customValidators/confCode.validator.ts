@@ -1,4 +1,4 @@
-import { UsersService } from '@app/src/endPointsEntities/users/users.service';
+import { UsersService } from '@app/src/features/users/users.service';
 import { Injectable } from '@nestjs/common';
 import {
   ValidationArguments,

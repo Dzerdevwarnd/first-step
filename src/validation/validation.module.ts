@@ -1,8 +1,8 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
-import { BlogsModule } from '../endPointsEntities/blogs/blogs.module';
-import { UsersModule } from '../endPointsEntities/users/users.module';
-import { PostsModule } from '../posts/posts.module';
+import { BlogsModule } from '../features/blogs/blogs.module';
+import { PostsModule } from '../features/posts/posts.module';
+import { UsersModule } from '../features/users/users.module';
 import { BlogExistValidationConstraint } from './customValidators/BlogExist.validator';
 import { IsEmailIsAlreadyConfirmedConstraint } from './customValidators/EmailIsAlreadyConfirmed.validator';
 import { ConfirmationCodeValidationConstraint } from './customValidators/confCode.validator';

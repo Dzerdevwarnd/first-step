@@ -1,4 +1,4 @@
-import { UserDbType } from '@app/src/endPointsEntities/users/users.types';
+import { UserDbType } from '@app/src/features/users/users.types';
 import { settings } from '@app/src/settings';
 import { Injectable } from '@nestjs/common';
 import { JwtService as JwtNestService } from '@nestjs/jwt';
