@@ -1,8 +1,8 @@
-import { JwtService } from '@app/src/application/jwt/jwtService';
 import { RefreshTokensMetaService } from '@app/src/features/refreshTokenMeta/refreshTokenMeta.service';
 import { Injectable } from '@nestjs/common';
 import { add } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
+import { JwtService } from '../auth/jwt/jwtService';
 import { UserDbType, userViewType, usersPaginationType } from './users.types';
 import { UsersMongoRepository } from './usersMongo.repository';
 import { UsersPgSqlRepository } from './usersPgSql.Repository';

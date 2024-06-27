@@ -1,4 +1,3 @@
-import { JwtService } from '@app/src/application/jwt/jwtService';
 import { BasicAuthGuard } from '@app/src/features/auth/guards/basic.auth.guard';
 import { PostsPgSqlRepository } from '@app/src/features/posts/posts.PgSqlRepository';
 import { PostsService } from '@app/src/features/posts/posts.service';
@@ -25,6 +24,7 @@ import {
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { Response } from 'express';
+import { JwtService } from '../auth/jwt/jwtService';
 
 import {
   CreateBlogInputModelType,

@@ -1,8 +1,8 @@
-import { JwtService } from '@app/src/application/jwt/jwtService';
-import { CommentLikesService } from '@app/src/comments/commentLikes/commentLikesService';
+import { CommentLikesService } from '@app/src/features/comments/commentLikes/commentLikesService';
 import { PostsMongoRepository } from '@app/src/features/posts/posts.mongoRepository';
 import { UsersService } from '@app/src/features/users/users.service';
 import { Injectable } from '@nestjs/common';
+import { JwtService } from '../auth/jwt/jwtService';
 import { CommentsMongoRepository } from './comments.MongoRepository';
 import { CommentsPgSqlRepository } from './comments.PgSql';
 import {

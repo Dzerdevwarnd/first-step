@@ -1,9 +1,8 @@
 /* eslint-disable prefer-const */
-import { JwtService } from '@app/src/application/jwt/jwtService';
-import { CommentsService } from '@app/src/comments/comments.service';
-import { CommentCreateInputModelType } from '@app/src/comments/comments.types';
 import { AccessTokenAuthGuard } from '@app/src/features/auth/guards/accessToken.auth.guard';
 import { BasicAuthGuard } from '@app/src/features/auth/guards/basic.auth.guard';
+import { CommentsService } from '@app/src/features/comments/comments.service';
+import { CommentCreateInputModelType } from '@app/src/features/comments/comments.types';
 import {
   Body,
   Controller,
@@ -19,6 +18,7 @@ import {
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { Response } from 'express';
+import { JwtService } from '../auth/jwt/jwtService';
 import { PostsService } from './posts.service';
 import {
   CreatePostInputModelType,

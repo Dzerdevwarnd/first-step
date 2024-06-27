@@ -1,4 +1,3 @@
-import { JwtService } from '@app/src/application/jwt/jwtService';
 import { BasicAuthGuard } from '@app/src/features/auth/guards/basic.auth.guard';
 import {
   Body,
@@ -17,6 +16,7 @@ import {
   CreateUserInputModelType,
   usersPaginationType,
 } from '../../features/users/users.types';
+import { JwtService } from '../auth/jwt/jwtService';
 
 @Controller('sa')
 export class SaUsersController {

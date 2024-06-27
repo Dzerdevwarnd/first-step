@@ -1,6 +1,5 @@
 /* eslint-disable prefer-const */
 import { EmailAdapter } from '@app/src/application/emailAdapter/emailAdapter';
-import { JwtService } from '@app/src/application/jwt/jwtService';
 import { BlacklistTokensService } from '@app/src/features/blacklistTokens/blacklistTokens.Service';
 import { RefreshTokensMetaService } from '@app/src/features/refreshTokenMeta/refreshTokenMeta.service';
 import { UsersService } from '@app/src/features/users/users.service';
@@ -8,7 +7,6 @@ import {
   CreateUserInputModelType,
   UserDbType,
 } from '@app/src/features/users/users.types';
-import { UsersMongoRepository } from '@app/src/features/users/usersMongo.repository';
 import { settings } from '@app/src/settings';
 import {
   currentUser,
@@ -29,16 +27,17 @@ import {
 } from '@nestjs/common';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { Request, Response } from 'express';
-import { AuthService } from './auth.service';
 import {
   EmailInputModelType,
   EmailResendingModelType,
   RecoveryCodeAndNewPasswordType,
   confirmationCodeType,
-} from './auth.validation.types';
+} from './EmailInputModelType';
+import { AuthService } from './auth.service';
 import { AccessTokenAuthGuard } from './guards/accessToken.auth.guard';
 import { LocalAuthGuard } from './guards/local.auth.guard';
 import { RefreshTokenAuthGuard } from './guards/refreshToken.auth.guard';
+import { JwtService } from './jwt/jwtService';
 
 @Controller('auth')
 export class AuthController {
@@ -47,7 +46,6 @@ export class AuthController {
     protected authService: AuthService,
     protected jwtService: JwtService,
     protected usersService: UsersService,
-    protected usersMongoRepository: UsersMongoRepository,
     protected blacklistRepository: BlacklistTokensService,
     protected refreshTokenMetaService: RefreshTokensMetaService,
   ) {}

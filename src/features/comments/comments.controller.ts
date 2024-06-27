@@ -1,5 +1,4 @@
 /* eslint-disable prefer-const */
-import { JwtService } from '@app/src/application/jwt/jwtService';
 import { AccessTokenAuthGuard } from '@app/src/features/auth/guards/accessToken.auth.guard';
 import { PostsService } from '@app/src/features/posts/posts.service';
 import { currentUser, requestUserWithUserId } from '@app/src/types/req.user';
@@ -17,6 +16,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { JwtService } from '../auth/jwt/jwtService';
 import { CommentsService } from './comments.service';
 import {
   CommentUpdateInputModelType,

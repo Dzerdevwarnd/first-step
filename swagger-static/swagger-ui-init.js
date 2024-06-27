@@ -11,17 +11,6 @@ window.onload = function() {
   "swaggerDoc": {
     "openapi": "3.0.0",
     "paths": {
-      "/testing/all-data": {
-        "delete": {
-          "operationId": "TestController_deleteAllData",
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": ""
-            }
-          }
-        }
-      },
       "/blogs": {
         "get": {
           "operationId": "BlogsController_getBlogsWithPagination",
@@ -116,6 +105,126 @@ window.onload = function() {
           },
           "responses": {
             "201": {
+              "description": ""
+            }
+          }
+        }
+      },
+      "/sa/blogs": {
+        "get": {
+          "operationId": "SaBlogsController_getBlogsWithPagination",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        },
+        "post": {
+          "operationId": "SaBlogsController_postBlog",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateBlogInputModelType"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          }
+        }
+      },
+      "/sa/blogs/{id}/posts": {
+        "get": {
+          "operationId": "SaBlogsController_getPostsByBlogId",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        },
+        "post": {
+          "operationId": "SaBlogsController_createPostByBlogId",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatePostByBlogIdInputModelType"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          }
+        }
+      },
+      "/sa/blogs/{id}": {
+        "put": {
+          "operationId": "SaBlogsController_updateBlog",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateBlogInputModelType"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        },
+        "delete": {
+          "operationId": "SaBlogsController_deleteBlogByID",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        }
+      },
+      "/sa/blogs/{blogId}/posts/{postId}": {
+        "put": {
+          "operationId": "SaBlogsController_updatePost",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdatePostPgSqlInputModelType"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        },
+        "delete": {
+          "operationId": "SaBlogsController_deletePostByID",
+          "parameters": [],
+          "responses": {
+            "200": {
               "description": ""
             }
           }
@@ -303,37 +412,6 @@ window.onload = function() {
           }
         }
       },
-      "/security/devices": {
-        "get": {
-          "operationId": "SecurityController_getAllUserDevices",
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": ""
-            }
-          }
-        },
-        "delete": {
-          "operationId": "SecurityController_deleteAllUserDevices",
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": ""
-            }
-          }
-        }
-      },
-      "/security/devices/{id}": {
-        "delete": {
-          "operationId": "SecurityController_deleteOneUserDevice",
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": ""
-            }
-          }
-        }
-      },
       "/auth/me": {
         "get": {
           "operationId": "AuthController_getInformationAboutMe",
@@ -483,9 +561,9 @@ window.onload = function() {
           }
         }
       },
-      "/sa/blogs": {
+      "/users": {
         "get": {
-          "operationId": "SaController_getBlogsWithPagination",
+          "operationId": "UsersController_getUsersWithPagination",
           "parameters": [],
           "responses": {
             "200": {
@@ -494,14 +572,14 @@ window.onload = function() {
           }
         },
         "post": {
-          "operationId": "SaController_postBlog",
+          "operationId": "UsersController_createUser",
           "parameters": [],
           "requestBody": {
             "required": true,
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateBlogInputModelType"
+                  "$ref": "#/components/schemas/CreateUserInputModelType"
                 }
               }
             }
@@ -513,88 +591,9 @@ window.onload = function() {
           }
         }
       },
-      "/sa/blogs/{id}/posts": {
-        "get": {
-          "operationId": "SaController_getPostsByBlogId",
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": ""
-            }
-          }
-        },
-        "post": {
-          "operationId": "SaController_createPostByBlogId",
-          "parameters": [],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreatePostByBlogIdInputModelType"
-                }
-              }
-            }
-          },
-          "responses": {
-            "201": {
-              "description": ""
-            }
-          }
-        }
-      },
-      "/sa/blogs/{id}": {
-        "put": {
-          "operationId": "SaController_updateBlog",
-          "parameters": [],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UpdateBlogInputModelType"
-                }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": ""
-            }
-          }
-        },
+      "/users/{id}": {
         "delete": {
-          "operationId": "SaController_deleteBlogByID",
-          "parameters": [],
-          "responses": {
-            "200": {
-              "description": ""
-            }
-          }
-        }
-      },
-      "/sa/blogs/{blogId}/posts/{postId}": {
-        "put": {
-          "operationId": "SaController_updatePost",
-          "parameters": [],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UpdatePostPgSqlInputModelType"
-                }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": ""
-            }
-          }
-        },
-        "delete": {
-          "operationId": "SaController_deletePostByID",
+          "operationId": "UsersController_deleteUserByID",
           "parameters": [],
           "responses": {
             "200": {
@@ -644,9 +643,9 @@ window.onload = function() {
           }
         }
       },
-      "/users": {
+      "/security/devices": {
         "get": {
-          "operationId": "UsersController_getUsersWithPagination",
+          "operationId": "SecurityController_getAllUserDevices",
           "parameters": [],
           "responses": {
             "200": {
@@ -654,29 +653,19 @@ window.onload = function() {
             }
           }
         },
-        "post": {
-          "operationId": "UsersController_createUser",
+        "delete": {
+          "operationId": "SecurityController_deleteAllUserDevices",
           "parameters": [],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreateUserInputModelType"
-                }
-              }
-            }
-          },
           "responses": {
-            "201": {
+            "200": {
               "description": ""
             }
           }
         }
       },
-      "/users/{id}": {
+      "/security/devices/{id}": {
         "delete": {
-          "operationId": "UsersController_deleteUserByID",
+          "operationId": "SecurityController_deleteOneUserDevice",
           "parameters": [],
           "responses": {
             "200": {
@@ -710,6 +699,10 @@ window.onload = function() {
           "properties": {}
         },
         "UpdateBlogInputModelType": {
+          "type": "object",
+          "properties": {}
+        },
+        "UpdatePostPgSqlInputModelType": {
           "type": "object",
           "properties": {}
         },
@@ -754,10 +747,6 @@ window.onload = function() {
           "properties": {}
         },
         "RecoveryCodeAndNewPasswordType": {
-          "type": "object",
-          "properties": {}
-        },
-        "UpdatePostPgSqlInputModelType": {
           "type": "object",
           "properties": {}
         }

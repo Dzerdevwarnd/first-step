@@ -1,6 +1,6 @@
-import { JwtService } from '@app/src/application/jwt/jwtService';
 import { UsersService } from '@app/src/features/users/users.service';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { JwtService } from '../../auth/jwt/jwtService';
 import { PostLikesService } from '../postLikes/postLikes.service';
 import { PostsPgSqlRepository } from '../posts.PgSqlRepository';
 import { PostsMongoRepository } from '../posts.mongoRepository';

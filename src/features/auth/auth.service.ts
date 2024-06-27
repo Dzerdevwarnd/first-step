@@ -1,19 +1,19 @@
-import { JwtService } from '@app/src/application/jwt/jwtService';
 import { BlacklistTokensService } from '@app/src/features/blacklistTokens/blacklistTokens.Service';
 import { UsersService } from '@app/src/features/users/users.service';
 import { UserDbType, userViewType } from '@app/src/features/users/users.types';
-import { UsersMongoRepository } from '@app/src/features/users/usersMongo.repository';
+
 import { settings } from '@app/src/settings';
 import { Injectable } from '@nestjs/common';
 import { add } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
+import { JwtService } from './jwt/jwtService';
 
 @Injectable()
 export class AuthService {
   constructor(
     protected jwtService: JwtService,
     protected usersService: UsersService,
-    protected usersMongoRepository: UsersMongoRepository,
+
     protected blacklistTokensService: BlacklistTokensService,
   ) {}
   async validateUser(loginOrEmail: string, password: string) {

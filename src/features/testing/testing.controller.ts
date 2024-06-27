@@ -1,9 +1,9 @@
 /* eslint-disable prefer-const */
-import { Comment } from '@app/src/comments/comments.mongo.scheme';
 import {
   BlacklistToken,
   BlacklistTokenDocument,
 } from '@app/src/features/blacklistTokens/blacklistTokens.scheme.types';
+import { Comment } from '@app/src/features/comments/comments.mongo.scheme';
 import { Post, PostDocument } from '@app/src/features/posts/posts.mongo.scheme';
 import {
   RefreshTokenMeta,
@@ -32,7 +32,7 @@ export class TestController {
     @InjectDataSource() protected dataSource: DataSource,
   ) {}
 
-  @Delete('all-data')
+  @Delete('/all-data')
   async deleteAllData(@Res() res: Response) {
     let resultOfDeleteBlogs = await this.blogModel.deleteMany({});
 
