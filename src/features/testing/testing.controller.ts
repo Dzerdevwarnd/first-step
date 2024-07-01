@@ -32,9 +32,8 @@ export class TestingController {
     @InjectDataSource() protected dataSource: DataSource,
   ) {}
 
-  @Delete('/all-data')
+  @Delete('all-data')
   async deleteAllData(@Res() res: Response) {
-    console.log('deleteAllData called');
     let resultOfDeleteBlogs = await this.blogModel.deleteMany({});
 
     let resultOfDeletePosts = await this.postModel.deleteMany({});

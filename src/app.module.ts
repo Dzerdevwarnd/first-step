@@ -7,12 +7,13 @@ import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { TestingModule } from '@nestjs/testing';
 import { ThrottlerModule } from '@nestjs/throttler';
+
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { AuthModule } from './features/auth/auth.module';
 import { BlogsModule } from './features/blogs/blogs.module';
+import { TestingModule } from './features/testing/testing.module';
 import { settings } from './settings';
 
 const modules = [BlogsModule, AuthModule, TestingModule];

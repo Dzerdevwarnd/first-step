@@ -673,6 +673,17 @@ window.onload = function() {
             }
           }
         }
+      },
+      "/testing/all-data": {
+        "delete": {
+          "operationId": "TestingController_deleteAllData",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        }
       }
     },
     "info": {
