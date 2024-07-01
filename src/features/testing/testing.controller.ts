@@ -19,7 +19,7 @@ import { Blog, BlogDocument } from '../blogs/blogs.mongo.scheme';
 import { User, UserDocument } from '../users/users.mongo.scheme';
 
 @Controller('testing')
-export class TestController {
+export class TestingController {
   constructor(
     @InjectModel(Blog.name) private blogModel: Model<BlogDocument>,
     @InjectModel(Post.name) private postModel: Model<PostDocument>,
@@ -34,6 +34,7 @@ export class TestController {
 
   @Delete('/all-data')
   async deleteAllData(@Res() res: Response) {
+    console.log('deleteAllData called');
     let resultOfDeleteBlogs = await this.blogModel.deleteMany({});
 
     let resultOfDeletePosts = await this.postModel.deleteMany({});

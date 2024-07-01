@@ -3,6 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtService } from '../../auth/jwt/jwtService';
 import { PostLikesService } from '../postLikes/postLikes.service';
 import { PostsPgSqlRepository } from '../posts.PgSqlRepository';
+import { PostsTypeOrmRepository } from '../posts.TypeOrm.repository';
 import { PostsMongoRepository } from '../posts.mongoRepository';
 import { PostsService } from '../posts.service';
 
@@ -24,6 +25,7 @@ export class updatePostLikeStatusUseCase
   constructor(
     protected postsMongoRepository: PostsMongoRepository,
     protected postsPgSqlRepository: PostsPgSqlRepository,
+    protected postsTypeOrmRepository: PostsTypeOrmRepository,
     protected jwtService: JwtService,
     protected postsService: PostsService,
     protected postLikesService: PostLikesService,
@@ -33,10 +35,14 @@ export class updatePostLikeStatusUseCase
   }
 
   private getPostsRepository() {
-    return process.env.USERS_REPOSITORY === 'Mongo'
-      ? this.postsMongoRepository
-      : this.postsPgSqlRepository;
+    const repositories = {
+      Mongo: this.postsMongoRepository,
+      PgSql: this.postsPgSqlRepository,
+      TypeOrm: this.postsTypeOrmRepository,
+    };
+    return repositories[process.env.REPOSITORY] || this.postsMongoRepository;
   }
+
   async execute(command: updatePostLikeStatusCommand): Promise<boolean> {
     const userId = await this.jwtService.verifyAndGetUserIdByToken(
       command.accessToken,

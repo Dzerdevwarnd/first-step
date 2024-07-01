@@ -1,5 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsPgSqlRepository } from '../posts.PgSqlRepository';
+import { PostsTypeOrmRepository } from '../posts.TypeOrm.repository';
 import { PostsMongoRepository } from '../posts.mongoRepository';
 import { postDBType, postViewType } from '../posts.types';
 
@@ -22,14 +23,19 @@ export class createPostByBlogIdUseCase
   constructor(
     protected postsMongoRepository: PostsMongoRepository,
     protected postsPgSqlRepository: PostsPgSqlRepository,
+    protected postsTypeOrmRepository: PostsTypeOrmRepository,
   ) {
     this.postsRepository = this.getPostsRepository();
   }
 
   private getPostsRepository() {
-    return process.env.USERS_REPOSITORY === 'Mongo'
-      ? this.postsMongoRepository
-      : this.postsPgSqlRepository;
+    const repositories = {
+      Mongo: this.postsMongoRepository,
+      PgSql: this.postsPgSqlRepository,
+      TypeOrm: this.postsTypeOrmRepository,
+    };
+
+    return repositories[process.env.REPOSITORY] || this.postsMongoRepository;
   }
   async execute(command: createPostByBlogIdCommand): Promise<postViewType> {
     const createdDate = new Date();

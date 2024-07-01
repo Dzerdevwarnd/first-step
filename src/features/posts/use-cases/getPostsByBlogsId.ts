@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PostLikesService } from '../postLikes/postLikes.service';
 import { PostsPgSqlRepository } from '../posts.PgSqlRepository';
+import { PostsTypeOrmRepository } from '../posts.TypeOrm.repository';
 import { PostsMongoRepository } from '../posts.mongoRepository';
 import { postsByBlogIdPaginationType } from '../posts.types';
 
@@ -20,15 +20,19 @@ export class GetPostsByBlogIdUseCase
   constructor(
     protected postsMongoRepository: PostsMongoRepository,
     protected postsPgSqlRepository: PostsPgSqlRepository,
-    protected postLikesService: PostLikesService,
+    protected postsTypeOrmRepository: PostsTypeOrmRepository,
   ) {
-    this.postsRepository = this.getUsersRepository();
+    this.postsRepository = this.getPostsRepository();
   }
 
-  private getUsersRepository() {
-    return process.env.USERS_REPOSITORY === 'Mongo'
-      ? this.postsMongoRepository
-      : this.postsPgSqlRepository;
+  private getPostsRepository() {
+    const repositories = {
+      Mongo: this.postsMongoRepository,
+      PgSql: this.postsPgSqlRepository,
+      TypeOrm: this.postsTypeOrmRepository,
+    };
+
+    return repositories[process.env.REPOSITORY] || this.postsMongoRepository;
   }
   async execute(
     command: GetPostsByBlogIdCommand,

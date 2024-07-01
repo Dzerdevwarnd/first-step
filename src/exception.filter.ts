@@ -34,7 +34,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     if (status === 500 && process.env.environment !== 'production') {
       response.status(500).json(exception);
     }
-
+    ///
     if (status === 400) {
       const errorResponse = {
         errorsMessages: [],

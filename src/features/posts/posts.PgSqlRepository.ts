@@ -14,7 +14,7 @@ export class PostsPgSqlRepository {
     @InjectDataSource() protected dataSource: DataSource,
     protected postLikesService: PostLikesService,
   ) {}
-  async findPostsWithQuery(query: any) {
+  async returnPostsWithQueryAndTotalCount(query: any) {
     const pageSize = Number(query?.pageSize) || 10;
     const page = Number(query?.pageNumber) || 1;
     const sortBy: string = query?.sortBy ?? 'createdAt';
@@ -145,7 +145,7 @@ export class PostsPgSqlRepository {
     );
     return result[1] == 1;
   }
-
+  //
   async updatePost(
     id: string,
     body: {

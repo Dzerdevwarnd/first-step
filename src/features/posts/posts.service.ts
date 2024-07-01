@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PostsPgSqlRepository } from './posts.PgSqlRepository';
+import { PostsTypeOrmRepository } from './posts.TypeOrm.repository';
 import { Post, PostDocument } from './posts.mongo.scheme';
 import { PostsMongoRepository } from './posts.mongoRepository';
 
@@ -13,15 +14,19 @@ export class PostsService {
     @InjectModel(Post.name) private postModel: Model<PostDocument>,
     protected postsMongoRepository: PostsMongoRepository,
     protected postsPgSqlRepository: PostsPgSqlRepository,
+    protected postsTypeOrmRepository: PostsTypeOrmRepository,
     protected postLikesService: PostLikesService,
   ) {
     this.postsRepository = this.getPostsRepository();
   } //
 
   private getPostsRepository() {
-    return process.env.USERS_REPOSITORY === 'Mongo'
-      ? this.postsMongoRepository
-      : this.postsPgSqlRepository;
+    const repositories = {
+      Mongo: this.postsMongoRepository,
+      PgSql: this.postsPgSqlRepository,
+      TypeOrm: this.postsTypeOrmRepository,
+    };
+    return repositories[process.env.REPOSITORY] || this.postsMongoRepository;
   }
   /*async getPostsWithPagination(
     query: any,

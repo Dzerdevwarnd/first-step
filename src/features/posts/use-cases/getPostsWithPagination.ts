@@ -1,6 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostLikesService } from '../postLikes/postLikes.service';
 import { PostsPgSqlRepository } from '../posts.PgSqlRepository';
+import { PostsTypeOrmRepository } from '../posts.TypeOrm.repository';
 import { PostsMongoRepository } from '../posts.mongoRepository';
 import { postViewType, postsByBlogIdPaginationType } from '../posts.types';
 
@@ -19,22 +20,28 @@ export class GetPostsWithPaginationUseCase
   constructor(
     protected postsMongoRepository: PostsMongoRepository,
     protected postsPgSqlRepository: PostsPgSqlRepository,
+    protected postsTypeOrmRepository: PostsTypeOrmRepository,
     protected postLikesService: PostLikesService,
   ) {
-    this.postsRepository = this.getUsersRepository();
+    this.postsRepository = this.getPostsRepository();
   }
 
-  private getUsersRepository() {
-    return process.env.USERS_REPOSITORY === 'Mongo'
-      ? this.postsMongoRepository
-      : this.postsPgSqlRepository;
-  }
+  private getPostsRepository() {
+    const repositories = {
+      Mongo: this.postsMongoRepository,
+      PgSql: this.postsPgSqlRepository,
+      TypeOrm: this.postsTypeOrmRepository,
+    };
+
+    return repositories[process.env.REPOSITORY] || this.postsMongoRepository;
+  } ////
   async execute(
     command: GetPostsWithPaginationCommand,
   ): Promise<postsByBlogIdPaginationType> {
-    const postsDBAndTotalCount = await this.postsRepository.findPostsWithQuery(
-      command.query,
-    );
+    const postsDBAndTotalCount =
+      await this.postsRepository.returnPostsWithQueryAndTotalCount(
+        command.query,
+      );
     const postsView: postViewType[] = [];
     for (const post of postsDBAndTotalCount.posts) {
       const like = await this.postLikesService.findPostLikeFromUser(

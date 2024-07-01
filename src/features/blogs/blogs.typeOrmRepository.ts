@@ -11,8 +11,8 @@ export class BlogsTypeOrmRepository {
     private readonly blogsRepository: Repository<BlogsEntity>,
   ) {}
 
-  async findBlog(id: string): Promise<blogViewType | null> {
-    const blogDB = await this.blogsRepository.findOneBy({ id: id });
+  async findBlog(params: { id: string }): Promise<blogViewType | null> {
+    const blogDB = await this.blogsRepository.findOneBy({ id: params.id });
     if (!blogDB) {
       return null;
     }

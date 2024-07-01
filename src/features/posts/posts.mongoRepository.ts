@@ -15,7 +15,7 @@ export class PostsMongoRepository {
     @InjectModel(Post.name) private postModel: Model<PostDocument>,
     protected postLikesService: PostLikesService,
   ) {}
-  async findPostsWithQuery(query: any) {
+  async returnPostsWithQueryAndTotalCount(query: any) {
     const pageSize = Number(query?.pageSize) || 10;
     const page = Number(query?.pageNumber) || 1;
     const sortBy: string = query?.sortBy ?? 'createdAt';

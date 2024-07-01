@@ -23,7 +23,7 @@ import {
 } from '../refreshTokenMeta/refreshTokenMeta.scheme.types';
 import { UserEntity } from '../users/users.entity';
 import { User, UserSchema } from '../users/users.mongo.scheme';
-import { TestController } from './testing.controller';
+import { TestingController } from './testing.controller';
 
 @Module({
   imports: [
@@ -45,7 +45,7 @@ import { TestController } from './testing.controller';
       { name: BlacklistToken.name, schema: BlacklistTokenSchema },
     ]),
   ],
-  controllers: [TestController],
+  controllers: [TestingController],
   providers: [],
   exports: [],
 })
