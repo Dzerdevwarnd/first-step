@@ -1,57 +1,22 @@
-/* import { myJwtModule } from '@app/src/application/jwt/jwt.module';
-import { AuthModule } from '@app/src/auth/auth.module';
-import { Module } from '@nestjs/common';
-import { CqrsModule } from '@nestjs/cqrs';
-import { MongooseModule } from '@nestjs/mongoose';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { SaBlogsController } from '../sa/sa.blogs.contorller';
-import { BlogsController } from './blogs.controller';
-import { BlogsEntity } from './blogs.entity';
-import { Blog, BlogSchema } from './blogs.mongo.scheme';
-import { DeleteBlogUseCase } from './use-cases/deleteBlog';
-import { FindBlogByIdUseCase } from './use-cases/findBlogById';
-import { PostBlogUseCase } from './use-cases/postBlog';
-import { ReturnBlogsWithPaginationUseCase } from './use-cases/returnBlogsWithPagination';
-import { UpdateBlogUseCase } from './use-cases/updateBlog';
-
-const useCases = [
-  ReturnBlogsWithPaginationUseCase,
-  DeleteBlogUseCase,
-  FindBlogByIdUseCase,
-  PostBlogUseCase,
-  UpdateBlogUseCase,
-];
-
-@Module({
-  imports: [
-    TypeOrmModule.forFeature([BlogsEntity]),
-    MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
-    myJwtModule,
-    CqrsModule,
-    AuthModule,
-  ],
-  providers: [, ...useCases],
-  controllers: [BlogsController, SaBlogsController],
-  exports: [...useCases],
-})
-export class BlogsModule {}
-//
- */
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '../auth/auth.module';
+import { CommentLikeEntity } from '../comments/commentLikes/CommentLikes.entity';
 import { CommentLikesPgSqlRepository } from '../comments/commentLikes/commentLikes.PgSqlRepository';
+import { CommentLikesTypeOrmRepository } from '../comments/commentLikes/commentLikes.TypeOrmRepository';
 import {
   CommentLike,
   CommentLikeSchema,
 } from '../comments/commentLikes/commentLikes.mongo.scheme';
-import { CommentLikesMongoRepository } from '../comments/commentLikes/commentLikesRepository';
+import { CommentLikesMongoRepository } from '../comments/commentLikes/commentLikesMongoRepository';
 import { CommentLikesService } from '../comments/commentLikes/commentLikesService';
 import { CommentsMongoRepository } from '../comments/comments.MongoRepository';
 import { CommentsPgSqlRepository } from '../comments/comments.PgSql';
+import { CommentsTypeOrmRepository } from '../comments/comments.TypeOrmRepository';
 import { CommentsController } from '../comments/comments.controller';
+import { CommentsEntity } from '../comments/comments.entity';
 import { Comment, CommentSchema } from '../comments/comments.mongo.scheme';
 import { CommentsService } from '../comments/comments.service';
 import { BlogExistValidationConstraint } from '../posts/customValidators/BlogExist.validator';
@@ -105,7 +70,12 @@ const customValidators = [BlogExistValidationConstraint];
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([BlogsEntity, PostEntity]),
+    TypeOrmModule.forFeature([
+      BlogsEntity,
+      PostEntity,
+      CommentsEntity,
+      CommentLikeEntity,
+    ]),
     MongooseModule.forFeature([
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
@@ -139,6 +109,8 @@ const customValidators = [BlogExistValidationConstraint];
     CommentLikesMongoRepository,
     CommentLikesPgSqlRepository,
     CommentLikesService,
+    CommentsTypeOrmRepository,
+    CommentLikesTypeOrmRepository,
     ...useCases,
     ...customValidators,
   ],

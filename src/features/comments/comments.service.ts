@@ -5,6 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '../auth/jwt/jwtService';
 import { CommentsMongoRepository } from './comments.MongoRepository';
 import { CommentsPgSqlRepository } from './comments.PgSql';
+import { CommentsTypeOrmRepository } from './comments.TypeOrmRepository';
 import {
   CommentDBType,
   CommentViewType,
@@ -17,6 +18,7 @@ export class CommentsService {
   constructor(
     protected commentsMongoRepository: CommentsMongoRepository,
     protected commentsPgSqlRepository: CommentsPgSqlRepository,
+    protected commentsTypeOrmRepository: CommentsTypeOrmRepository,
     protected postsReposittory: PostsMongoRepository,
     protected commentLikesService: CommentLikesService,
     protected usersService: UsersService,
@@ -26,9 +28,13 @@ export class CommentsService {
   }
 
   private getCommentsRepository() {
-    return process.env.USERS_REPOSITORY === 'Mongo'
-      ? this.commentsMongoRepository
-      : this.commentsPgSqlRepository;
+    const repositories = {
+      Mongo: this.commentsMongoRepository,
+      PgSql: this.commentsPgSqlRepository,
+      TypeOrm: this.commentsTypeOrmRepository,
+    };
+
+    return repositories[process.env.REPOSITORY] || this.commentsRepository;
   }
   async findComment(
     commentId: string,
