@@ -343,7 +343,7 @@ window.onload = function() {
       },
       "/posts/{postId}": {
         "delete": {
-          "operationId": "PostsController_deleteBlogByID",
+          "operationId": "PostsController_deletePostByID",
           "parameters": [],
           "responses": {
             "200": {

@@ -26,7 +26,7 @@ export class PostEntity {
   @Column(() => LikesInfo)
   likesInfo: LikesInfo;
 
-  @ManyToOne(() => BlogsEntity)
+  @ManyToOne(() => BlogsEntity, (blog) => blog.id)
   @JoinColumn({ name: 'blogId' })
   blog: BlogsEntity;
 

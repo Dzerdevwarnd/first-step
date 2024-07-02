@@ -157,6 +157,13 @@ export class SaBlogsController {
     body: UpdatePostPgSqlInputModelType,
     @Res() res: Response,
   ) {
+    const blog = await this.commandBus.execute(
+      new FindBlogByIdCommand({ id: params.blogId }),
+    );
+    if (!blog) {
+      res.sendStatus(404);
+      return;
+    }
     // @ts-expect-error blogId dont exist in body in type UpdatePostPgSqlInputModelType
     body.blogId = params.blogId;
     const ResultOfUpdatePost = await this.commandBus.execute(
@@ -177,6 +184,13 @@ export class SaBlogsController {
     @Param() params: { blogId: string; postId: string },
     @Res() res: Response,
   ) {
+    const blog = await this.commandBus.execute(
+      new FindBlogByIdCommand({ id: params.blogId }),
+    );
+    if (!blog) {
+      res.sendStatus(404);
+      return;
+    }
     const resultOfDelete = await await this.commandBus.execute(
       new deletePostCommand(params),
     );

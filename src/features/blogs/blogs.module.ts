@@ -22,6 +22,8 @@ import { CommentsService } from '../comments/comments.service';
 import { BlogExistValidationConstraint } from '../posts/customValidators/BlogExist.validator';
 import { PostLikesMongoRepository } from '../posts/postLikes/postLikes.MongoRepository';
 import { PostLikesPgSqlRepository } from '../posts/postLikes/postLikes.PgSqlRepository';
+import { PostLikesTypeOrmRepository } from '../posts/postLikes/postLikes.TypeOrmRepositort';
+import { PostLikesEntity } from '../posts/postLikes/postLikes.entity';
 import { PostLike, PostLikeSchema } from '../posts/postLikes/postLikes.scheme';
 import { PostLikesService } from '../posts/postLikes/postLikes.service';
 import { PostsPgSqlRepository } from '../posts/posts.PgSqlRepository';
@@ -34,7 +36,7 @@ import { PostsService } from '../posts/posts.service';
 import { CreatePostUseCase } from '../posts/use-cases/createPost';
 import { createPostByBlogIdUseCase } from '../posts/use-cases/createPostByBlogId';
 import { deletePostUseCase } from '../posts/use-cases/deletePost';
-import { GetPostsByBlogIdCommand } from '../posts/use-cases/getPostsByBlogsId';
+import { GetPostsByBlogIdUseCase } from '../posts/use-cases/getPostsByBlogsId';
 import { GetPostsWithPaginationUseCase } from '../posts/use-cases/getPostsWithPagination';
 import { updatePostUseCase } from '../posts/use-cases/updatePost';
 import { updatePostLikeStatusUseCase } from '../posts/use-cases/updatePostLikeStatus';
@@ -63,7 +65,7 @@ const useCases = [
   GetPostsWithPaginationUseCase,
   updatePostUseCase,
   updatePostLikeStatusUseCase,
-  GetPostsByBlogIdCommand,
+  GetPostsByBlogIdUseCase,
 ];
 
 const customValidators = [BlogExistValidationConstraint];
@@ -75,6 +77,7 @@ const customValidators = [BlogExistValidationConstraint];
       PostEntity,
       CommentsEntity,
       CommentLikeEntity,
+      PostLikesEntity,
     ]),
     MongooseModule.forFeature([
       { name: Blog.name, schema: BlogSchema },
@@ -99,6 +102,7 @@ const customValidators = [BlogExistValidationConstraint];
     PostLikesService,
     PostLikesMongoRepository,
     PostLikesPgSqlRepository,
+    PostLikesTypeOrmRepository,
     PostsService,
     BlogsMongoRepository,
     BlogsPgSqlRepository,

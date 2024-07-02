@@ -28,7 +28,7 @@ const modules = [BlogsModule, AuthModule, TestingModule];
     ThrottlerModule.forRoot([
       {
         ttl: 10000,
-        limit: 5,
+        limit: 500,
       },
     ]),
     CqrsModule,

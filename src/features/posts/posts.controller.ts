@@ -202,7 +202,7 @@ export class PostsController {
 
   @UseGuards(BasicAuthGuard)
   @Delete(':postId')
-  async deleteBlogByID(
+  async deletePostByID(
     @Param() params: { postId: string },
     @Res() res: Response,
   ) {

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PostLikesMongoRepository } from './postLikes.MongoRepository';
 import { PostLikesPgSqlRepository } from './postLikes.PgSqlRepository';
+import { PostLikesTypeOrmRepository } from './postLikes.TypeOrmRepositort';
 import { postLikeDBType } from './postLikes.types';
 
 @Injectable()
@@ -9,13 +10,20 @@ export class PostLikesService {
   constructor(
     protected postLikesMongoRepository: PostLikesMongoRepository,
     protected postLikesPgSqlRepository: PostLikesPgSqlRepository,
+    protected postLikesTypeOrmRepository: PostLikesTypeOrmRepository,
   ) {
     this.postLikesRepository = this.getPostLikeRepository();
   }
   private getPostLikeRepository() {
-    return process.env.USERS_REPOSITORY === 'Mongo'
-      ? this.postLikesMongoRepository
-      : this.postLikesPgSqlRepository;
+    const repositories = {
+      Mongo: this.postLikesMongoRepository,
+      PgSql: this.postLikesPgSqlRepository,
+      TypeOrm: this.postLikesTypeOrmRepository,
+    };
+
+    return (
+      repositories[process.env.REPOSITORY] || this.postLikesMongoRepository
+    );
   }
   async findPostLikeFromUser(userId: string, postId: string) {
     const like = await this.postLikesRepository.findPostLikeFromUser(

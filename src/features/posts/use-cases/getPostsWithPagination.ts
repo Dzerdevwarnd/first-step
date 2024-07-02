@@ -58,8 +58,9 @@ export class GetPostsWithPaginationUseCase
         blogName: post.blogName,
         createdAt: post.createdAt,
         extendedLikesInfo: {
-          likesCount: post.likesInfo?.likesCount || post.likesCount,
-          dislikesCount: post.likesInfo?.dislikesCount || post.dislikesCount,
+          likesCount: post.likesInfo?.likesCount /* || post.likesCount, */,
+          dislikesCount:
+            post.likesInfo?.dislikesCount /* || post.dislikesCount, */,
           myStatus: like?.likeStatus || 'None',
           newestLikes: last3DBLikes || [],
         },

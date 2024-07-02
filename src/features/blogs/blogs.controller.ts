@@ -1,6 +1,4 @@
 import { BasicAuthGuard } from '@app/src/features/auth/guards/basic.auth.guard';
-import { PostsPgSqlRepository } from '@app/src/features/posts/posts.PgSqlRepository';
-import { PostsMongoRepository } from '@app/src/features/posts/posts.mongoRepository';
 import { PostsService } from '@app/src/features/posts/posts.service';
 import { CreatePostByBlogIdInputModelType } from '@app/src/features/posts/posts.types';
 import { createPostByBlogIdCommand } from '@app/src/features/posts/use-cases/createPostByBlogId';
@@ -20,6 +18,7 @@ import {
 import { CommandBus } from '@nestjs/cqrs';
 import { Response } from 'express';
 import { JwtService } from '../auth/jwt/jwtService';
+import { GetPostsByBlogIdCommand } from '../posts/use-cases/getPostsByBlogsId';
 import {
   CreateBlogInputModelType,
   UpdateBlogInputModelType,
@@ -32,22 +31,11 @@ import { UpdateBlogCommand } from './use-cases/updateBlog';
 
 @Controller('blogs')
 export class BlogsController {
-  private postsRepository;
   constructor(
     private commandBus: CommandBus,
     protected postsService: PostsService,
     protected jwtService: JwtService,
-    protected postsMongoRepository: PostsMongoRepository,
-    protected postsPgSqlRepository: PostsPgSqlRepository,
-  ) {
-    this.postsRepository = this.getPostsRepository();
-  }
-
-  private getPostsRepository() {
-    return process.env.USERS_REPOSITORY === 'Mongo'
-      ? this.postsMongoRepository
-      : this.postsPgSqlRepository;
-  }
+  ) {}
 
   @Get()
   async getBlogsWithPagination(@Query() query: string) {
@@ -86,10 +74,8 @@ export class BlogsController {
         headers.authorization.split(' ')[1],
       );
     }
-    const foundPosts = await this.postsRepository.findPostsByBlogId(
-      params,
-      query,
-      userId,
+    const foundPosts = await this.commandBus.execute(
+      new GetPostsByBlogIdCommand(params, query, userId),
     );
     if (!foundPosts) {
       res.sendStatus(404);

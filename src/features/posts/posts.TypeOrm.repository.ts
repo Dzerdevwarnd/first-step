@@ -17,8 +17,8 @@ export class PostsTypeOrmRepository {
     private postLikesService: PostLikesService,
   ) {}
 
-  async findPost(id: string): Promise<postDBType | null> {
-    const Post = await this.postsRepository.findOneBy({ id: id });
+  async findPost(params: { id: string }): Promise<postDBType | null> {
+    const Post = await this.postsRepository.findOneBy({ id: params.id });
     if (!Post) {
       return null;
     }
@@ -148,12 +148,37 @@ export class PostsTypeOrmRepository {
     return post;
   }
 
+  async updatePost(
+    id: string,
+    body: {
+      title: string;
+      shortDescription: string;
+      content: string;
+      blogId: string;
+    },
+  ): Promise<boolean> {
+    const resultOfUpdate = await this.postsRepository
+      .createQueryBuilder()
+      .update(PostEntity)
+      .set({
+        title: body.title,
+        shortDescription: body.shortDescription,
+        content: body.content,
+        blogId: body.blogId,
+      })
+      .where('id = :id', {
+        id,
+      })
+      .execute();
+
+    return resultOfUpdate.affected === 1;
+  }
+
   async updatePostLikesAndDislikesCount(
     postId: string,
     likesCount: number,
     dislikesCount: number,
   ): Promise<boolean> {
-    //Пример сложного аптейта
     const resultOfUpdate = await this.postsRepository
       .createQueryBuilder()
       .update(PostEntity)
@@ -168,8 +193,8 @@ export class PostsTypeOrmRepository {
     return resultOfUpdate.affected === 1;
   }
 
-  async deleteBlog(params: { id: string }): Promise<boolean> {
-    const result = await this.postsRepository.delete({ id: params.id });
+  async deletePost(params: { postId: string }): Promise<boolean> {
+    const result = await this.postsRepository.delete({ id: params.postId });
     return result.affected === 1;
   }
 }

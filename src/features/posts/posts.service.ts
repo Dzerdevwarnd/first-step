@@ -89,9 +89,10 @@ export class PostsService {
       blogName: foundPost.blogName,
       createdAt: foundPost.createdAt,
       extendedLikesInfo: {
-        likesCount: foundPost.likesInfo?.likesCount || foundPost.likesCount,
+        likesCount:
+          foundPost.likesInfo?.likesCount /* || foundPost.likesCount */,
         dislikesCount:
-          foundPost.likesInfo?.dislikesCount || foundPost.dislikesCount,
+          foundPost.likesInfo?.dislikesCount /* || foundPost.dislikesCount */,
         myStatus: like?.likeStatus || 'None',
         newestLikes: last3DBLikes || [],
       },
