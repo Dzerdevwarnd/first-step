@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "xTunnel": "xTunnel 3004",
+    "localHost": "ssh -R 80:localhost:3004 localhost.run",
     "serveo": "ssh -R 80:localhost:3004 serveo.net",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

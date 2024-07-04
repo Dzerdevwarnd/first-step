@@ -33,8 +33,13 @@ export class PostLikesService {
     return like;
   }
   async findLast3Likes(postId: string) {
-    const last3Likes = await this.postLikesRepository.findLast3Likes(postId);
-    return last3Likes;
+    const last3LikesDB = await this.postLikesRepository.findLast3Likes(postId);
+    const last3LikesView = last3LikesDB.map((like) => ({
+      addedAt: like.addedAt,
+      userId: like.userId,
+      login: like.login,
+    }));
+    return last3LikesView;
   }
 
   async addLikeToBdFromUser(

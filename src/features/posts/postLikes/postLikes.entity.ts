@@ -3,13 +3,13 @@ import { PostEntity } from '../posts.entity';
 
 @Entity()
 export class PostLikesEntity {
-  @PrimaryColumn()
+  @Column()
   userId: string;
   @Column()
   likeStatus: string;
   @Column()
   login: string;
-  @Column()
+  @PrimaryColumn()
   addedAt: Date;
 
   @ManyToOne(() => PostEntity)

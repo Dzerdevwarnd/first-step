@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CommentsTypeOrmRepository } from '../comments.TypeOrmRepository';
 import { CommentLikesPgSqlRepository } from './commentLikes.PgSqlRepository';
+import { CommentLikesTypeOrmRepository } from './commentLikes.TypeOrmRepository';
 import { commentLikeDBType } from './commentLikes.types';
 import { CommentLikesMongoRepository } from './commentLikesMongoRepository';
 
@@ -10,7 +10,7 @@ export class CommentLikesService {
   constructor(
     protected commentLikesMongoRepository: CommentLikesMongoRepository,
     protected commentsLikePgSqlRepository: CommentLikesPgSqlRepository,
-    protected commentsLikeTypeOrmRepository: CommentsTypeOrmRepository,
+    protected commentsLikeTypeOrmRepository: CommentLikesTypeOrmRepository,
   ) {
     this.commentLikesRepository = this.getCommentLikeRepository();
   }

@@ -185,7 +185,7 @@ export class PostsTypeOrmRepository {
       .set({
         likesInfo: { likesCount: likesCount, dislikesCount: dislikesCount },
       })
-      .where('id = :id', {
+      .where('id = :postId', {
         postId,
       })
       .execute();

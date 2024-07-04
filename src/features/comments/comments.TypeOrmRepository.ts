@@ -86,13 +86,13 @@ export class CommentsTypeOrmRepository {
       sortBy === 'CommentatorInfo.userId' ||
       sortBy === 'CommentatorInfo.userLogin'
     ) {
-      queryBuilder.addOrderBy(`user.${sortBy} COLLATE "C"`, sortDirection);
+      queryBuilder.addOrderBy(`comment.${sortBy} COLLATE "C"`, sortDirection);
     } else {
-      queryBuilder.addOrderBy(`user.${sortBy}`, sortDirection);
+      queryBuilder.addOrderBy(`comment.${sortBy}`, sortDirection);
     }
 
     queryBuilder
-      .addOrderBy('user.createdAt', sortDirection)
+      .addOrderBy('comment.createdAt', sortDirection)
       .skip((page - 1) * pageSize)
       .take(pageSize);
 

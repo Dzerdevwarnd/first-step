@@ -11,13 +11,14 @@ export class PostLikesTypeOrmRepository {
   ) {}
 
   async findPostLikeFromUser(userId: string, postId: string) {
-    const like = await this.postLikesRepository.findOneBy({
-      userId: userId,
-      postId: postId,
-    });
+    const like = await this.postLikesRepository
+      .createQueryBuilder('post_like')
+      .where('post_like.userId = :userId', { userId })
+      .andWhere('post_like.postId = :postId', { postId })
+      .getOne();
     return like;
   }
-
+  //
   async findLast3Likes(postId: string): Promise<PostLikesEntity[]> {
     return this.postLikesRepository.find({
       where: { postId: postId, likeStatus: 'Like' },
@@ -36,7 +37,7 @@ export class PostLikesTypeOrmRepository {
     const result = await this.postLikesRepository.save(likeDB);
     return likeDB;
   }
-
+  //
   async updateUserLikeStatus(
     userId: string,
     postId: string,

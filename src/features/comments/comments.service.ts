@@ -57,9 +57,9 @@ export class CommentsService {
       },
       createdAt: comment.createdAt,
       likesInfo: {
-        likesCount: comment.likesInfo?.likesCount || comment.likesCount,
+        likesCount: comment.likesInfo?.likesCount /* || comment.likesCount */,
         dislikesCount:
-          comment.likesInfo?.dislikesCount || comment.dislikesCount,
+          comment.likesInfo?.dislikesCount /* || comment.dislikesCount */,
         myStatus: like?.likeStatus || 'None',
       },
     };

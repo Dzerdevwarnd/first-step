@@ -11,10 +11,16 @@ export class CommentLikesTypeOrmRepository {
   ) {}
 
   async findCommentLikeFromUser(userId: string, commentId: string) {
-    const like = this.commentLikesRepository.findOneBy({
-      userId: userId,
-      commentId: commentId,
-    });
+    const like = await this.commentLikesRepository
+      .createQueryBuilder('commentLike')
+      .select([
+        'commentLike.userId',
+        'commentLike.commentId',
+        'commentLike.likeStatus',
+      ])
+      .where('commentLike.userId = :userId', { userId })
+      .andWhere('commentLike.commentId = :commentId', { commentId })
+      .getOne();
     return like;
   }
 
