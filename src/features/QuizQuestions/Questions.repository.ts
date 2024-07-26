@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { QuestionDBType } from './Questiong.types';
 import { Question } from './Questions.entity';
+import { QuestionDBType, QuestionQuizViewType } from './Questions.types';
 
 @Injectable()
 export class QuestionsRepository {
@@ -34,6 +34,18 @@ export class QuestionsRepository {
     queryBuilder.orderBy(`Question.${sortBy}`, sortDirection);
     const questions = await queryBuilder.getMany();
     return questions;
+  }
+
+  async findQuestionsForQuiz(): Promise<QuestionQuizViewType[]> {
+    const queryBuilder =
+      this.questionsRepository.createQueryBuilder('Question');
+    queryBuilder
+      .select(['Question.id', 'Question.body'])
+      .orderBy('RANDOM()')
+      .take(5);
+
+    const questions = await queryBuilder.getMany();
+    return questions as QuestionQuizViewType[];
   }
 
   async createQuestion(dto: {

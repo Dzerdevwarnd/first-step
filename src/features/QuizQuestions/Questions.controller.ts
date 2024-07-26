@@ -12,12 +12,12 @@ import {
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { Response } from 'express';
+import { QuestionsService } from './Questions.service';
 import {
   CreateAndUpdateQuestionsInputModelType,
   QuestionDBType,
   updateQuestionPublishInputType,
-} from './Questiong.types';
-import { QuestionsService } from './Questions.service';
+} from './Questions.types';
 
 @Controller('sa/quiz/questions')
 export class QuestionslController {

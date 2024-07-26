@@ -22,7 +22,7 @@ class PlayerProgress {
 }
 
 class questions {
-  id: string;
+  id: number;
   body: string;
 }
 
@@ -42,7 +42,7 @@ export class QuizGame {
   /*   @Column('json')
   @ValidateNested({ each: true })
   @Type(() => Question) */
-  questions: Question[];
+  questions: questions[];
 
   @Column()
   status: string;
@@ -55,9 +55,4 @@ export class QuizGame {
 
   @Column()
   finishGameDate: Date;
-}
-
-export class Question {
-  id: string;
-  body: string;
 }

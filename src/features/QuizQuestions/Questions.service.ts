@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '../auth/jwt/jwtService';
-import { EntityWithPagination, QuestionDBType } from './Questiong.types';
 import { QuestionsRepository } from './Questions.repository';
+import {
+  EntityWithPagination,
+  QuestionDBType,
+  QuestionQuizViewType,
+} from './Questions.types';
 
 @Injectable()
 export class QuestionsService {
@@ -26,6 +30,11 @@ export class QuestionsService {
       items: questions,
     };
     return questionsWithPagination;
+  }
+
+  async findQuestionsForQuiz(): Promise<QuestionQuizViewType[]> {
+    const questions = await this.questionsRepository.findQuestionsForQuiz();
+    return questions;
   }
 
   async createQuestion(dto: { body: string; correctAnswers: string[] }) {

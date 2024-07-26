@@ -27,6 +27,11 @@ export class updateQuestionPublishInputType {
   published: boolean;
 }
 
+export type QuestionQuizViewType = {
+  id: number;
+  body: string;
+};
+
 export type QuestionDBType = {
   id: number;
   body: string;

@@ -24,6 +24,13 @@ class EmailConfirmationData {
   isConfirmed: boolean;
 }
 
+class QuizGameDate {
+  @Column()
+  score: string;
+  @Column()
+  currentGameId: number;
+}
+
 @Entity()
 export class UserEntity {
   @PrimaryColumn()
@@ -34,4 +41,7 @@ export class UserEntity {
 
   @Column(() => EmailConfirmationData)
   emailConfirmationData: EmailConfirmationData;
+
+  @Column(() => QuizGameDate)
+  quizGameDate: QuizGameDate;
 }
