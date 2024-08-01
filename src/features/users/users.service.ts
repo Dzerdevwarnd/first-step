@@ -147,10 +147,37 @@ export class UsersService {
   }
 
   async userConfirmationCodeUpdate(email: string) {
-    const confirmationCode =
+    const resultOfUpdate =
       await this.usersRepository.userConfirmationCodeUpdate(email);
-    if (confirmationCode) {
-      return confirmationCode;
+    if (resultOfUpdate) {
+      return resultOfUpdate;
+    } else {
+      return;
+    }
+  }
+
+  async updateUserQuizGameCurrentId(
+    userId: string,
+    currentGameId: string | null,
+  ) {
+    const resultOfUpdate = await this.usersRepository.updateUserQuizGameScore(
+      userId,
+      currentGameId,
+    );
+    if (resultOfUpdate) {
+      return resultOfUpdate;
+    } else {
+      return;
+    }
+  }
+
+  async updateUserQuizGameScore(userId: string, totalScore: number) {
+    const resultOfUpdate = await this.usersRepository.updateUserQuizGameScore(
+      userId,
+      totalScore,
+    );
+    if (resultOfUpdate) {
+      return resultOfUpdate;
     } else {
       return;
     }

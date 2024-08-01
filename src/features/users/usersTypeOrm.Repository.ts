@@ -165,6 +165,33 @@ export class UsersTypeOrmRepository {
       return undefined;
     }
   }
+
+  async updateUserQuizGameCurrentId(
+    userId: string,
+    currentGameId: number | null,
+  ): Promise<boolean> {
+    const updateResult = await this.usersRepository
+      .createQueryBuilder()
+      .update(UserEntity)
+      .set({ quizGameDate: { currentGameId: currentGameId } })
+      .where({ id: userId })
+      .execute();
+    return updateResult.affected === 1;
+  }
+
+  async updateUserQuizGameScore(
+    userId: string,
+    totalScore: number,
+  ): Promise<boolean> {
+    const updateResult = await this.usersRepository
+      .createQueryBuilder()
+      .update(UserEntity)
+      .set({ quizGameDate: { score: totalScore } })
+      .where({ id: userId })
+      .execute();
+    return updateResult.affected === 1;
+  }
+
   async findDBUserByConfirmationCode(confirmationCode: any) {
     const user = await this.usersRepository
       .createQueryBuilder('user')

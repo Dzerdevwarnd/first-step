@@ -25,10 +25,11 @@ class EmailConfirmationData {
 }
 
 class QuizGameDate {
-  @Column()
-  score: string;
-  @Column()
-  currentGameId: number;
+  @Column({ type: 'int', default: 0 })
+  score: number;
+
+  @Column({ type: 'int', nullable: true, default: null })
+  currentGameId: number | null;
 }
 
 @Entity()

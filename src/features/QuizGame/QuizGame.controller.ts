@@ -1,11 +1,10 @@
-import { BasicAuthGuard } from '@app/src/features/auth/guards/basic.auth.guard';
 import {
   Body,
   Controller,
+  Get,
   Headers,
   Param,
   Post,
-  Put,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -13,11 +12,8 @@ import { CommandBus } from '@nestjs/cqrs';
 import { Response } from 'express';
 import { AccessTokenAuthGuard } from '../auth/guards/accessToken.auth.guard';
 import { JwtService } from '../auth/jwt/jwtService';
+import { UserEntity } from '../users/users.entity';
 import { UsersService } from '../users/users.service';
-import {
-  CreateAndUpdateQuestionsInputModelType,
-  updateQuestionPublishInputType,
-} from './Questiong.types';
 import { QuizGame } from './QuizGame.entity';
 import { QuizGameService } from './QuizGame.service';
 
@@ -31,17 +27,35 @@ export class QuizGamelController {
   ) {}
 
   @UseGuards(AccessTokenAuthGuard)
-  @Post()
-  async findGameById(
+  @Get('/my-current')
+  async findMyCurrentGame(
     @Headers() headers: { authorization: string },
     @Res() res: Response,
   ): Promise<QuizGame> {
     const userId = await this.jwtService.verifyAndGetUserIdByToken(
       headers.authorization.split(' ')[1],
     );
-    const user = await this.usersService.findUser(userId);
-    const myGame = await this.quizGameService.connectOrCreateGame(user);
-    res.status(200).send(myGame);
+    const user: UserEntity = await this.usersService.findUser(userId);
+    const game = await this.quizGameService.findMyCurrentGame(user);
+    if (!game) {
+      res.status(404);
+    }
+    res.status(200).send(game);
+    return;
+  }
+
+  @UseGuards(AccessTokenAuthGuard)
+  @Get(':id')
+  async findGamebyId(
+    @Param() params: { id },
+    @Headers() headers: { authorization: string },
+    @Res() res: Response,
+  ): Promise<QuizGame> {
+    const game = await this.quizGameService.findGamebyId(params);
+    if (!game) {
+      res.status(404);
+    }
+    res.status(200).send(game);
     return;
   }
 
@@ -54,58 +68,33 @@ export class QuizGamelController {
     const userId = await this.jwtService.verifyAndGetUserIdByToken(
       headers.authorization.split(' ')[1],
     );
-    const user = await this.usersService.findUser(userId);
-    const myGame = await this.quizGameService.connectOrCreateGame(user);
-    res.status(200).send(myGame);
-    return;
+    const user: UserEntity = await this.usersService.findUser(userId);
+    if (user.quizGameDate.currentGameId === null) {
+      const myGame = await this.quizGameService.connectOrCreateGame(user);
+      res.status(200).send(myGame);
+      return;
+    } else {
+      res.status(403);
+    }
   }
 
-  @UseGuards(BasicAuthGuard)
-  @Put(':id')
-  async updateQuestion(
-    @Param() params: { id: number },
-    @Body()
-    body: CreateAndUpdateQuestionsInputModelType,
+  @UseGuards(AccessTokenAuthGuard)
+  @Post('/answers')
+  async giveAnswerForNestQuestion(
+    @Headers() headers: { authorization: string },
+    @Body() body: { answer: string },
     @Res() res: Response,
-  ) {
-    const updateResult = await this.questionsService.updateQuestion(
-      params.id,
-      body,
+  ): Promise<QuizGame> {
+    const userId = await this.jwtService.verifyAndGetUserIdByToken(
+      headers.authorization.split(' ')[1],
     );
-    if (!updateResult) {
-      res.status(404);
-    }
-    res.status(204);
-    return;
-  }
+    const user: UserEntity = await this.usersService.findUser(userId);
 
-  @UseGuards(BasicAuthGuard)
-  @Put(':id/publish')
-  async updateQuestionPublish(
-    @Param() params: { id: number },
-    @Body()
-    body: updateQuestionPublishInputType,
-    @Res() res: Response,
-  ) {
-    const updateResult = await this.questionsService.updateQuestionPublish(
-      params.id,
+    const answerData = await this.quizGameService.giveAnswerForNestQuestion(
       body,
+      user,
     );
-    if (!updateResult) {
-      res.status(404);
-    }
-    res.status(204);
-    return;
-  }
-
-  @UseGuards(BasicAuthGuard)
-  @Put(':id')
-  async deleteQuestion(@Param() params: { id: number }, @Res() res: Response) {
-    const deleteResult = await this.questionsService.deleteQuestion(params.id);
-    if (!deleteResult) {
-      res.status(404);
-    }
-    res.status(204);
+    res.status(200).send(answerData);
     return;
   }
 }

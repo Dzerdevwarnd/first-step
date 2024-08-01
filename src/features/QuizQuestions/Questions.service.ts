@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '../auth/jwt/jwtService';
+import { Question } from './Questions.entity';
 import { QuestionsRepository } from './Questions.repository';
 import {
   EntityWithPagination,
@@ -13,6 +14,11 @@ export class QuestionsService {
     protected jwtService: JwtService,
     protected questionsRepository: QuestionsRepository,
   ) {}
+
+  async findQuestionById(id: number): Promise<Question> {
+    const question = await this.questionsRepository.findQuestionById(id);
+    return question;
+  }
 
   async findQuestionsWithQuery(
     query: Record<string, any>,

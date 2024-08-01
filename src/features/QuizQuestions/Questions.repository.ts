@@ -11,6 +11,15 @@ export class QuestionsRepository {
     private readonly questionsRepository: Repository<Question>,
   ) {}
 
+  async findQuestionById(id: number): Promise<Question> {
+    const question = await this.questionsRepository
+      .createQueryBuilder('Question')
+      .where('Question.id = :id', { id })
+      .getOne();
+
+    return question;
+  }
+
   async findQuestionsWithQuery(
     query: Record<string, any>,
   ): Promise<QuestionDBType[]> {

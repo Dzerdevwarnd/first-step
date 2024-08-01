@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { QuestionQuizViewType } from '../QuizQuestions/Questions.types';
+import { UserEntity } from '../users/users.entity';
 import { UserDbType } from '../users/users.types';
 import { QuizGame } from './QuizGame.entity';
 
@@ -11,6 +12,41 @@ export class QuizGameRepository {
     @InjectRepository(QuizGame)
     private quizGameRepository: Repository<QuizGame>,
   ) {}
+
+  async findMyCurrentGame(user: UserEntity): Promise<QuizGame | null> {
+    const game = await this.quizGameRepository
+      .createQueryBuilder('quizGame')
+      .where('quizGame.firstPlayerProgress.player.id = :userId', {
+        userId: user.id,
+      })
+      .orWhere('quizGame.secondPlayerProgress.player.id = :userId', {
+        userId: user.id,
+      })
+      .getOne();
+
+    return game;
+  }
+
+  async findGamebyId(params: { id }): Promise<QuizGame | null> {
+    const game = await this.quizGameRepository
+      .createQueryBuilder('quizGame')
+      .where('quizGame.firstPlayerProgress.player.id = :userId', {
+        userId: params.id,
+      })
+      .orWhere('quizGame.secondPlayerProgress.player.id = :userId', {
+        userId: params.id,
+      })
+      .getOne();
+
+    return game;
+  }
+
+  async findOpenGame(): Promise<QuizGame> {
+    const game = await this.quizGameRepository.findOne({
+      where: { status: 'PendingSecondPlayer' },
+    });
+    return game;
+  }
 
   async findOpenGameAndJoin(
     user: UserDbType,
@@ -24,7 +60,8 @@ export class QuizGameRepository {
     game.questions = questions;
     game.status = 'Active';
     game.startGameDate = new Date();
-    return game;
+    const updatedGame = this.quizGameRepository.save(game);
+    return updatedGame;
   }
 
   async createGame(user: UserDbType): Promise<QuizGame> {
@@ -52,42 +89,8 @@ export class QuizGameRepository {
     return game;
   }
 
-  async updateQuestion(
-    id: number,
-    dto: {
-      body: string;
-      correctAnswers: string[];
-    },
-  ): Promise<boolean> {
-    const updateResult = await this.questionsRepository
-      .createQueryBuilder()
-      .update(Question)
-      .set({
-        body: dto.body,
-        correctAnswers: dto.correctAnswers,
-      })
-      .where('id = :id', { id })
-      .execute();
-    return updateResult.affected === 1;
-  }
-
-  async updateQuestionPublish(
-    id: number,
-    dto: { published: boolean },
-  ): Promise<boolean> {
-    const updateResult = await this.questionsRepository
-      .createQueryBuilder()
-      .update(Question)
-      .set({
-        published: dto.published,
-      })
-      .where('id = :id', { id })
-      .execute();
-    return updateResult.affected === 1;
-  }
-
-  async deleteQuestion(id: number): Promise<boolean> {
-    const updateResult = await this.questionsRepository.delete({ id: id });
-    return updateResult.affected === 1;
+  async saveGame(game: QuizGame) {
+    const savedGame = await this.quizGameRepository.save(game);
+    return savedGame;
   }
 }

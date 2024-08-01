@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 class Answer {
-  questionId: string;
+  questionId: number;
   answerStatus: string;
   addedAt: Date;
 }
@@ -10,7 +10,7 @@ class Player {
   id: string;
   login: string;
 }
-class PlayerProgress {
+export class PlayerProgress {
   /*   @ValidateNested({ each: true })
   @Type(() => Answer) */
   answers: Answer[];
