@@ -674,6 +674,112 @@ window.onload = function() {
           }
         }
       },
+      "/pair-game-quiz/pairs/my-current": {
+        "get": {
+          "operationId": "QuizGameController_findMyCurrentGame",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        }
+      },
+      "/pair-game-quiz/pairs/{id}": {
+        "get": {
+          "operationId": "QuizGameController_findGamebyId",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        }
+      },
+      "/pair-game-quiz/pairs": {
+        "post": {
+          "operationId": "QuizGameController_connectOrCreateGame",
+          "parameters": [],
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          }
+        }
+      },
+      "/pair-game-quiz/pairs/answers": {
+        "post": {
+          "operationId": "QuizGameController_giveAnswerForNestQuestion",
+          "parameters": [],
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          }
+        }
+      },
+      "/sa/quiz/questions": {
+        "get": {
+          "operationId": "QuestionsController_getQuestionsWithQuery",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        },
+        "post": {
+          "operationId": "QuestionsController_createQuestion",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateAndUpdateQuestionsInputModelType"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          }
+        }
+      },
+      "/sa/quiz/questions/{id}": {
+        "put": {
+          "operationId": "QuestionsController_deleteQuestion",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        }
+      },
+      "/sa/quiz/questions/{id}/publish": {
+        "put": {
+          "operationId": "QuestionsController_updateQuestionPublish",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/updateQuestionPublishInputType"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          }
+        }
+      },
       "/testing/all-data": {
         "delete": {
           "operationId": "TestingController_deleteAllData",
@@ -758,6 +864,14 @@ window.onload = function() {
           "properties": {}
         },
         "RecoveryCodeAndNewPasswordType": {
+          "type": "object",
+          "properties": {}
+        },
+        "CreateAndUpdateQuestionsInputModelType": {
+          "type": "object",
+          "properties": {}
+        },
+        "updateQuestionPublishInputType": {
           "type": "object",
           "properties": {}
         }

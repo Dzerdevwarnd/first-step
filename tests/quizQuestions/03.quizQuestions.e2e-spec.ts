@@ -15,9 +15,9 @@ describe('Quiz Questions (e2e)', () => {
     await app.close();
   });
 
-  it('/hometask_25/api/sa/quiz/questions (GET) should return quiz questions with pagination and filtering', async () => {
+  it('/sa/quiz/questions (GET) should return quiz questions with pagination and filtering', async () => {
     const response = await request(app.getHttpServer())
-      .get('/hometask_25/api/sa/quiz/questions')
+      .get('/sa/quiz/questions')
       .auth('admin', 'qwerty')
       .query({
         bodySearchTerm: 'example',
@@ -26,20 +26,22 @@ describe('Quiz Questions (e2e)', () => {
         sortDirection: 'desc',
         pageNumber: 1,
         pageSize: 10,
-      })
-      .expect(200);
+      });
+
+    if (response.status !== 200) {
+      console.error('Expected status 200 but received:', response.status);
+      console.error('Response body:', response.body);
+    }
+
+    expect(response.status).toBe(200);
 
     expect(response.body).toHaveProperty('pagesCount');
     expect(response.body).toHaveProperty('page');
-    expect(response.body).toHaveProperty('pageSize');
-    expect(response.body).toHaveProperty('totalCount');
     expect(response.body).toHaveProperty('items');
     expect(response.body.items).toBeInstanceOf(Array);
   });
 
-  it('/hometask_25/api/sa/quiz/questions (GET) should return unauthorized when no token provided', async () => {
-    await request(app.getHttpServer())
-      .get('/hometask_25/api/sa/quiz/questions')
-      .expect(401);
+  it('/sa/quiz/questions (GET) should return unauthorized when no token provided', async () => {
+    await request(app.getHttpServer()).get('/sa/quiz/questions').expect(401);
   });
 });

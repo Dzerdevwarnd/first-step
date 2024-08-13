@@ -7,7 +7,7 @@ export class Question {
 
   @Column()
   body: string;
-  @Column()
+  @Column('text', { array: true })
   correctAnswers: string[];
   @Column()
   published: boolean;
@@ -17,3 +17,4 @@ export class Question {
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
 }
+//

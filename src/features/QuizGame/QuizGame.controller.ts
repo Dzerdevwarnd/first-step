@@ -8,7 +8,6 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
 import { Response } from 'express';
 import { AccessTokenAuthGuard } from '../auth/guards/accessToken.auth.guard';
 import { JwtService } from '../auth/jwt/jwtService';
@@ -22,7 +21,6 @@ export class QuizGameController {
   constructor(
     protected usersService: UsersService,
     protected jwtService: JwtService,
-    private commandBus: CommandBus,
     private quizGameService: QuizGameService,
   ) {}
 

@@ -10,7 +10,6 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
 import { Response } from 'express';
 import { QuestionsService } from './Questions.service';
 import {
@@ -21,10 +20,7 @@ import {
 
 @Controller('sa/quiz/questions')
 export class QuestionsController {
-  constructor(
-    private commandBus: CommandBus,
-    private questionsService: QuestionsService,
-  ) {}
+  constructor(private questionsService: QuestionsService) {}
 
   @UseGuards(BasicAuthGuard)
   @Get()
