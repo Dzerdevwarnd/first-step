@@ -18,7 +18,7 @@ import { QuizGame } from './QuizGame.entity';
 import { QuizGameService } from './QuizGame.service';
 
 @Controller('pair-game-quiz/pairs')
-export class QuizGamelController {
+export class QuizGameController {
   constructor(
     protected usersService: UsersService,
     protected jwtService: JwtService,

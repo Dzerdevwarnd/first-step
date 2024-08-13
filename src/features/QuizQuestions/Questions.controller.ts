@@ -20,7 +20,7 @@ import {
 } from './Questions.types';
 
 @Controller('sa/quiz/questions')
-export class QuestionslController {
+export class QuestionsController {
   constructor(
     private commandBus: CommandBus,
     private questionsService: QuestionsService,
