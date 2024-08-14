@@ -13,8 +13,8 @@ export class QuestionsRepository {
 
   async findQuestionById(id: number): Promise<Question> {
     const question = await this.questionsRepository
-      .createQueryBuilder('Question')
-      .where('Question.id = :id', { id })
+      .createQueryBuilder('question')
+      .where('question.id = :id', { id })
       .getOne();
 
     return question;
@@ -29,27 +29,28 @@ export class QuestionsRepository {
     const sortDirection = query.sortDirection === 'DESC' ? 'DESC' : 'ASC';
 
     const queryBuilder =
-      this.questionsRepository.createQueryBuilder('Question');
+      this.questionsRepository.createQueryBuilder('question');
     if (bodySearchTerm) {
-      queryBuilder.andWhere('Question.body LIKE :bodySearchTerm', {
+      queryBuilder.andWhere('question.body LIKE :bodySearchTerm', {
         bodySearchTerm: `%${bodySearchTerm}%`,
       });
     }
-    if (publishedStatus) {
-      queryBuilder.andWhere('Question.publishedStatus = :publishedStatus', {
-        publishedStatus,
-      });
+    if (publishedStatus === 'published') {
+      queryBuilder.andWhere('question.published = true', {});
+    } else if (publishedStatus === 'notPublished') {
+      queryBuilder.andWhere('question.published = false', {});
     }
-    queryBuilder.orderBy(`Question.${sortBy}`, sortDirection);
+    queryBuilder.orderBy(`question.${sortBy}`, sortDirection);
     const questions = await queryBuilder.getMany();
     return questions;
   }
 
   async findQuestionsForQuiz(): Promise<QuestionQuizViewType[]> {
     const queryBuilder =
-      this.questionsRepository.createQueryBuilder('Question');
+      this.questionsRepository.createQueryBuilder('question');
     queryBuilder
-      .select(['Question.id', 'Question.body'])
+      .select(['question.id', 'question.body'])
+      .where('published = true')
       .orderBy('RANDOM()')
       .take(5);
 

@@ -14,7 +14,6 @@ import { Response } from 'express';
 import { QuestionsService } from './Questions.service';
 import {
   CreateAndUpdateQuestionsInputModelType,
-  QuestionDBType,
   updateQuestionPublishInputType,
 } from './Questions.types';
 
@@ -27,13 +26,12 @@ export class QuestionsController {
   async getQuestionsWithQuery(
     @Query()
     query: Record<string, any>,
-    @Body()
-    body: CreateAndUpdateQuestionsInputModelType,
-    @Res() res: Response,
-  ) {
+    @Res()
+    res: Response,
+  ): Promise<void> {
     const questionsWithPagination =
       await this.questionsService.findQuestionsWithQuery(query);
-    res.status(201).send(questionsWithPagination);
+    res.status(200).send(questionsWithPagination);
     return;
   }
 
@@ -43,7 +41,7 @@ export class QuestionsController {
     @Body()
     body: CreateAndUpdateQuestionsInputModelType,
     @Res() res: Response,
-  ): Promise<QuestionDBType> {
+  ): Promise<void> {
     const newQuestion = await this.questionsService.createQuestion(body);
     res.status(201).send(newQuestion);
     return;
@@ -56,7 +54,7 @@ export class QuestionsController {
     @Body()
     body: CreateAndUpdateQuestionsInputModelType,
     @Res() res: Response,
-  ) {
+  ): Promise<void> {
     const updateResult = await this.questionsService.updateQuestion(
       params.id,
       body,
@@ -75,7 +73,7 @@ export class QuestionsController {
     @Body()
     body: updateQuestionPublishInputType,
     @Res() res: Response,
-  ) {
+  ): Promise<void> {
     const updateResult = await this.questionsService.updateQuestionPublish(
       params.id,
       body,
@@ -89,7 +87,10 @@ export class QuestionsController {
 
   @UseGuards(BasicAuthGuard)
   @Put(':id')
-  async deleteQuestion(@Param() params: { id: number }, @Res() res: Response) {
+  async deleteQuestion(
+    @Param() params: { id: number },
+    @Res() res: Response,
+  ): Promise<void> {
     const deleteResult = await this.questionsService.deleteQuestion(params.id);
     if (!deleteResult) {
       res.status(404);
