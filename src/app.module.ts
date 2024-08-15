@@ -44,7 +44,7 @@ const modules = [BlogsModule, AuthModule, QuizGameModule, TestingModule];
       port: 5432,
       username: 'nodejs',
       password: 'nodejs', ////
-      database: 'Homework1',
+      database: process.env.NODE_ENV === 'testing' ? 'testing' : 'development',
       autoLoadEntities: true,
       synchronize: true,
     }),

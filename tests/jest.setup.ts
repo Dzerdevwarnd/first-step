@@ -1,4 +1,5 @@
-import 'dotenv/config';
+/* import * as dotenv from 'dotenv';
+dotenv.config({ path: '.env.testing' }); // использования файла .env.test */
 
 expect.extend({
   toBeOk(response, expectedStatus) {
