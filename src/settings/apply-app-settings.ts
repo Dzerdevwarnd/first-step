@@ -1,4 +1,3 @@
-import { INestApplication } from '@nestjs/common';
 import {
   setCookieParser,
   setCors,
@@ -8,11 +7,11 @@ import {
   setValidationPipe,
 } from './app-settings';
 
-export const applyAppSettings = (app: INestApplication) => {
+export function applyAppSettings(app) {
   setCookieParser(app);
   setCors(app);
   setValidationPipe(app);
   setGlobalFilters(app);
   setDependencyInjection(app);
   setSwagger(app);
-};
+}
