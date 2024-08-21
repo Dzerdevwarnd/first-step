@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { getAppAndCleanDB } from '../test.utils';
+import { getAppAndCleanDB } from '../utils/test.utils';
 
 describe('Users - /users (e2e)', () => {
   let startTestObject;

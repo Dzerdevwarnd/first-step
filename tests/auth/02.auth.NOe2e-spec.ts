@@ -2,7 +2,7 @@ import { UsersService } from '@app/src/features/users/users.service';
 import { UserDbType } from '@app/src/features/users/users.types';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { getAppAndCleanDB } from '../test.utils';
+import { getAppAndCleanDB } from '../utils/test.utils';
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));

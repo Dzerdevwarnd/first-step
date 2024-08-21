@@ -1,7 +1,7 @@
 import { Question } from '@app/src/features/QuizQuestions/Questions.entity';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { getAppAndCleanDB } from '../test.utils';
+import { getAppAndCleanDB } from '../utils/test.utils';
 
 describe('Quiz Questions (e2e)', () => {
   let startTestObject;
