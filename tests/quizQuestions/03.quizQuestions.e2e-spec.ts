@@ -8,8 +8,12 @@ describe('Quiz Questions (e2e)', () => {
   let app: INestApplication;
 
   const createQuestionDto = {
-    body: 'This is a sample question',
-    correctAnswers: ['Sample answer 1', 'Sample answer 2'],
+    body: 'ThisIsaSampleQuestion',
+    correctAnswers: ['SampleAnswer1', 'SampleAnswer2'],
+  };
+  const updateQuestionDto = {
+    body: 'ThisIsaSampleQuestionUPDATE',
+    correctAnswers: ['SampleAnswer1UPDATE', 'SampleAnswer2UPDATE'],
   };
 
   let question: Question;
@@ -29,16 +33,14 @@ describe('Quiz Questions (e2e)', () => {
       .auth('admin', 'qwerty') // Используйте аутентификацию, если она нужна
       .send(createQuestionDto);
     expect(response).toBeOk(201);
-    expect(response.status).toBe(201);
-    expect(response.body).toHaveProperty('id');
-    expect(response.body).toHaveProperty('body', createQuestionDto.body);
-    expect(response.body).toHaveProperty('correctAnswers');
-    expect(response.body.correctAnswers).toEqual(
-      createQuestionDto.correctAnswers,
-    );
-    expect(response.body).toHaveProperty('published', false);
-    expect(response.body).toHaveProperty('createdAt');
-    expect(response.body).toHaveProperty('updatedAt');
+    expect(response.body).toEqual({
+      id: expect.any(Number),
+      body: createQuestionDto.body,
+      correctAnswers: createQuestionDto.correctAnswers,
+      published: false,
+      createdAt: expect.any(String),
+      updatedAt: expect.any(String),
+    });
   });
 
   it('/sa/quiz/questions (POST) should return 400 if input is invalid', async () => {
@@ -71,7 +73,7 @@ describe('Quiz Questions (e2e)', () => {
       .get('/sa/quiz/questions')
       .auth('admin', 'qwerty')
       .query({
-        bodySearchTerm: 'sample',
+        bodySearchTerm: createQuestionDto.body,
         publishedStatus: 'notPublished',
         sortBy: 'createdAt',
         sortDirection: 'desc',
@@ -79,31 +81,106 @@ describe('Quiz Questions (e2e)', () => {
         pageSize: 10,
       });
 
-    await expect(response).toBeOk(200);
+    await expect(response).toBeOk(200); ///
 
-    expect(response.status).toBe(200);
-
-    expect(response.body).toHaveProperty('pagesCount');
-    expect(response.body).toHaveProperty('page');
-    expect(response.body).toHaveProperty('items');
-    expect(response.body.items).toBeInstanceOf(Array);
     expect(response.body.items[0]).toEqual({
-      //
       id: expect.any(Number),
-      body: 'This is a sample question',
-      correctAnswers: ['Sample answer 1', 'Sample answer 2'],
+      body: createQuestionDto.body,
+      correctAnswers: createQuestionDto.correctAnswers,
       published: false,
       createdAt: expect.any(String),
-      updatedAt: expect.any(String), //
+      updatedAt: expect.any(String),
     });
     question = response.body.items[0];
-    console.log(question);
   });
 
   it('/sa/quiz/questions (GET) should return unauthorized when no token provided', async () => {
     const response = await request(app.getHttpServer())
       .get('/sa/quiz/questions')
       .expect(401);
+    await expect(response).toBeNotOk(401);
+  });
+
+  it('/sa/quiz/questions/{id} (Put) should return 204 , should update question', async () => {
+    const response = await request(app.getHttpServer())
+      .put(`/sa/quiz/questions/${question.id}`)
+      .auth('admin', 'qwerty')
+      .send(updateQuestionDto);
+    await expect(response).toBeOk(204);
+  });
+
+  it('/sa/quiz/questions/{id} (Put) should return 400 , incorrect input data', async () => {
+    const response = await request(app.getHttpServer())
+      .put(`/sa/quiz/questions/${question.id}`)
+      .auth('admin', 'qwerty')
+      .send({
+        body: '',
+        correctAnswers: ['Sample answer 1', 'Sample answer 2'],
+      });
+    await expect(response).toBeNotOk(400);
+  });
+
+  it('/sa/quiz/questions/{id} (Put) should return 404 , Not found question', async () => {
+    const response = await request(app.getHttpServer())
+      .put(`/sa/quiz/questions/5`)
+      .auth('admin', 'qwerty')
+      .send(updateQuestionDto);
+    await expect(response).toBeNotOk(404);
+  });
+
+  it('/sa/quiz/questions/{id} (Put) should return 401 , Unauthorized user', async () => {
+    const response = await request(app.getHttpServer())
+      .put(`/sa/quiz/questions/${question.id}`)
+      .send(updateQuestionDto);
+    await expect(response).toBeNotOk(401);
+  });
+  //
+  it('/sa/quiz/questions (GET) should return quiz questions with pagination and filtering with UPDATE Data ', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/sa/quiz/questions')
+      .auth('admin', 'qwerty');
+
+    await expect(response).toBeOk(200);
+
+    expect(response.body.items[0]).toEqual({
+      //
+      id: expect.any(Number),
+      body: updateQuestionDto.body,
+      correctAnswers: updateQuestionDto.correctAnswers,
+      published: false,
+      createdAt: expect.any(String),
+      updatedAt: expect.any(String), ///
+    });
+    question = response.body.items[0];
+  });
+
+  it('/sa/quiz/questions/{id}/publish (Put) should return 204 , should update question publish status', async () => {
+    const response = await request(app.getHttpServer())
+      .put(`/sa/quiz/questions/${question.id}/publish`)
+      .auth('admin', 'qwerty')
+      .send({ published: true });
+    await expect(response).toBeOk(204);
+  });
+  //
+  it('/sa/quiz/questions/{id}/publish (Put) should return 400 , incorrect input data', async () => {
+    const response = await request(app.getHttpServer())
+      .put(`/sa/quiz/questions/${question.id}/publish`)
+      .auth('admin', 'qwerty')
+      .send({ published: 'notBoolean' });
+    await expect(response).toBeNotOk(400);
+  });
+
+  it('/sa/quiz/questions/{id}/publish (Put) should return 401 , Unauthorized user', async () => {
+    const response = await request(app.getHttpServer())
+      .put(`/sa/quiz/questions/${question.id}/publish`)
+      .send(updateQuestionDto);
+    await expect(response).toBeNotOk(401);
+  });
+
+  it('/sa/quiz/questions/{id} (Delete) should return 401 if unauthorized', async () => {
+    const response = await request(app.getHttpServer())
+      .delete(`/sa/quiz/questions/${question.id}`)
+      .auth('admin1', 'qwerty');
     await expect(response).toBeNotOk(401);
   });
 
@@ -115,11 +192,11 @@ describe('Quiz Questions (e2e)', () => {
     await expect(response).toBeOk(204);
   });
 
-  it('/sa/quiz/questions/{id} (Delete) should dont find question for delete', async () => {
-    const response = await request(app.getHttpServer()).delete(
-      `/sa/quiz/questions/${question.id}`,
-    );
+  it('/sa/quiz/questions/{id} (Delete) should return 404 dont find question for delete', async () => {
+    const response = await request(app.getHttpServer())
+      .delete(`/sa/quiz/questions/${question.id}`)
+      .auth('admin', 'qwerty');
     await expect(response).toBeNotOk(404);
   });
 });
-///
+////w

@@ -1,7 +1,8 @@
 import { BasicAuthGuard } from '@app/src/features/auth/guards/basic.auth.guard';
 import {
   Body,
-  Controller, //
+  Controller,
+  Delete, //
   Get,
   Param,
   Post,
@@ -50,7 +51,7 @@ export class QuestionsController {
   @UseGuards(BasicAuthGuard)
   @Put(':id')
   async updateQuestion(
-    @Param() params: { id: number },
+    @Param() params: { id: string },
     @Body()
     body: CreateAndUpdateQuestionsInputModelType,
     @Res() res: Response,
@@ -60,16 +61,17 @@ export class QuestionsController {
       body,
     );
     if (!updateResult) {
-      res.status(404);
+      res.sendStatus(404);
+      return;
     }
-    res.status(204);
+    res.sendStatus(204);
     return;
   }
 
   @UseGuards(BasicAuthGuard)
   @Put(':id/publish')
   async updateQuestionPublish(
-    @Param() params: { id: number },
+    @Param() params: { id: string },
     @Body()
     body: updateQuestionPublishInputType,
     @Res() res: Response,
@@ -79,23 +81,25 @@ export class QuestionsController {
       body,
     );
     if (!updateResult) {
-      res.status(404);
+      res.sendStatus(404);
+      return;
     }
-    res.status(204);
+    res.sendStatus(204);
     return;
   }
 
   @UseGuards(BasicAuthGuard)
-  @Put(':id')
+  @Delete(':id')
   async deleteQuestion(
-    @Param() params: { id: number },
+    @Param() params: { id: string },
     @Res() res: Response,
   ): Promise<void> {
     const deleteResult = await this.questionsService.deleteQuestion(params.id);
     if (!deleteResult) {
-      res.status(404);
+      res.sendStatus(404);
+      return;
     }
-    res.status(204);
+    res.sendStatus(204);
     return;
   }
 }

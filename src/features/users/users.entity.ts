@@ -29,7 +29,7 @@ class QuizGameDate {
   score: number;
 
   @Column({ type: 'int', nullable: true, default: null })
-  currentGameId: number | null;
+  currentGameId: string | null;
 }
 
 @Entity()

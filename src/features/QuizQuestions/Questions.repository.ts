@@ -11,7 +11,7 @@ export class QuestionsRepository {
     private readonly questionsRepository: Repository<Question>,
   ) {}
 
-  async findQuestionById(id: number): Promise<Question> {
+  async findQuestionById(id: string): Promise<Question> {
     const question = await this.questionsRepository
       .createQueryBuilder('question')
       .where('question.id = :id', { id })
@@ -67,14 +67,14 @@ export class QuestionsRepository {
       correctAnswers: dto.correctAnswers,
       published: false,
       createdAt: new Date(),
-      updatedAt: new Date(),
+      updatedAt: null,
     };
     const savedNewQuestion = await this.questionsRepository.save(newQuestion);
     return savedNewQuestion;
   }
 
   async updateQuestion(
-    id: number,
+    id: string,
     dto: {
       body: string;
       correctAnswers: string[];
@@ -86,6 +86,7 @@ export class QuestionsRepository {
       .set({
         body: dto.body,
         correctAnswers: dto.correctAnswers,
+        updatedAt: new Date(),
       })
       .where('id = :id', { id })
       .execute();
@@ -93,7 +94,7 @@ export class QuestionsRepository {
   }
 
   async updateQuestionPublish(
-    id: number,
+    id: string,
     dto: { published: boolean },
   ): Promise<boolean> {
     const updateResult = await this.questionsRepository
@@ -101,13 +102,14 @@ export class QuestionsRepository {
       .update(Question)
       .set({
         published: dto.published,
+        updatedAt: new Date(),
       })
       .where('id = :id', { id })
       .execute();
     return updateResult.affected === 1;
   }
 
-  async deleteQuestion(id: number): Promise<boolean> {
+  async deleteQuestion(id: string): Promise<boolean> {
     const updateResult = await this.questionsRepository.delete({ id: id });
     return updateResult.affected === 1;
   }

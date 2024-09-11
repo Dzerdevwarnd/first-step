@@ -15,7 +15,7 @@ export class QuestionsService {
     protected questionsRepository: QuestionsRepository,
   ) {}
 
-  async findQuestionById(id: number): Promise<Question> {
+  async findQuestionById(id: string): Promise<Question> {
     const question = await this.questionsRepository.findQuestionById(id);
     return question;
   }
@@ -25,9 +25,9 @@ export class QuestionsService {
   ): Promise<EntityWithPagination<QuestionDBType>> {
     const questions =
       await this.questionsRepository.findQuestionsWithQuery(query);
-    const pageNumber = query.pageNumber;
-    const pageSize = query.pageSize;
-    const pagesCount = questions.length / pageSize;
+    const pageNumber = query.pageNumber || 1;
+    const pageSize = query.pageSize || 10;
+    const pagesCount = Math.ceil(questions.length / pageSize);
     const questionsWithPagination = {
       pagesCount: pagesCount,
       page: pageNumber,
@@ -49,7 +49,7 @@ export class QuestionsService {
   }
 
   async updateQuestion(
-    id: number,
+    id: string,
     dto: {
       body: string;
       correctAnswers: string[];
@@ -60,7 +60,7 @@ export class QuestionsService {
   }
 
   async updateQuestionPublish(
-    id: number,
+    id: string,
     dto: { published: boolean },
   ): Promise<boolean> {
     const updateResult = await this.questionsRepository.updateQuestionPublish(
@@ -70,7 +70,7 @@ export class QuestionsService {
     return updateResult;
   }
 
-  async deleteQuestion(id: number): Promise<boolean> {
+  async deleteQuestion(id: string): Promise<boolean> {
     const deleteResult = await this.questionsRepository.deleteQuestion(id);
     return deleteResult;
   }

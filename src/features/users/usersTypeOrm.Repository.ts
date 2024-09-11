@@ -168,7 +168,7 @@ export class UsersTypeOrmRepository {
 
   async updateUserQuizGameCurrentId(
     userId: string,
-    currentGameId: number | null,
+    currentGameId: string | null,
   ): Promise<boolean> {
     const updateResult = await this.usersRepository
       .createQueryBuilder()

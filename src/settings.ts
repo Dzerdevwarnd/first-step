@@ -11,7 +11,7 @@ export const settings = {
   recoveryCodeLifeTime: '1000000',
   basicAuthLogin: 'admin',
   basicAuthPassword: 'qwerty',
-};
+}; //
 
 /*export const routersPaths = {
   auth: '/auth',

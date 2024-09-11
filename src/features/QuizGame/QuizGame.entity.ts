@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 class Answer {
-  questionId: number;
+  questionId: string;
   answerStatus: string;
   addedAt: Date;
 }
@@ -22,7 +22,7 @@ export class PlayerProgress {
 }
 
 class questions {
-  id: number;
+  id: string;
   body: string;
 }
 
@@ -50,9 +50,9 @@ export class QuizGame {
   @Column()
   pairCreatedDate: Date;
 
-  @Column()
-  startGameDate: Date;
+  @Column({ nullable: true })
+  startGameDate: Date | null;
 
-  @Column()
-  finishGameDate: Date;
+  @Column({ nullable: true })
+  finishGameDate: Date | null;
 }
