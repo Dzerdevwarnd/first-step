@@ -1,8 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class Question {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn()
   id: string;
 
   @Column()
@@ -17,4 +17,4 @@ export class Question {
   @Column({ type: 'timestamptz', nullable: true })
   updatedAt: Date | null;
 }
-//
+////

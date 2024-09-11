@@ -23,17 +23,17 @@ export class QuestionsService {
   async findQuestionsWithQuery(
     query: Record<string, any>,
   ): Promise<EntityWithPagination<QuestionDBType>> {
-    const questions =
+    const questionsAndTotalCount =
       await this.questionsRepository.findQuestionsWithQuery(query);
     const pageNumber = query.pageNumber || 1;
     const pageSize = query.pageSize || 10;
-    const pagesCount = Math.ceil(questions.length / pageSize);
+    const pagesCount = Math.ceil(questionsAndTotalCount.totalCount / pageSize);
     const questionsWithPagination = {
       pagesCount: pagesCount,
       page: pageNumber,
       pageSize: pageSize,
-      totalCount: questions.length,
-      items: questions,
+      totalCount: questionsAndTotalCount.totalCount,
+      items: questionsAndTotalCount.questions,
     };
     return questionsWithPagination;
   }

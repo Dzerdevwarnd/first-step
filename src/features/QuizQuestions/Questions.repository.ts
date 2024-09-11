@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 import { Question } from './Questions.entity';
 import { QuestionDBType, QuestionQuizViewType } from './Questions.types';
 
@@ -22,11 +23,13 @@ export class QuestionsRepository {
 
   async findQuestionsWithQuery(
     query: Record<string, any>,
-  ): Promise<QuestionDBType[]> {
+  ): Promise<{ questions; totalCount }> {
     const bodySearchTerm = query.bodySearchTerm;
     const publishedStatus = query.publishedStatus;
     const sortBy = query.sortBy || 'createdAt';
-    const sortDirection = query.sortDirection === 'DESC' ? 'DESC' : 'ASC';
+    const sortDirection = query.sortDirection === 'ASC' ? 'ASC' : 'DESC';
+    const page = query.page || 1;
+    const limit = query.pageSize || 10;
 
     const queryBuilder =
       this.questionsRepository.createQueryBuilder('question');
@@ -41,8 +44,10 @@ export class QuestionsRepository {
       queryBuilder.andWhere('question.published = false', {});
     }
     queryBuilder.orderBy(`question.${sortBy}`, sortDirection);
+    queryBuilder.skip((page - 1) * limit).take(limit);
     const questions = await queryBuilder.getMany();
-    return questions;
+    const totalCount = await queryBuilder.getCount();
+    return { questions: questions, totalCount: totalCount };
   }
 
   async findQuestionsForQuiz(): Promise<QuestionQuizViewType[]> {
@@ -63,6 +68,7 @@ export class QuestionsRepository {
     correctAnswers: string[];
   }): Promise<QuestionDBType> {
     const newQuestion = {
+      id: uuidv4(),
       body: dto.body,
       correctAnswers: dto.correctAnswers,
       published: false,
@@ -113,4 +119,5 @@ export class QuestionsRepository {
     const updateResult = await this.questionsRepository.delete({ id: id });
     return updateResult.affected === 1;
   }
+  ///
 }
