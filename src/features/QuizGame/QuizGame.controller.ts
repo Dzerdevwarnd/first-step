@@ -36,29 +36,39 @@ export class QuizGameController {
     const user: UserEntity = await this.usersService.findUser(userId);
     const game = await this.quizGameService.findMyCurrentGame(user);
     if (!game) {
-      res.status(404);
+      res.sendStatus(404);
+      return;
     }
     res.status(200).send(game);
     return;
   }
 
   @UseGuards(AccessTokenAuthGuard)
-  @Get(':id')
+  @Get('/:id')
   async findGamebyId(
     @Param() params: { id },
     @Headers() headers: { authorization: string },
     @Res() res: Response,
   ): Promise<QuizGame> {
-    const game = await this.quizGameService.findGamebyId(params);
-    if (!game) {
-      res.status(404);
+    const userId = await this.jwtService.verifyAndGetUserIdByToken(
+      headers.authorization.split(' ')[1],
+    );
+    const user: UserEntity = await this.usersService.findUser(userId);
+    const game = await this.quizGameService.findGamebyId(params, user);
+    if (game === 'forbidden') {
+      res.sendStatus(403);
+      return;
+    } else if (!game) {
+      res.sendStatus(404);
+      return;
     }
+
     res.status(200).send(game);
     return;
   }
 
   @UseGuards(AccessTokenAuthGuard)
-  @Post()
+  @Post('/connection')
   async connectOrCreateGame(
     @Headers() headers: { authorization: string },
     @Res() res: Response,
@@ -72,12 +82,13 @@ export class QuizGameController {
       res.status(200).send(myGame);
       return;
     } else {
-      res.status(403);
+      res.sendStatus(403);
+      return;
     }
   }
-
+  //
   @UseGuards(AccessTokenAuthGuard)
-  @Post('/answers')
+  @Post('/my-current/answers')
   async giveAnswerForNestQuestion(
     @Headers() headers: { authorization: string },
     @Body() body: { answer: string },

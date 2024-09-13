@@ -160,10 +160,11 @@ export class UsersService {
     userId: string,
     currentGameId: string | null,
   ) {
-    const resultOfUpdate = await this.usersRepository.updateUserQuizGameScore(
-      userId,
-      currentGameId,
-    );
+    const resultOfUpdate =
+      await this.usersRepository.updateUserQuizGameCurrentId(
+        userId,
+        currentGameId,
+      );
     if (resultOfUpdate) {
       return resultOfUpdate;
     } else {

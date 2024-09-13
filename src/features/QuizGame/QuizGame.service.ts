@@ -4,6 +4,7 @@ import { QuestionsService } from '../QuizQuestions/Questions.service';
 
 import { UserEntity } from '../users/users.entity';
 import { UsersService } from '../users/users.service';
+import { UserDbType } from '../users/users.types';
 import { PlayerProgress, QuizGame } from './QuizGame.entity';
 import { QuizGameRepository } from './QuizGame.repository';
 
@@ -20,9 +21,20 @@ export class QuizGameService {
     const game = await this.quizGameRepository.findGamebyId(user);
     return game;
   }
-
-  async findGamebyId(params: { id }): Promise<QuizGame> {
+  //
+  async findGamebyId(
+    params: { id },
+    user: UserDbType | null,
+  ): Promise<QuizGame | string> {
     const game = await this.quizGameRepository.findGamebyId(params);
+    if (game === null) {
+      return game;
+    } else if (
+      game?.firstPlayerProgress?.player?.id !== user.id &&
+      game?.secondPlayerProgress?.player?.id !== user.id
+    ) {
+      return 'forbidden';
+    }
     return game;
   }
 
@@ -78,6 +90,7 @@ export class QuizGameService {
       );
     }
     this.quizGameRepository.saveGame(currentGame);
+    return playerProgress.answers[currentQuestionIndex].answerStatus;
   }
 }
 //

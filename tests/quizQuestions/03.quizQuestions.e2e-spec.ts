@@ -185,7 +185,6 @@ describe('Quiz Questions (e2e)', () => {
   });
 
   it('/sa/quiz/questions/{id} (Delete) should delete question by id', async () => {
-    console.log(question);
     const response = await request(app.getHttpServer())
       .delete(`/sa/quiz/questions/${question.id}`)
       .auth('admin', 'qwerty');

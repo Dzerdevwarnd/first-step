@@ -1,48 +1,56 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 class Answer {
+  @Column()
   questionId: string;
+
+  @Column()
   answerStatus: string;
+
+  @Column()
   addedAt: Date;
 }
 
 class Player {
+  @Column()
   id: string;
+
+  @Column()
   login: string;
 }
+
 export class PlayerProgress {
-  /*   @ValidateNested({ each: true })
-  @Type(() => Answer) */
+  @Column('json', { nullable: true })
   answers: Answer[];
 
-  /*   @ValidateNested()
-  @Type(() => Player) */
+  @Column((type) => Player)
   player: Player;
+
+  @Column()
   score: number;
 }
 
-class questions {
+class Questions {
+  @Column()
   id: string;
+
+  @Column()
   body: string;
 }
 
 @Entity()
 export class QuizGame {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn()
   id: string;
 
-  /*   @ValidateNested()
-  @Type(() => PlayerProgress) */
+  @Column('json')
   firstPlayerProgress: PlayerProgress;
 
-  /*   @ValidateNested()
-  @Type(() => PlayerProgress) */
-  secondPlayerProgress: PlayerProgress;
+  @Column('json', { nullable: true }) // Сохраняем второй прогресс игрока как nullable JSON
+  secondPlayerProgress: PlayerProgress | null;
 
-  /*   @Column('json')
-  @ValidateNested({ each: true })
-  @Type(() => Question) */
-  questions: questions[];
+  @Column('json', { nullable: true }) // Если вопросы нужно хранить как JSON
+  questions: Questions[];
 
   @Column()
   status: string;
