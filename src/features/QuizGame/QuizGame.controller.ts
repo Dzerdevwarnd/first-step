@@ -15,6 +15,7 @@ import { UserEntity } from '../users/users.entity';
 import { UsersService } from '../users/users.service';
 import { QuizGame } from './QuizGame.entity';
 import { QuizGameService } from './QuizGame.service';
+/* import { validate as isUUID, version as uuidVersion } from 'uuid'; */
 
 @Controller('pair-game-quiz/pairs')
 export class QuizGameController {
@@ -103,6 +104,10 @@ export class QuizGameController {
       body,
       user,
     );
+    if (!answerData) {
+      res.sendStatus(403);
+      return;
+    }
     res.status(200).send(answerData);
     return;
   }
