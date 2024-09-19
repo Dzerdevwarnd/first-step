@@ -15,6 +15,7 @@ import { UserEntity } from '../users/users.entity';
 import { UsersService } from '../users/users.service';
 import { QuizGame } from './QuizGame.entity';
 import { QuizGameService } from './QuizGame.service';
+import { FindGameByIdParams } from './QuizGame.types';
 /* import { validate as isUUID, version as uuidVersion } from 'uuid'; */
 
 @Controller('pair-game-quiz/pairs')
@@ -47,7 +48,7 @@ export class QuizGameController {
   @UseGuards(AccessTokenAuthGuard)
   @Get('/:id')
   async findGamebyId(
-    @Param() params: { id },
+    @Param() params: FindGameByIdParams,
     @Headers() headers: { authorization: string },
     @Res() res: Response,
   ): Promise<QuizGame> {

@@ -18,7 +18,7 @@ export class QuizGameService {
   ) {}
 
   async findMyCurrentGame(user: UserEntity): Promise<QuizGame> {
-    const game = await this.quizGameRepository.findGamebyId(user);
+    const game = await this.quizGameRepository.findMyCurrentGame(user);
     return game;
   }
   //
@@ -37,12 +37,12 @@ export class QuizGameService {
     }
     return game;
   }
-
+  //
   async connectOrCreateGame(user: UserEntity): Promise<QuizGame> {
     const openGame = await this.quizGameRepository.findOpenGame();
-    const questions = await this.questionsService.findQuestionsForQuiz();
     let game: QuizGame;
     if (openGame) {
+      const questions = await this.questionsService.findQuestionsForQuiz();
       game = await this.quizGameRepository.findOpenGameAndJoin(user, questions);
       await this.usersService.updateUserQuizGameCurrentId(user.id, game.id);
     } else if (!openGame) {
@@ -64,7 +64,7 @@ export class QuizGameService {
       playerProgress = currentGame.secondPlayerProgress;
     }
     const currentQuestionNumber =
-      playerProgress.answers.length === 0 ? 1 : playerProgress.answers.length;
+      playerProgress.answers === null ? 1 : playerProgress.answers.length;
     const currentQuestionIndex = currentQuestionNumber - 1;
     const questionId = currentGame.questions[currentQuestionIndex].id;
     const rightAnswers = (

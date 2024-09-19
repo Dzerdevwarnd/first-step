@@ -55,7 +55,7 @@ export class QuestionsRepository {
       this.questionsRepository.createQueryBuilder('question');
     queryBuilder
       .select(['question.id', 'question.body'])
-      .where('published = true')
+      /*       .where('published = true') Проверка на публикацию вопроса */
       .orderBy('RANDOM()')
       .take(5);
 

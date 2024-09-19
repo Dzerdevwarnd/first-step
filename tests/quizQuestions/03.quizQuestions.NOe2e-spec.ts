@@ -34,12 +34,12 @@ describe('Quiz Questions (e2e)', () => {
       .send(createQuestionDto);
     expect(response).toBeOk(201);
     expect(response.body).toEqual({
-      id: expect.any(Number),
+      id: expect.any(String),
       body: createQuestionDto.body,
       correctAnswers: createQuestionDto.correctAnswers,
       published: false,
       createdAt: expect.any(String),
-      updatedAt: expect.any(String),
+      updatedAt: null,
     });
   });
 
@@ -84,12 +84,12 @@ describe('Quiz Questions (e2e)', () => {
     await expect(response).toBeOk(200); ///
 
     expect(response.body.items[0]).toEqual({
-      id: expect.any(Number),
+      id: expect.any(String),
       body: createQuestionDto.body,
       correctAnswers: createQuestionDto.correctAnswers,
       published: false,
       createdAt: expect.any(String),
-      updatedAt: expect.any(String),
+      updatedAt: null,
     });
     question = response.body.items[0];
   });
@@ -144,7 +144,7 @@ describe('Quiz Questions (e2e)', () => {
 
     expect(response.body.items[0]).toEqual({
       //
-      id: expect.any(Number),
+      id: expect.any(String),
       body: updateQuestionDto.body,
       correctAnswers: updateQuestionDto.correctAnswers,
       published: false,
