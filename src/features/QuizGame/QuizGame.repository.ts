@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { QuestionQuizViewType } from '../QuizQuestions/Questions.types';
@@ -18,20 +18,27 @@ export class QuizGameRepository {
   async findMyCurrentGame(user: UserEntity): Promise<QuizGame | null> {
     const game = await this.quizGameRepository
       .createQueryBuilder('quiz_game')
-      .where(`"quiz_game"."firstPlayerProgress"->'player'->>'id' = :userId`, {
-        userId: user.id,
-      })
-      .orWhere(
-        `"quiz_game"."secondPlayerProgress"->'player'->>'id' = :userId`,
-        {
-          userId: user.id,
-        },
+      .where(
+        new Brackets((qb) => {
+          qb.where(
+            `"quiz_game"."firstPlayerProgress"->'player'->>'id' = :userId`,
+            {
+              userId: user.id,
+            },
+          ).orWhere(
+            `"quiz_game"."secondPlayerProgress"->'player'->>'id' = :userId`,
+            {
+              userId: user.id,
+            },
+          );
+        }),
       )
+      .andWhere(`"quiz_game"."status" != 'Finished'`)
       .getOne();
 
     return game;
   }
-  //
+  ///
   async findGamebyId(params: { id }): Promise<QuizGame | null> {
     const game = await this.quizGameRepository
       .createQueryBuilder('quiz_game')
@@ -49,7 +56,7 @@ export class QuizGameRepository {
     });
     return game;
   }
-
+  //
   async findOpenGameAndJoin(
     user: UserDbType,
     questions: QuestionQuizViewType[],
@@ -58,7 +65,7 @@ export class QuizGameRepository {
       where: { status: 'PendingSecondPlayer' },
     });
     (game.secondPlayerProgress = {
-      answers: null,
+      answers: [],
       player: {
         id: user.id,
         login: user.accountData.login,
@@ -76,7 +83,7 @@ export class QuizGameRepository {
     const newGame = {
       id: uuidv4(),
       firstPlayerProgress: {
-        answers: null,
+        answers: [],
         player: {
           id: user.id,
           login: user.accountData.login,
@@ -84,7 +91,7 @@ export class QuizGameRepository {
         score: 0,
       },
       secondPlayerProgress: null,
-      questions: [],
+      questions: null,
       status: 'PendingSecondPlayer',
       pairCreatedDate: new Date(),
       startGameDate: null,
@@ -93,7 +100,7 @@ export class QuizGameRepository {
     const game = this.quizGameRepository.save(newGame);
     return game;
   }
-
+  //
   async saveGame(game: QuizGame) {
     const savedGame = await this.quizGameRepository.save(game);
     return savedGame;

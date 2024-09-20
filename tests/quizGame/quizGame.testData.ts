@@ -75,7 +75,7 @@ export const createQuestionArrayDto = [
 export const gameAfterUser1CreatedGame = {
   id: expect.any(String), // Для UUID используем проверку на строку
   firstPlayerProgress: {
-    answers: null,
+    answers: [],
     player: {
       id: expect.any(String),
       login: createUser1InputData.login,
@@ -83,7 +83,7 @@ export const gameAfterUser1CreatedGame = {
     score: 0,
   },
   secondPlayerProgress: null,
-  questions: [],
+  questions: null,
   status: 'PendingSecondPlayer',
   pairCreatedDate: expect.any(String), // Для даты используем проверку на тип Date
   startGameDate: null,
@@ -93,7 +93,7 @@ export const gameAfterUser1CreatedGame = {
 export const gameAfterUser2ConnectedGame = {
   id: expect.any(String), // Для UUID используем проверку на строку
   firstPlayerProgress: {
-    answers: null,
+    answers: [],
     player: {
       id: expect.any(String),
       login: createUser1InputData.login,
@@ -101,7 +101,7 @@ export const gameAfterUser2ConnectedGame = {
     score: 0,
   },
   secondPlayerProgress: {
-    answers: null,
+    answers: [],
     player: {
       id: expect.any(String),
       login: createUser2InputData.login,
@@ -121,7 +121,7 @@ export const gameAfterUser2ConnectedGame = {
 };
 
 export const answerDto = {
-  answer: 'string',
+  answer: 'SampleAnswer1',
 };
 
 export const answerData = {

@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { add } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
 import { JwtService } from '../auth/jwt/jwtService';
+import { UserEntity } from './users.entity';
 import { UserDbType, userViewType, usersPaginationType } from './users.types';
 import { UsersMongoRepository } from './usersMongo.repository';
 import { UsersPgSqlRepository } from './usersPgSql.Repository';
@@ -172,7 +173,9 @@ export class UsersService {
     }
   }
 
-  async updateUserQuizGameScore(userId: string, totalScore: number) {
+  async updateUserQuizGameScore(userId: string, quizScore) {
+    const user: UserEntity = await this.findUser(userId);
+    const totalScore = quizScore + user.quizGameDate.score;
     const resultOfUpdate = await this.usersRepository.updateUserQuizGameScore(
       userId,
       totalScore,
@@ -182,5 +185,10 @@ export class UsersService {
     } else {
       return;
     }
+  }
+
+  async findUserCurrentGameId(userId: string): Promise<string | null> {
+    const gameId = await this.usersRepository.findUserCurrentGameId(userId);
+    return gameId;
   }
 }

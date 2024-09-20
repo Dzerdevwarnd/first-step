@@ -29,9 +29,9 @@ export class QuestionsService {
     const pageSize = query.pageSize || 10;
     const pagesCount = Math.ceil(questionsAndTotalCount.totalCount / pageSize);
     const questionsWithPagination = {
-      pagesCount: pagesCount,
-      page: pageNumber,
-      pageSize: pageSize,
+      pagesCount: Number(pagesCount),
+      page: Number(pageNumber),
+      pageSize: Number(pageSize),
       totalCount: questionsAndTotalCount.totalCount,
       items: questionsAndTotalCount.questions,
     };

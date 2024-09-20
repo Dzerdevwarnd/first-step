@@ -117,7 +117,18 @@ describe('Quiz Game (e2e)', () => {
     expect(response).toBeNotOk(404);
   });
 
-  /////// Проверка  создания игры
+  //Проверка my-current answer когда нет активной игры
+
+  it('/pair-game-quiz/pairs/my-current/answers (Post) should return 200 and answer info', async () => {
+    const response = await request(app.getHttpServer())
+      .post(`/pair-game-quiz/pairs/my-current/answers`)
+      .set('Authorization', `Bearer ${user2AccessToken}`)
+      .send(answerDto);
+
+    expect(response).toBeOk(403);
+  });
+
+  //////// Проверка  создания игры
 
   it('/pair-game-quiz/pairs/connection (POST) should create game, connect to game, and return game', async () => {
     const response = await request(app.getHttpServer())
@@ -216,14 +227,59 @@ describe('Quiz Game (e2e)', () => {
     expect(response).toBeOk(404);
   });
 
-  it('/pair-game-quiz/pairs/my-current/answers (Post) should return 200 and answer info', async () => {
+  it('/pair-game-quiz/pairs/my-current/answers (Post) should return 401, if unauthorized', async () => {
     const response = await request(app.getHttpServer())
       .post(`/pair-game-quiz/pairs/my-current/answers`)
-      .set('Authorization', `Bearer ${user2AccessToken}`)
       .send(answerDto);
 
-    expect(response).toBeOk(200);
-    console.log('RESPONSE BODY:', response.body);
-    expect(response.body).toEqual(answerData);
+    expect(response).toBeNotOk(401);
   }); //
+
+  // проверка my-current answers,
+  it('/sa/quiz/questions (POST) should create multiple quiz questions', async () => {
+    for (let i = 0; i < 6; i++) {
+      const response = await request(app.getHttpServer())
+        .post(`/pair-game-quiz/pairs/my-current/answers`)
+        .set('Authorization', `Bearer ${user2AccessToken}`)
+        .send(answerDto);
+
+      if (i === 0) {
+        // Выполняем проверку только для первого запроса
+        expect(response).toBeOk(200);
+        expect(response.body).toEqual(answerData);
+      } else if (i === 5) {
+        expect(response).toBeNotOk(403);
+      } else {
+        // Для остальных запросов проверяем только статус 201
+        expect(response).toBeOk(200);
+      }
+    }
+  });
+
+  it('/sa/quiz/questions (POST) should create multiple quiz questions', async () => {
+    for (let i = 0; i < 5; i++) {
+      const response = await request(app.getHttpServer())
+        .post(`/pair-game-quiz/pairs/my-current/answers`)
+        .set('Authorization', `Bearer ${user1AccessToken}`)
+        .send(answerDto);
+
+      if (i === 0) {
+        // Выполняем проверку только для первого запроса
+        expect(response).toBeOk(200);
+        expect(response.body).toEqual(answerData);
+      } else {
+        // Для остальных запросов проверяем только статус 201
+        expect(response).toBeOk(200);
+      }
+    }
+  });
+
+  //Проверка, что у пользователя больше нет активной игры
+  it('/pair-game-quiz/pairs/my-current (Get) should return 404, if player dont have active pair', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/pair-game-quiz/pairs/my-current')
+      .set('Authorization', `Bearer ${user1AccessToken}`);
+
+    expect(response).toBeNotOk(404);
+  });
 });
