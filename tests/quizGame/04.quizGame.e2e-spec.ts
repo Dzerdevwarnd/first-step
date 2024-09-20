@@ -4,6 +4,7 @@ import * as request from 'supertest';
 import { getAppAndCleanDB } from '../utils/test.utils';
 import {
   answerData,
+  answerDto,
   createQuestionArrayDto,
   createUser1InputData,
   createUser2InputData,
@@ -217,10 +218,12 @@ describe('Quiz Game (e2e)', () => {
 
   it('/pair-game-quiz/pairs/my-current/answers (Post) should return 200 and answer info', async () => {
     const response = await request(app.getHttpServer())
-      .get(`/pair-game-quiz/my-current/answers`)
-      .set('Authorization', `Bearer ${user2AccessToken}`);
+      .post(`/pair-game-quiz/pairs/my-current/answers`)
+      .set('Authorization', `Bearer ${user2AccessToken}`)
+      .send(answerDto);
 
     expect(response).toBeOk(200);
+    console.log('RESPONSE BODY:', response.body);
     expect(response.body).toEqual(answerData);
-  });
+  }); //
 });

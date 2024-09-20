@@ -120,6 +120,10 @@ export const gameAfterUser2ConnectedGame = {
   finishGameDate: null,
 };
 
+export const answerDto = {
+  answer: 'string',
+};
+
 export const answerData = {
   questionId: expect.any(String),
   answerStatus: expect.stringMatching(/^(Correct|Incorrect)$/),

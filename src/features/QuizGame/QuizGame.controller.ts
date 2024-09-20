@@ -88,7 +88,7 @@ export class QuizGameController {
       return;
     }
   }
-  //
+  ///
   @UseGuards(AccessTokenAuthGuard)
   @Post('/my-current/answers')
   async giveAnswerForNestQuestion(

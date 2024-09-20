@@ -51,7 +51,7 @@ export class QuizGameService {
     }
     return game;
   }
-
+  //
   async giveAnswerForNestQuestion(body: { answer: string }, user: UserEntity) {
     const currentGame = await this.findMyCurrentGame(user);
     if (!currentGame || currentGame.status === 'Finished') {
@@ -70,14 +70,22 @@ export class QuizGameService {
     const rightAnswers = (
       await this.questionsService.findQuestionById(questionId)
     ).correctAnswers;
+    if (!playerProgress.answers) {
+      playerProgress.answers = [];
+    }
+    playerProgress.answers[currentQuestionIndex] = {
+      questionId: null,
+      answerStatus: null,
+      addedAt: null,
+    }; ///
     if (rightAnswers.includes(body.answer)) {
       playerProgress.answers[currentQuestionIndex].answerStatus = 'Correct';
       playerProgress.score += 1;
     } else {
       playerProgress.answers[currentQuestionIndex].answerStatus = 'Incorrect';
     }
-    playerProgress.answers[currentQuestionNumber].addedAt = new Date();
-    playerProgress.answers[currentQuestionNumber].questionId = questionId;
+    playerProgress.answers[currentQuestionIndex].addedAt = new Date();
+    playerProgress.answers[currentQuestionIndex].questionId = questionId;
     currentGame.finishGameDate = new Date();
     if (playerProgress.answers.length === 5) {
       currentGame.status = 'Finished';
@@ -88,9 +96,9 @@ export class QuizGameService {
         user.id,
         userTotalScore,
       );
-    }
-    this.quizGameRepository.saveGame(currentGame);
-    return playerProgress.answers[currentQuestionIndex].answerStatus;
+    } //
+    await this.quizGameRepository.saveGame(currentGame);
+    return playerProgress.answers[currentQuestionIndex];
   }
 }
 //
