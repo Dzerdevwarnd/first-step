@@ -236,7 +236,7 @@ describe('Quiz Game (e2e)', () => {
   }); //
 
   // проверка my-current answers,
-  it('/sa/quiz/questions (POST) should create multiple quiz questions', async () => {
+  it('/pair-game-quiz/pairs/my-current/answers (POST) should create multiple quiz answers', async () => {
     for (let i = 0; i < 6; i++) {
       const response = await request(app.getHttpServer())
         .post(`/pair-game-quiz/pairs/my-current/answers`)
@@ -256,7 +256,7 @@ describe('Quiz Game (e2e)', () => {
     }
   });
 
-  it('/sa/quiz/questions (POST) should create multiple quiz questions', async () => {
+  it('/pair-game-quiz/pairs/my-current/answers (POST) should create multiple quiz answers', async () => {
     for (let i = 0; i < 5; i++) {
       const response = await request(app.getHttpServer())
         .post(`/pair-game-quiz/pairs/my-current/answers`)

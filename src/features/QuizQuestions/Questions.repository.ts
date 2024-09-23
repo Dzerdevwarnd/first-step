@@ -27,8 +27,12 @@ export class QuestionsRepository {
     const bodySearchTerm = query.bodySearchTerm;
     const publishedStatus = query.publishedStatus;
     const sortBy = query.sortBy || 'createdAt';
-    query.sortDirection === query.sortDirection.toUpperCase();
-    const sortDirection = query.sortDirection === 'ASC' ? 'ASC' : 'DESC';
+    let sortDirection = query.sortDirection || 'desc';
+    if (sortDirection === 'desc') {
+      sortDirection = 'DESC';
+    } else {
+      sortDirection = 'ASC';
+    }
     const page = query.pageNumber || 1;
     const limit = query.pageSize || 10;
 

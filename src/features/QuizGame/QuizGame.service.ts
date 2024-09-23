@@ -92,11 +92,23 @@ export class QuizGameService {
     }
     playerProgress.answers[currentQuestionIndex].addedAt = new Date();
     playerProgress.answers[currentQuestionIndex].questionId = questionId;
-    currentGame.finishGameDate = new Date();
+
     if (
       playerProgress.answers.length >= 5 &&
       secondPlayerProgress.answers.length >= 5
     ) {
+      if (
+        playerProgress.answers[playerProgress.answers.length - 1].addedAt <
+        secondPlayerProgress.answers[secondPlayerProgress.answers.length - 1]
+          .addedAt
+      ) {
+        if (playerProgress.score > 0) {
+          playerProgress.score += 1;
+        }
+      } else if (secondPlayerProgress.score > 0) {
+        secondPlayerProgress.score += 1;
+      }
+
       currentGame.status = 'Finished';
       currentGame.finishGameDate = new Date();
 
@@ -104,7 +116,7 @@ export class QuizGameService {
         playerProgress.player.id,
         null,
       );
-      await await this.usersService.updateUserQuizGameScore(
+      await this.usersService.updateUserQuizGameScore(
         playerProgress.player.id,
         playerProgress.score,
       );
@@ -113,7 +125,7 @@ export class QuizGameService {
         secondPlayerProgress.player.id,
         null,
       );
-      await await this.usersService.updateUserQuizGameScore(
+      await this.usersService.updateUserQuizGameScore(
         user.id,
         secondPlayerProgress.score,
       );
