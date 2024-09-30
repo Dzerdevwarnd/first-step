@@ -6,11 +6,11 @@ export const settings = {
     process.env.MONGO_URL ||
     `mongodb+srv://admin:qwerty123@cluster0.hzh4nyr.mongodb.net/${dbName}?retryWrites=true&w=majority`,
   JWT_SECRET: process.env.JWT_SECRET || '123',
-  accessTokenLifeTime: '10000000',
-  refreshTokenLifeTime: '20000000',
-  recoveryCodeLifeTime: '1000000',
-  basicAuthLogin: 'admin',
-  basicAuthPassword: 'qwerty',
+  accessTokenLifeTime: process.env.ACCESS_TOKEN_LIFE_TIME || '10000000',
+  refreshTokenLifeTime: process.env.REFRESH_TOKEN_LIFE_TIME || '20000000',
+  recoveryCodeLifeTime: process.env.RECOVERY_CODE_LIFE_TIME || '1000000',
+  basicAuthLogin: process.env.BASIC_AUTH_LOGIN || 'admin',
+  basicAuthPassword: process.env.BASIC_AUTH_PASSWORD || 'qwerty',
 }; //
 
 /*export const routersPaths = {
