@@ -42,8 +42,7 @@ export class QuizGameRepository {
   async findMyGamesWithQuery(
     query: Record<string, any>,
   ): Promise<{ games; totalCount }> {
-    const bodySearchTerm = query.bodySearchTerm;
-    const publishedStatus = query.publishedStatus;
+    const status = query.status;
     const sortBy = query.sortBy || 'pairCreatedDate';
     let sortDirection = query.sortDirection || 'desc';
     if (sortDirection === 'desc') {
@@ -56,12 +55,17 @@ export class QuizGameRepository {
     ///
     const queryBuilder =
       this.quizGameRepository.createQueryBuilder('quiz_game');
+    if (status) {
+      queryBuilder.andWhere('quiz_game.status LIKE :status', {
+        status: `%${status}%`,
+      });
+    }
     if (sortDirection === 'DESC') {
       queryBuilder.orderBy(`quiz_game.${sortBy}`, sortDirection, 'NULLS FIRST');
     } else if (sortDirection === 'ASC') {
       queryBuilder.orderBy(`quiz_game.${sortBy}`, sortDirection, 'NULLS LAST');
     }
-    queryBuilder.orderBy(`quiz_game.${sortBy}`, sortDirection);
+    queryBuilder.addOrderBy('quiz_game.pairCreatedDate', 'DESC');
     queryBuilder.skip((page - 1) * limit).take(limit);
     const games = await queryBuilder.getMany();
     const totalCount = await queryBuilder.getCount();

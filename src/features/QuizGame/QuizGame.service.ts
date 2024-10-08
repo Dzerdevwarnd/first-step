@@ -43,6 +43,13 @@ export class QuizGameService {
     };
     return gamesWithPagination;
   }
+
+  async findMyStatistic(user: UserEntity): Promise<QuizGame> {
+    const gamesWithPagination = await this.findMyGamesWithQuery(user, {
+      status: 'Finished',
+    });
+    return game;
+  }
   ////
   async findGamebyId(
     params: { id },

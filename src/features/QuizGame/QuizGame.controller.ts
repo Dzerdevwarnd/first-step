@@ -54,12 +54,30 @@ export class QuizGameController {
     query: Record<string, any>,
     @Res() res: Response,
   ): Promise<QuizGame> {
-    console.log('Query params:', query);
     const userId = await this.jwtService.verifyAndGetUserIdByToken(
       headers.authorization.split(' ')[1],
     );
     const user: UserEntity = await this.usersService.findUser(userId);
     const games = await this.quizGameService.findMyGamesWithQuery(user, query);
+    if (!games) {
+      res.sendStatus(404);
+      return;
+    }
+    res.status(200).send(games);
+    return;
+  }
+
+  @UseGuards(AccessTokenAuthGuard)
+  @Get('/my')
+  async findMyStatistic(
+    @Headers() headers: { authorization: string },
+    @Res() res: Response,
+  ): Promise<QuizGame> {
+    const userId = await this.jwtService.verifyAndGetUserIdByToken(
+      headers.authorization.split(' ')[1],
+    );
+    const user: UserEntity = await this.usersService.findUser(userId);
+    const games = await this.quizGameService.findMyGamesWithQuery(user);
     if (!games) {
       res.sendStatus(404);
       return;
