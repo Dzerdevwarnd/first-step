@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '../auth/jwt/jwtService';
 import { QuestionsService } from '../QuizQuestions/Questions.service';
 
+import { EntityWithPagination } from '../QuizQuestions/Questions.types';
 import { UserEntity } from '../users/users.entity';
 import { UsersService } from '../users/users.service';
 import { UserDbType } from '../users/users.types';
@@ -22,6 +23,27 @@ export class QuizGameService {
     return game;
   }
   //
+  async findMyGamesWithQuery(
+    user: UserEntity,
+    query: any,
+  ): Promise<EntityWithPagination<QuizGame>> {
+    const gamesAndTotalCountObject =
+      await this.quizGameRepository.findMyGamesWithQuery(query);
+    const pageNumber = query.pageNumber || 1;
+    const pageSize = query.pageSize || 10;
+    const pagesCount = Math.ceil(
+      gamesAndTotalCountObject.totalCount / pageSize,
+    );
+    const gamesWithPagination = {
+      pagesCount: Number(pagesCount),
+      page: Number(pageNumber),
+      pageSize: Number(pageSize),
+      totalCount: gamesAndTotalCountObject.totalCount,
+      items: gamesAndTotalCountObject.games,
+    };
+    return gamesWithPagination;
+  }
+  ////
   async findGamebyId(
     params: { id },
     user: UserDbType | null,

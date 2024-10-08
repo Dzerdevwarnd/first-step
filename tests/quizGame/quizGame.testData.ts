@@ -33,6 +33,20 @@ export const user2ViewData = {
 };
 export let createdUser2Id: string;
 
+export const createUser3InputData = {
+  login: 'warnd3',
+  password: '123321',
+  email: 'dzerdevwarnd3@gmail.com',
+};
+
+export const user3ViewData = {
+  id: expect.any(String),
+  login: 'warnd3',
+  email: 'dzerdevwarnd3@gmail.com',
+  createdAt: expect.any(Date),
+};
+export let createdUser3Id: string;
+
 export const registrationUser3InputData = {
   login: 'string',
   password: 'zk1O61ah-g',
@@ -128,4 +142,54 @@ export const answerData = {
   questionId: expect.any(String),
   answerStatus: expect.stringMatching(/^(Correct|Incorrect)$/),
   addedAt: expect.any(String),
+};
+
+export const allGamesByUser1 = {
+  pagesCount: 0,
+  page: 0,
+  pageSize: 0,
+  totalCount: 0,
+  items: [
+    {
+      id: 'string',
+      firstPlayerProgress: {
+        answers: [
+          {
+            questionId: 'string',
+            answerStatus: 'Correct',
+            addedAt: '2024-10-08T08:10:16.618Z',
+          },
+        ],
+        player: {
+          id: 'string',
+          login: 'string',
+        },
+        score: 0,
+      },
+      secondPlayerProgress: {
+        answers: [
+          {
+            questionId: 'string',
+            answerStatus: 'Correct',
+            addedAt: '2024-10-08T08:10:16.618Z',
+          },
+        ],
+        player: {
+          id: 'string',
+          login: 'string',
+        },
+        score: 0,
+      },
+      questions: [
+        {
+          id: 'string',
+          body: 'string',
+        },
+      ],
+      status: 'PendingSecondPlayer',
+      pairCreatedDate: '2024-10-08T08:10:16.618Z',
+      startGameDate: '2024-10-08T08:10:16.618Z',
+      finishGameDate: '2024-10-08T08:10:16.618Z',
+    },
+  ],
 };

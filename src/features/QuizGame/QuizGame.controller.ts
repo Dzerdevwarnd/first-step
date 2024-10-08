@@ -5,6 +5,7 @@ import {
   Headers,
   Param,
   Post,
+  Query,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -42,6 +43,28 @@ export class QuizGameController {
       return;
     }
     res.status(200).send(game);
+    return;
+  }
+
+  @UseGuards(AccessTokenAuthGuard)
+  @Get('/my')
+  async findMyGamesWithQuery(
+    @Headers() headers: { authorization: string },
+    @Query()
+    query: Record<string, any>,
+    @Res() res: Response,
+  ): Promise<QuizGame> {
+    console.log('Query params:', query);
+    const userId = await this.jwtService.verifyAndGetUserIdByToken(
+      headers.authorization.split(' ')[1],
+    );
+    const user: UserEntity = await this.usersService.findUser(userId);
+    const games = await this.quizGameService.findMyGamesWithQuery(user, query);
+    if (!games) {
+      res.sendStatus(404);
+      return;
+    }
+    res.status(200).send(games);
     return;
   }
 

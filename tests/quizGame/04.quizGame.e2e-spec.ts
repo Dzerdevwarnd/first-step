@@ -1,3 +1,4 @@
+import { QuizGame } from '@app/src/features/QuizGame/QuizGame.entity';
 import { Question } from '@app/src/features/QuizQuestions/Questions.entity';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
@@ -8,10 +9,12 @@ import {
   createQuestionArrayDto,
   createUser1InputData,
   createUser2InputData,
+  createUser3InputData,
   gameAfterUser1CreatedGame,
   gameAfterUser2ConnectedGame,
   user1ViewData,
   user2ViewData,
+  user3ViewData,
 } from './quizGame.testData';
 
 describe('Quiz Game (e2e)', () => {
@@ -19,7 +22,12 @@ describe('Quiz Game (e2e)', () => {
   let user1RefreshToken: string;
   let user2AccessToken: string;
   let user2RefreshToken: string;
-  let gameId: string;
+  let user3AccessToken: string;
+  let user3RefreshToken: string;
+  let game1Data: QuizGame;
+  let game2Data: QuizGame;
+  let game1Id: string;
+  let game2Id: string;
 
   let startTestObject;
   let app: INestApplication;
@@ -59,6 +67,18 @@ describe('Quiz Game (e2e)', () => {
       });
   });
 
+  it('/sa/users (POST) Should Create User3]', () => {
+    return request(app.getHttpServer())
+      .post('/sa/users')
+      .auth('admin', 'qwerty')
+      .send(createUser3InputData)
+      .expect(201)
+      .then(({ body }) => {
+        body.createdAt = new Date(body.createdAt);
+        expect(body).toEqual(user3ViewData);
+      });
+  });
+
   it('/auth/login (POST) Should login user1 and return status code 200 ]', async () => {
     const response = await request(app.getHttpServer())
       .post('/auth/login')
@@ -81,6 +101,18 @@ describe('Quiz Game (e2e)', () => {
       .expect(200);
     user2AccessToken = response.body.accessToken;
     user2RefreshToken = response.headers['set-cookie'][0];
+  });
+
+  it('/auth/login (POST) Should login user3 and return status code 200 ]', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        loginOrEmail: createUser3InputData.login,
+        password: createUser3InputData.password,
+      })
+      .expect(200);
+    user3AccessToken = response.body.accessToken;
+    user3RefreshToken = response.headers['set-cookie'][0];
   });
 
   //// Добавление 5 вопросов в пул вопросов
@@ -137,13 +169,13 @@ describe('Quiz Game (e2e)', () => {
 
     expect(response).toBeOk(200);
     expect(response.body).toEqual(gameAfterUser1CreatedGame);
-    gameId = response.body.id;
+    game1Id = response.body.id;
   });
 
   //Проверка нахождения игры по id, в которой не состоит игрок
   it('/pair-game-quiz/pairs/{id} (Get) should return 403, If current user tries to get pair in which user is not participant', async () => {
     const response = await request(app.getHttpServer())
-      .get(`/pair-game-quiz/pairs/${gameId}`)
+      .get(`/pair-game-quiz/pairs/${game1Id}`)
       .set('Authorization', `Bearer ${user2AccessToken}`);
 
     expect(response).toBeOk(403);
@@ -195,7 +227,7 @@ describe('Quiz Game (e2e)', () => {
   //проверки get по id игры
   it('/pair-game-quiz/pairs/{id} (Get) should return 200 and player game by id', async () => {
     const response = await request(app.getHttpServer())
-      .get(`/pair-game-quiz/pairs/${gameId}`)
+      .get(`/pair-game-quiz/pairs/${game1Id}`)
       .set('Authorization', `Bearer ${user2AccessToken}`);
 
     expect(response).toBeOk(200);
@@ -213,7 +245,7 @@ describe('Quiz Game (e2e)', () => {
 
   it('/pair-game-quiz/pairs/{id} (Get) should return 401, if unauthorized', async () => {
     const response = await request(app.getHttpServer()).get(
-      `/pair-game-quiz/pairs/${gameId}`,
+      `/pair-game-quiz/pairs/${game1Id}`,
     );
 
     expect(response).toBeOk(401);
@@ -281,5 +313,65 @@ describe('Quiz Game (e2e)', () => {
       .set('Authorization', `Bearer ${user1AccessToken}`);
 
     expect(response).toBeNotOk(404);
+  });
+
+  //Создание и подключение второй игры для пользователей 1 и 3
+
+  it('/pair-game-quiz/pairs/connection (POST) should create game, connect to game, and return game', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/connection')
+      .set('Authorization', `Bearer ${user1AccessToken}`);
+
+    expect(response).toBeOk(200);
+    game2Id = response.body.id;
+  });
+
+  it('/pair-game-quiz/pairs/connection (POST) should create game, connect to game, and return game', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/connection')
+      .set('Authorization', `Bearer ${user3AccessToken}`);
+
+    expect(response).toBeOk(200);
+  });
+  //Проверка получения всех игр пользователя 1
+
+  it('/pair-game-quiz/pairs/my (POST) return all games by user 1', async () => {
+    const responseGame1 = await request(app.getHttpServer())
+      .get(`/pair-game-quiz/pairs/${game1Id}`)
+      .set('Authorization', `Bearer ${user1AccessToken}`);
+    game1Data = responseGame1.body;
+
+    const responseGame2 = await request(app.getHttpServer())
+      .get(`/pair-game-quiz/pairs/${game2Id}`)
+      .set('Authorization', `Bearer ${user1AccessToken}`);
+    game2Data = responseGame2.body;
+
+    const response = await request(app.getHttpServer())
+      .get('/pair-game-quiz/pairs/my')
+      .set('Authorization', `Bearer ${user1AccessToken}`);
+    //
+    expect(response.body).toEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 2,
+      items: [game2Data, game1Data],
+    });
+    expect(response).toBeOk(200);
+  });
+
+  it('/pair-game-quiz/pairs/my (POST) return all games by user 1 sort by finishGameDate, sort = asc', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/pair-game-quiz/pairs/my?sortBy=finishGameDate&sortDirection=asc')
+      .set('Authorization', `Bearer ${user1AccessToken}`);
+    ///
+    expect(response.body).toEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 2,
+      items: [game1Data, game2Data],
+    });
+    expect(response).toBeOk(200);
   });
 });
