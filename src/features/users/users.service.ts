@@ -191,4 +191,31 @@ export class UsersService {
     const gameId = await this.usersRepository.findUserCurrentGameId(userId);
     return gameId;
   }
+
+  async updateQuizGameUserGameResultCount(quizGameResultData: {
+    result: string;
+    user1Id: string;
+    user2Id: string;
+  }) {
+    const user1 = await this.findUser(quizGameResultData.user1Id);
+    const user2 = await this.findUser(quizGameResultData.user2Id);
+
+    if (quizGameResultData.result === 'win') {
+      // Увеличиваем счетчик побед и поражений
+      user1.quizGameDate.winsCount += 1;
+      user2.quizGameDate.lossesCount += 1;
+    } else if (quizGameResultData.result === 'draw') {
+      // Увеличиваем счетчик ничьих для обоих
+      user1.quizGameDate.drawsCount += 1;
+      user2.quizGameDate.drawsCount += 1;
+    }
+
+    await this.usersTypeOrmRepository.updateQuizGameUserGameResultCount({
+      user1: user1,
+      user2: user2,
+    });
+
+    // Сохраняем обновленные данные пользователей
+    await this.usersRepository.save([user1, user2]);
+  }
 }

@@ -12,7 +12,7 @@ export class UsersTypeOrmRepository {
     private readonly usersRepository: Repository<UserEntity>,
   ) {}
 
-  async findUser(id: string): Promise<UserDbType | null> {
+  async findUser(id: string): Promise<UserEntity | null> {
     return this.usersRepository.findOneBy({ id: id });
   }
 
@@ -201,5 +201,16 @@ export class UsersTypeOrmRepository {
       )
       .getOne();
     return user;
+  }
+
+  async updateQuizGameUserGameResultCount(quizGameResultData: {
+    user1: UserEntity;
+    user2: UserEntity;
+  }) {
+    // Сохраняем обновленные данные пользователей
+    await this.usersRepository.save([
+      quizGameResultData.user1,
+      quizGameResultData.user2,
+    ]);
   }
 }

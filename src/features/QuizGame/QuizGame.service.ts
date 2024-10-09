@@ -140,6 +140,25 @@ export class QuizGameService {
 
       currentGame.status = 'Finished';
       currentGame.finishGameDate = new Date();
+      if (playerProgress.score > secondPlayerProgress.score) {
+        await this.usersService.updateQuizGameUserGameResultCount({
+          result: 'win',
+          user1Id: playerProgress.player.id,
+          user2Id: secondPlayerProgress.player.id,
+        });
+      } else if (secondPlayerProgress.score > playerProgress.score) {
+        await this.usersService.updateQuizGameUserGameResultCount({
+          result: 'win',
+          user1Id: secondPlayerProgress.player.id,
+          user2Id: playerProgress.player.id,
+        });
+      } else {
+        await this.usersService.updateQuizGameUserGameResultCount({
+          result: 'draw',
+          user1Id: secondPlayerProgress.player.id,
+          user2Id: playerProgress.player.id,
+        });
+      }
 
       await this.usersService.updateUserQuizGameCurrentId(
         playerProgress.player.id,

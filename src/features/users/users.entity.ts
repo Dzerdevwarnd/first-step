@@ -30,6 +30,13 @@ class QuizGameDate {
 
   @Column({ nullable: true, default: null })
   currentGameId: string | null;
+
+  @Column({ default: 0 })
+  winsCount: number;
+  @Column({ default: 0 })
+  lossesCount: number;
+  @Column({ default: 0 })
+  drawsCount: number;
 }
 
 @Entity()
